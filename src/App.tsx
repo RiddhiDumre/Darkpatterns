@@ -1,25 +1,27 @@
 import { useEffect, useState } from 'react'
 import type { Analysis } from '../shared/types'
 import { Dropzone } from './components/Dropzone'
+import { Examples } from './components/Examples'
 import { FindingsPanel } from './components/FindingsPanel'
 import { ScreenshotView } from './components/ScreenshotView'
 
 type Status = 'idle' | 'analyzing' | 'done' | 'error'
 
 const SCAN_TELEMETRY_STEPS = [
-  { step: 'Inspecting visual hierarchy…', detail: 'Hunting for microscopic decline links and camouflage checkboxes' },
-  { step: 'Auditing psychological pressure…', detail: 'Checking if that countdown timer was born 4 seconds ago' },
-  { step: 'Translating corporate guilt-trips…', detail: 'Deciphering why opting out requires confessing to a moral failure' },
-  { step: 'Calculating shamelessness score…', detail: 'Measuring total gap between user intent and growth-hacker ambition' },
+  { step: 'Inspecting visual hierarchy…', detail: 'Hunting for microscopic decline links, camouflage checkboxes, and visual asymmetry' },
+  { step: 'Auditing psychological pressure…', detail: 'Checking if countdown timers, fake social proof, and artificial scarcity loops are active' },
+  { step: 'Translating corporate guilt-trips…', detail: 'Deciphering why opting out requires confessing to a personal flaw or moral failure' },
+  { step: 'Calculating shamelessness score…', detail: 'Measuring total gap between genuine user intent and aggressive growth-hacker ambition' },
 ]
 
-function WatchdogShieldIcon() {
+function CosmosWatchdogIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="var(--coral)" stroke="#ffffff" />
-      <circle cx="12" cy="11" r="3" fill="#ffffff" />
-      <circle cx="12" cy="11" r="1.5" fill="var(--ink)" />
-    </svg>
+    <div className="cosmos-radar-logo" aria-hidden="true">
+      <span className="radar-core" />
+      <span className="radar-orbit" />
+      <span className="radar-crosshair-v" />
+      <span className="radar-crosshair-h" />
+    </div>
   )
 }
 
@@ -83,6 +85,22 @@ export default function App() {
     void runAnalysis(url)
   }
 
+  const onExampleSelect = async (label: string, src: string) => {
+    try {
+      const res = await fetch(src)
+      const blob = await res.blob()
+      const reader = new FileReader()
+      reader.onload = () => {
+        const dataUrlResult = String(reader.result)
+        const file = new File([blob], `${label}.png`, { type: blob.type || 'image/png' })
+        onImage(dataUrlResult, file)
+      }
+      reader.readAsDataURL(blob)
+    } catch (err) {
+      console.error('Failed to load exhibit', err)
+    }
+  }
+
   const resetAll = () => {
     setDataUrl(null)
     setFileName(null)
@@ -97,43 +115,59 @@ export default function App() {
 
   return (
     <div className="app-viewport">
-      {/* 1. Global Navigation Bar */}
-      <header className="watchdog-nav">
+      {/* 1. Floating Cosmos-Style Capsule Navigation */}
+      <header className="watchdog-nav-capsule">
         <button type="button" className="brand-shield-btn" onClick={resetAll} aria-label="Dark Pattern Watchdog Home">
           <div className="brand-logo-icon">
-            <WatchdogShieldIcon />
+            <CosmosWatchdogIcon />
           </div>
           <div className="brand-title-wrap">
-            <span className="brand-name">Dark Pattern Watchdog</span>
-            <span className="brand-tagline">Autonomous Consumer Defense</span>
+            <span className="brand-name">Dark Pattern Detector</span>
+            <span className="brand-tagline">FORENSIC UX AUDIT // COSMOS ED.</span>
           </div>
         </button>
 
-        <div className="nav-telemetry">
+        <div className="nav-center-pill">
+          {status === 'done' ? (
+            <div className="nav-audit-score-pill">
+              <span className="audit-pulse-magenta" aria-hidden="true" />
+              <span>
+                DECEPTION INDEX: <strong>{analysis?.score ?? 0}/100</strong>
+              </span>
+            </div>
+          ) : (
+            <div className="engine-status-pill">
+              <span className="pulse-dot" aria-hidden="true" />
+              <span>Vision Engine: Gemini 3.8 Flash Online</span>
+            </div>
+          )}
+        </div>
+
+        <div className="nav-actions-group">
           {status === 'done' ? (
             <div className="header-action-group">
               <button
                 type="button"
-                className="btn btn-secondary btn-sm"
+                className="btn btn-secondary btn-sm pill-btn"
                 onClick={() => setShowOverlay((v) => !v)}
                 aria-pressed={showOverlay}
                 disabled={!hasFlags}
               >
-                {showOverlay ? 'Hide highlights' : 'Show highlights'}
+                {showOverlay ? 'Hide Highlights' : 'Show Highlights'}
               </button>
               <button
                 type="button"
-                className="btn btn-primary btn-sm"
+                className="btn btn-primary btn-sm pill-btn"
                 onClick={resetAll}
               >
                 ← New Scan
               </button>
             </div>
           ) : (
-            <div className="engine-status-pill">
-              <span className="pulse-dot" aria-hidden="true" />
-              <span>Vision Engine: Online</span>
-            </div>
+            <a href="#examples" className="nav-link-pill">
+              <span>View Exhibits</span>
+              <span className="exhibits-count-badge">6</span>
+            </a>
           )}
         </div>
       </header>
@@ -143,10 +177,13 @@ export default function App() {
         <main className="view-scanner" role="status" aria-live="polite">
           <div className="scanner-pod">
             <div className="scanner-feed-window">
+              <div className="scanner-optical-grid" aria-hidden="true" />
               {dataUrl && <img src={dataUrl} alt="Inspection target preview" className="scanner-preview-img" />}
+              <div className="scanner-sweep-line" aria-hidden="true" />
             </div>
 
             <div className="scanner-telemetry">
+              <div className="scanner-mono-badge">[OPTICAL FORENSICS // IN PROGRESS]</div>
               <div className="scanner-progress-track" aria-hidden="true">
                 <div
                   className="scanner-progress-bar"
@@ -164,17 +201,18 @@ export default function App() {
       {status === 'error' && (
         <main className="view-error-pod">
           <div className="error-pod-card" role="alert">
+            <span className="mono-sub">[AUDIT INTERRUPTED]</span>
             <h2>Inspection Encountered An Issue</h2>
             <p>{error}</p>
-            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginTop: '8px' }}>
               <button
                 type="button"
-                className="btn btn-primary btn-sm"
+                className="btn btn-primary btn-sm pill-btn"
                 onClick={() => dataUrl && runAnalysis(dataUrl)}
               >
                 Retry Scan
               </button>
-              <button type="button" className="btn btn-secondary btn-sm" onClick={resetAll}>
+              <button type="button" className="btn btn-secondary btn-sm pill-btn" onClick={resetAll}>
                 Select Another Screenshot
               </button>
             </div>
@@ -187,10 +225,14 @@ export default function App() {
         <main className="view-workspace">
           <section className="forensic-top-strip">
             <div className="forensic-verdict-group">
+              <div className="verdict-meta-row">
+                <span className="verdict-tag">[AUDIT FINDING]</span>
+                <span className="verdict-timestamp">CCPA 2023 & OECD FORENSICS COMPLIANT</span>
+              </div>
               <h1 className="verdict-headline">
                 {analysis.verdict ||
                   (hasFlags
-                    ? `${flagCount} ${flagCount === 1 ? 'trap' : 'traps'} flagged — this screen is trying aggressively hard to hustle you`
+                    ? `${flagCount} ${flagCount === 1 ? 'trap' : 'traps'} flagged — this screen is actively nudging you into compliance`
                     : 'Suspiciously wholesome — no dark patterns detected')}
               </h1>
               <p className="verdict-count">
@@ -203,10 +245,16 @@ export default function App() {
 
             {hasFlags && (
               <div className="severity-meter-capsules">
-                <span className="verdict-audit-badge">
-                  <span className="audit-dot" aria-hidden="true" />
-                  <span>Deception Score: {analysis.score}/100</span>
-                </span>
+                <div className="deception-score-card">
+                  <span className="score-card-label">DECEPTION INDEX</span>
+                  <div className="score-card-val-row">
+                    <span className="score-num">{analysis.score}</span>
+                    <span className="score-max">/100</span>
+                  </div>
+                  <span className="score-rating-pill">
+                    {analysis.score >= 70 ? 'High Coercion' : analysis.score >= 40 ? 'Moderate Nudge' : 'Low Friction'}
+                  </span>
+                </div>
               </div>
             )}
           </section>
@@ -215,8 +263,8 @@ export default function App() {
             {/* Left Column: Natural Aspect Screenshot Canvas */}
             <section className="forensic-canvas-panel">
               <div className="canvas-panel-bar">
-                <span>Inspected Evidence</span>
-                <span>{fileName || 'screenshot.png'}</span>
+                <span className="panel-bar-title">INSPECTED EXHIBIT EVIDENCE</span>
+                <span className="panel-bar-file">{fileName || 'screenshot.png'}</span>
               </div>
               <ScreenshotView
                 src={dataUrl!}
@@ -228,7 +276,7 @@ export default function App() {
               />
             </section>
 
-            {/* Right Column: Watchdog Findings Panel */}
+            {/* Right Column: Watchdog Findings Panel with 3D Flip Card Specimen */}
             <section style={{ height: '100%', minHeight: 0 }}>
               <FindingsPanel
                 findings={analysis.findings}
@@ -241,45 +289,53 @@ export default function App() {
         </main>
       )}
 
-      {/* 5. State 1: Watchdog Launchpad (Upload View) */}
+      {/* 5. State 1: Watchdog Launchpad (Upload View & Exhibits Archive) */}
       {status === 'idle' && (
         <main className="view-launchpad">
           <section className="launchpad-hero">
             <div className="hero-content">
+              <div className="hero-eyebrow-pill">
+                <span className="eyebrow-dot" aria-hidden="true" />
+                <span>AUTONOMOUS FORENSIC UX AUDITOR</span>
+              </div>
               <h1>
                 Expose <span className="hero-highlight">deceptive interfaces</span> before they cost you.
               </h1>
               <p className="hero-desc">
-                Inspect any checkout or web screenshot. The vision engine flags hidden subscriptions, misleading timers, sneak-into-basket fees, and confirmshaming with concrete fixes.
+                Drop any mobile checkout or subscription screenshot. The vision engine flags hidden fees, manufactured countdowns, sneaky pre-selections, and confirmshaming with concrete, ethical 3D redesigns.
               </p>
               <div className="watchdog-capabilities-strip">
                 <span className="capability-item">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
+                  <span className="cap-icon-check">✓</span>
                   <span>Instant Vision Audit</span>
                 </span>
                 <span className="capability-item">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  <span>Coordinate Evidence</span>
+                  <span className="cap-icon-check">✓</span>
+                  <span>Coordinate Evidence Pins</span>
                 </span>
                 <span className="capability-item">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  <span>Ethical Redesign Fixes</span>
+                  <span className="cap-icon-check">✓</span>
+                  <span>Interactive 3D Ethical Fixes</span>
+                </span>
+                <span className="capability-item">
+                  <span className="cap-icon-check">✓</span>
+                  <span>Zero Data Retention</span>
                 </span>
               </div>
             </div>
 
             <div className="hero-visual-frame">
-              <img
-                src="/hero-illustration.png"
-                alt="Watchdog inspector examining deceptive mobile and web interfaces"
-                className="hero-watchdog-img"
-              />
+              <div className="hero-image-card-3d">
+                <img
+                  src="/hero-illustration.png"
+                  alt="Watchdog inspector examining deceptive mobile and web interfaces"
+                  className="hero-watchdog-img"
+                />
+                <div className="hero-card-tag">
+                  <span className="tag-status-live" />
+                  <span>AUDIT READY</span>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -289,9 +345,12 @@ export default function App() {
             </div>
           )}
 
-          <section>
+          <section className="launchpad-dropzone-section">
             <Dropzone onImage={onImage} />
           </section>
+
+          {/* Curated Exhibits Gallery */}
+          <Examples onSelect={onExampleSelect} activeSrc={dataUrl} />
         </main>
       )}
     </div>

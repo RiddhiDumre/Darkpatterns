@@ -42,7 +42,6 @@ function formatHighlightedText(text: string) {
     })
   }
 
-  // Fallback: highlight common manipulative tactics if no markdown bolding was present
   const keywordsRegex =
     /(emotional guilt|guilt-tripping|personal flaw|humiliating|false urgency|fake countdown|sneaking fees|hidden fee|preselected|forced subscription|impossible to cancel|low-contrast|hidden link|asymmetric|deceptive|manipulative|pity party)/gi
   const parts = text.split(keywordsRegex)
@@ -93,7 +92,8 @@ export function FindingsPanel({ findings, summary, activeId, onActivate }: Props
               <polyline points="20 6 9 17 4 12" />
             </svg>
           </div>
-          <h3 className="all-clear-title">Suspiciously wholesome</h3>
+          <span className="mono-sub">[AUDIT VERDICT: CLEAN]</span>
+          <h3 className="all-clear-title">Suspiciously Wholesome</h3>
           <p className="all-clear-desc">
             {summary || 'No manipulative urgency, fake scarcity, or emotional hostage-taking detected. Either this company genuinely respects you, or their growth hacker called in sick today.'}
           </p>
@@ -105,11 +105,14 @@ export function FindingsPanel({ findings, summary, activeId, onActivate }: Props
   return (
     <div className="forensic-findings-panel">
       <div className="findings-panel-header">
-        <span className="findings-panel-title">
-          {findings.length} Flagged {findings.length === 1 ? 'Trap' : 'Traps'}
-        </span>
+        <div className="findings-panel-title-wrap">
+          <span className="mono-tag">[FORENSIC DOSSIER]</span>
+          <span className="findings-panel-title">
+            {findings.length} Flagged {findings.length === 1 ? 'Trap' : 'Traps'}
+          </span>
+        </div>
         <span className="findings-panel-sub">
-          Ranked by shamelessness
+          Ranked by Shamelessness
         </span>
       </div>
 
@@ -118,6 +121,8 @@ export function FindingsPanel({ findings, summary, activeId, onActivate }: Props
           const isActive = activeId === f.id
           const currentFix = fixViewMode[f.id] || 'after'
           const translationText = f.translation || PATTERN_TRANSLATIONS[f.pattern] || ''
+          const isFlipped = currentFix === 'before'
+
           return (
             <li
               key={f.id}
@@ -128,8 +133,15 @@ export function FindingsPanel({ findings, summary, activeId, onActivate }: Props
             >
               <div className="finding-header-row">
                 <div className="finding-title-group">
-                  <span className="finding-index-num">{i + 1}</span>
-                  <h3 className="finding-pattern-name">{f.pattern}</h3>
+                  <span className="finding-index-num">{String(i + 1).padStart(2, '0')}</span>
+                  <div className="finding-title-meta">
+                    <h3 className="finding-pattern-name">{f.pattern}</h3>
+                    {f.bbox && (
+                      <span className="finding-coords-pill">
+                        LOC // X:{f.bbox.x}% Y:{f.bbox.y}% W:{f.bbox.w}%
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="finding-severity-inline">
                   <span className={`severity-dot sev-${f.severity}`} aria-hidden="true" />
@@ -139,14 +151,18 @@ export function FindingsPanel({ findings, summary, activeId, onActivate }: Props
 
               {f.guideline && (
                 <div className="finding-reference-tag">
-                  <span>Reference: {f.guideline}</span>
+                  <span className="mono-prefix">REGULATION //</span>
+                  <span>{f.guideline}</span>
                 </div>
               )}
 
               {translationText && (
                 <div className="finding-translation-callout">
-                  <span className="translation-badge">Reality Check</span>
-                  <span className="translation-text">“{translationText}”</span>
+                  <div className="translation-header">
+                    <span className="translation-badge">REALITY CHECK</span>
+                    <span className="editorial-handwritten-note">what they actually mean:</span>
+                  </div>
+                  <p className="translation-text">“{translationText}”</p>
                 </div>
               )}
 
@@ -154,17 +170,20 @@ export function FindingsPanel({ findings, summary, activeId, onActivate }: Props
 
               {f.evidence && (
                 <div className="finding-evidence-box">
-                  <span className="evidence-box-label">Quoted from interface:</span>
+                  <span className="evidence-box-label">Quoted Interface Evidence:</span>
                   <blockquote className="evidence-quote-content">
                     “{f.evidence}”
                   </blockquote>
                 </div>
               )}
 
-              {/* Interactive Before/After Visual Fix Specimen */}
+              {/* Interactive 3D Card Flip: Ethical Alternative Specimen */}
               <div className="finding-fix-specimen">
                 <div className="fix-specimen-toolbar">
-                  <span className="fix-toolbar-title">Ethical Interface Alternative</span>
+                  <div className="fix-toolbar-title-wrap">
+                    <span className="fix-toolbar-title">Ethical Interface Alternative</span>
+                    <span className="fix-3d-hint">3D Flip Specimen</span>
+                  </div>
                   <div className="fix-toggle-pill">
                     <button
                       type="button"
@@ -173,6 +192,7 @@ export function FindingsPanel({ findings, summary, activeId, onActivate }: Props
                         e.stopPropagation()
                         toggleFix(f.id, 'before')
                       }}
+                      aria-pressed={currentFix === 'before'}
                     >
                       The Trap
                     </button>
@@ -183,37 +203,58 @@ export function FindingsPanel({ findings, summary, activeId, onActivate }: Props
                         e.stopPropagation()
                         toggleFix(f.id, 'after')
                       }}
+                      aria-pressed={currentFix === 'after'}
                     >
                       Honest Fix
                     </button>
                   </div>
                 </div>
 
-                <div className="fix-specimen-stage">
-                  {currentFix === 'before' ? (
-                    <div className="specimen-view state-flagged">
+                {/* 3D Spatial Flip Stage */}
+                <div
+                  className="fix-3d-stage"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    toggleFix(f.id, isFlipped ? 'after' : 'before')
+                  }}
+                  title="Click to flip specimen in 3D"
+                >
+                  <div className={`fix-3d-card${isFlipped ? ' is-flipped' : ''}`}>
+                    {/* FRONT FACE: Honest Fix (Remedy) */}
+                    <div className="fix-3d-face fix-face-front state-remedy">
                       <div className="specimen-meta-row">
-                        <span className="specimen-state-tag tag-flagged">As Flagged (Maximum Coercion)</span>
-                      </div>
-                      <div className="mock-ui-interactive flagged-mock">
-                        <div className="mock-btn-flagged-primary">Accept & Surrender Dignity</div>
-                        <div className="mock-btn-flagged-shame">“{f.evidence || 'Manipulative link'}”</div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="specimen-view state-remedy">
-                      <div className="specimen-meta-row">
-                        <span className="specimen-state-tag tag-remedy">Honest Fix (Basic Decency)</span>
+                        <span className="specimen-state-tag tag-remedy">
+                          <span className="status-dot-emerald" aria-hidden="true" />
+                          Honest Fix (Basic Decency)
+                        </span>
+                        <span className="flip-prompt-pill">Click to inspect Trap ⤾</span>
                       </div>
                       <div className="mock-ui-interactive remedy-mock">
                         <div className="mock-button-pair">
                           <div className="mock-btn-remedy-secondary">No thanks</div>
                           <div className="mock-btn-remedy-primary">Continue</div>
                         </div>
-                        <div className="mock-remedy-guidance">{f.recommendation || 'Provide neutral choices with equal visual weight.'}</div>
+                        <div className="mock-remedy-guidance">
+                          {f.recommendation || 'Provide neutral choices with equal visual weight and zero emotional blackmail.'}
+                        </div>
                       </div>
                     </div>
-                  )}
+
+                    {/* BACK FACE: The Trap (Coercion) */}
+                    <div className="fix-3d-face fix-face-back state-flagged">
+                      <div className="specimen-meta-row">
+                        <span className="specimen-state-tag tag-flagged">
+                          <span className="status-dot-coral" aria-hidden="true" />
+                          The Trap (Maximum Coercion)
+                        </span>
+                        <span className="flip-prompt-pill">Click for Honest Fix ⤾</span>
+                      </div>
+                      <div className="mock-ui-interactive flagged-mock">
+                        <div className="mock-btn-flagged-primary">Accept & Surrender Dignity</div>
+                        <div className="mock-btn-flagged-shame">“{f.evidence || 'Manipulative opt-out'}”</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </li>

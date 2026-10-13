@@ -1,98 +1,82 @@
 ---
 name: Dark Pattern Detector
-description: Clean category standard modern SaaS utility for detecting and analyzing deceptive interface patterns.
+description: High-end editorial consumer defense tool inspired by Eduard Bodak's portfolio (Cosmos / Codrops SOTD) featuring tactile 3D card flips, linen canvas, obsidian typography, and electric magenta accents.
 colors:
-  bg: "#f8fafc"
+  bg: "#f7f5ef"
+  bg-subtle: "#f1ede3"
   surface: "#ffffff"
-  surface-raised: "#f1f5f9"
-  surface-subtle: "#f8fafc"
-  ink: "#0f172a"
-  ink-secondary: "#475569"
-  ink-muted: "#64748b"
-  ink-faint: "#94a3b8"
-  line: "#e2e8f0"
-  line-strong: "#cbd5e1"
-  coral: "#ff1e56"
-  coral-soft: "#ffe4eb"
-  coral-tint: "#fff1f4"
-  coral-ink: "#b80d39"
-  amber: "#f59e0b"
-  amber-soft: "#fef3c7"
-  amber-ink: "#b45309"
-  emerald: "#10b981"
-  emerald-soft: "#d1fae5"
+  surface-raised: "#faf8f3"
+  surface-inset: "#eee9de"
+  ink: "#0a0a0a"
+  ink-secondary: "#33322e"
+  ink-muted: "#6e6b63"
+  ink-faint: "#a6a297"
+  line: "#e3ded3"
+  line-strong: "#cac3b4"
+  magenta: "#ff2e93"
+  magenta-soft: "#ffe5f1"
+  magenta-tint: "#fff1f8"
+  magenta-ink: "#b8005b"
+  coral: "#ff2e93"
+  coral-soft: "#ffe5f1"
+  coral-tint: "#fff1f8"
+  coral-ink: "#b8005b"
+  amber: "#e67e00"
+  amber-soft: "#fef3e2"
+  amber-ink: "#a35500"
+  emerald: "#059669"
+  emerald-soft: "#e1f6ee"
   emerald-ink: "#047857"
   blue: "#2563eb"
-  blue-soft: "#dbeafe"
+  blue-soft: "#e8effe"
   blue-ink: "#1d4ed8"
 typography:
   display:
     fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "clamp(2.25rem, 4vw, 3rem)"
-    fontWeight: 800
-    lineHeight: 1.1
-    letterSpacing: "-0.03em"
+    fontSize: "clamp(2.5rem, 4.5vw, 3.5rem)"
+    fontWeight: 900
+    lineHeight: 1.05
+    letterSpacing: "-0.04em"
   h1:
     fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
     fontSize: "2.25rem"
     fontWeight: 800
     lineHeight: 1.15
+    letterSpacing: "-0.03em"
   h2:
     fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
     fontSize: "1.5rem"
-    fontWeight: 700
+    fontWeight: 800
     lineHeight: 1.2
+    letterSpacing: "-0.025em"
   h3:
     fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
     fontSize: "1.125rem"
-    fontWeight: 600
-    lineHeight: 1.3
-  h4:
-    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "1rem"
     fontWeight: 700
-    lineHeight: 1.35
+    lineHeight: 1.3
+    letterSpacing: "-0.015em"
   body:
     fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
     fontSize: "0.9375rem"
     fontWeight: 400
     lineHeight: 1.5
-  subtext:
-    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.875rem"
-    fontWeight: 400
-    lineHeight: 1.45
-  caption:
-    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.8125rem"
-    fontWeight: 600
-    lineHeight: 1.4
-  tag:
-    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.75rem"
-    fontWeight: 600
-    lineHeight: 1.4
-  micro:
-    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.6875rem"
-    fontWeight: 700
-    lineHeight: 1.3
-  nano:
-    fontFamily: "Archivo, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "0.625rem"
-    fontWeight: 800
-    lineHeight: 1.2
   mono:
     fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
     fontSize: "0.75rem"
-    fontWeight: 500
+    fontWeight: 600
     lineHeight: 1.4
+    letterSpacing: "0.06em"
+  editorial:
+    fontFamily: "Caveat, cursive"
+    fontSize: "1.25rem"
+    fontWeight: 600
+    lineHeight: 1.2
 rounded:
   none: "0px"
   sm: "6px"
   md: "10px"
   lg: "16px"
-  xl: "20px"
+  xl: "22px"
   full: "9999px"
 spacing:
   xs: "4px"
@@ -107,22 +91,26 @@ spacing:
 <!-- impeccable:design-schema 1 -->
 
 ## Overview
-A modern, crisp SaaS category standard interface for consumer protection and ethical interface inspection. Clean neutral surfaces (`#ffffff`, `#f8fafc`) pair with precision hairline borders (`#e2e8f0`), high-contrast ink typography, and standardized signal badges (coral for deceptive patterns, amber for questionable nudges, emerald for ethical fixes).
+Inspired by Eduard Bodak's acclaimed creative portfolio (featured on Cosmos & Codrops), this design marries high-end Swiss editorial minimalism with tactile digital physics. The foundation is a warm, tactile architectural linen surface (`#f7f5ef`), deep obsidian ink (`#0a0a0a`), hairline precision dividers, and a shocking electric magenta accent (`#ff2e93`) that slices through the layout with forensic authority.
 
-## Colors
-- **Canvas / Background**: Clean slate tint (`#f8fafc`), pure card surface (`#ffffff`), subtle inset wells (`#f1f5f9`), hairline dividers (`#e2e8f0`), strong active borders (`#cbd5e1`).
-- **Typography Inks**: Primary slate ink (`#0f172a`), secondary narrative text (`#475569`), muted tags and counts (`#64748b`), faint indicators (`#94a3b8`).
-- **Signal Accents**:
-  - High Deception / Violation: Vibrant Coral (`#ff1e56` / `#ffe4eb` / `#b80d39`).
-  - Questionable / Nudge: Warning Amber (`#f59e0b` / `#fef3c7` / `#b45309`).
-  - Remedy / Ethical Alternative: Clean Emerald (`#10b981` / `#d1fae5` / `#047857`).
-  - System / Interactive: Focus Blue (`#2563eb` / `#dbeafe` / `#1d4ed8`).
+## Key Design Signatures
 
-## Typography
-- **Headlines & Display**: Punchy `Archivo` (weight 800) with tight negative tracking (`-0.03em`).
-- **Body & Captions**: Clean, legible `Archivo` for descriptions, metadata pills, and ethical recommendations.
+1. **Floating Cosmos-Style Navigation**:
+   - A floating, glassmorphic capsule bar (`rounded-full`, backdrop blur, hairline border) anchored cleanly at the top of the viewport.
+   - Micro telemetry indicators: animated radar dots, tactile pill switches, and instant exhibit navigation.
 
-## Layout & Viewport Contract
-- Desktop experience is locked strictly to 100vh (`height: 100vh; overflow: hidden;`) with zero window scrolling.
-- Results view replaces the upload launchpad upon analysis completion.
-- Scrollable findings list is isolated to the findings pane (`overflow-y: auto`), allowing deep inspection without disturbing the layout.
+2. **3D Card Flips & Micro-Physics (Built to Move)**:
+   - 3D spatial rotation on ethical fix specimens (`preserve-3d`, `rotateY(180deg)`), letting users physically flip between "The Trap" and the "Honest Fix" with fluid inertia and specular light reflection.
+   - Interactive mouse-tracking perspective tilt on exhibit cards (`perspective(800px)`), making UI cards feel physically responsive and alive.
+
+3. **High-Contrast Editorial Typography**:
+   - Confident, tight-tracked headline typography (`Archivo` weight 800/900 with tracking `-0.035em`).
+   - Sarcastic forensic margin notes rendered with hand-drawn warmth (`Caveat`).
+   - Monospace precision coordinate tickers and CCPA/FTC taxonomy stamps (`ui-monospace`, uppercase tracking).
+
+4. **Curated Exhibits Archive**:
+   - Moodboard-inspired case exhibition showcasing real deceptive design patterns with instant-analysis triggers.
+
+5. **Two-Column Forensic Studio**:
+   - Left: Evidence viewport with numbered, glowing coordinate pins and hairline crosshair indicators.
+   - Right: Scrollable forensic audit stream with reality-check translations, quoted interface evidence, and interactive 3D specimens.

@@ -16,6 +16,12 @@ export function ScreenshotView({ src, alt, findings, showOverlay, activeId, onAc
   return (
     <div className="screenshot-container">
       <div className="screenshot-canvas">
+        {/* Viewfinder reticle corners */}
+        <div className="canvas-reticle top-left" aria-hidden="true" />
+        <div className="canvas-reticle top-right" aria-hidden="true" />
+        <div className="canvas-reticle bottom-left" aria-hidden="true" />
+        <div className="canvas-reticle bottom-right" aria-hidden="true" />
+
         <div className="shot-frame-native">
           <img src={src} alt={alt} className="native-img" />
           {showOverlay &&
@@ -37,11 +43,12 @@ export function ScreenshotView({ src, alt, findings, showOverlay, activeId, onAc
                 >
                   <span className="overlay-num">
                     <span className="overlay-pin-point" aria-hidden="true" />
-                    <span>{i + 1}</span>
+                    <span>{String(i + 1).padStart(2, '0')}</span>
                   </span>
                   {activeId === f.id && (
                     <span className="overlay-active-label" aria-hidden="true">
-                      {f.pattern}
+                      <span className="label-prefix">#{(i + 1)}</span>
+                      <span>{f.pattern}</span>
                     </span>
                   )}
                 </button>
@@ -50,6 +57,9 @@ export function ScreenshotView({ src, alt, findings, showOverlay, activeId, onAc
         </div>
       </div>
       <div className="screenshot-footer">
+        <div className="screenshot-canvas-meta">
+          <span className="mono-sub">CANVAS // OPTICAL PROJECTION</span>
+        </div>
         <button
           type="button"
           className="btn-zoom-preview"

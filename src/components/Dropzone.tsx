@@ -99,12 +99,22 @@ export function Dropzone({ onImage, disabled = false }: Props) {
           handleFile(e.dataTransfer.files?.[0])
         }}
       >
+        <div className="dropzone-corner-markers" aria-hidden="true">
+          <span className="corner-mark top-left" />
+          <span className="corner-mark top-right" />
+          <span className="corner-mark bottom-left" />
+          <span className="corner-mark bottom-right" />
+        </div>
+
         <div className="dropzone-icon-ring">
           <ScannerUploadIcon />
         </div>
         <span className="dropzone-title">Drop suspect screenshot to scan</span>
         <span className="dropzone-sub">or click to browse from device (Ctrl+V to paste)</span>
-        <span className="dropzone-limits">PNG, JPG, WebP or GIF up to 8 MB • Ephemeral zero-storage scan</span>
+        <div className="dropzone-metadata-row">
+          <span className="dropzone-pill">PNG / JPG / WebP &lt; 8MB</span>
+          <span className="dropzone-pill pill-security">Ephemeral Zero-Persistence</span>
+        </div>
       </button>
 
       <div className="station-presets-row">
