@@ -1,0 +1,12 @@
+node_modules
+dist
+.env
+*.local
+.DS_Store
+
+.fonts/
+.shots/
+dev.log
+dev.pid
+api.log
+api.pid
