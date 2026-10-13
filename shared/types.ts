@@ -15,11 +15,14 @@ export interface Finding {
   evidence: string
   explanation: string
   recommendation: string
+  guideline?: string
+  translation?: string
   bbox: BBox | null
 }
 
 export interface Analysis {
   score: number
+  verdict?: string
   summary: string
   findings: Finding[]
 }

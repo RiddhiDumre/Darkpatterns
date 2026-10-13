@@ -1,34 +1,31 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 const ACCEPT = 'image/png,image/jpeg,image/webp,image/gif'
 const MAX_BYTES = 8 * 1024 * 1024
 
+const QUICK_PRESETS = [
+  { label: 'Sneaky consent', file: '/examples/example-sneaky-consent.png' },
+  { label: 'Fake urgency', file: '/examples/example-fake-urgency.png' },
+  { label: 'Sneaky checkout', file: '/examples/example-dark-checkout.png' },
+  { label: 'Clean cart', file: '/examples/example-clean-cart.png' },
+]
+
 interface Props {
   onImage: (dataUrl: string, file: File) => void
-  compact?: boolean
   disabled?: boolean
 }
 
-function ImagePlusIcon() {
+function ScannerUploadIcon() {
   return (
-    <svg className="dz-icon" viewBox="0 0 72 64" aria-hidden="true" fill="none">
-      <rect x="8" y="14" width="40" height="33" rx="7" stroke="#14141B" strokeWidth="3.5" />
-      <circle cx="21" cy="26" r="4.5" stroke="#14141B" strokeWidth="3" />
-      <path
-        d="M11 43 l12 -13 8 8 6 -6 10 11"
-        stroke="#14141B"
-        strokeWidth="3.5"
-        strokeLinejoin="round"
-        strokeLinecap="round"
-      />
-      <circle cx="47" cy="43" r="13" fill="#FF5C8A" stroke="#14141B" strokeWidth="3.5" />
-      <path d="M47 37.5 v11 M41.5 43 h11" stroke="#14141B" strokeWidth="3" strokeLinecap="round" />
-      <path d="M58 10 l6 -6 M61 20 h9 M52 7 l2 -6" stroke="#14141B" strokeWidth="3" strokeLinecap="round" />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="17 8 12 3 7 8" />
+      <line x1="12" y1="3" x2="12" y2="15" />
     </svg>
   )
 }
 
-export function Dropzone({ onImage, compact = false, disabled = false }: Props) {
+export function Dropzone({ onImage, disabled = false }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragging, setDragging] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -50,11 +47,45 @@ export function Dropzone({ onImage, compact = false, disabled = false }: Props) 
     reader.readAsDataURL(file)
   }
 
+  const loadPreset = async (preset: { label: string; file: string }) => {
+    try {
+      const res = await fetch(preset.file)
+      const blob = await res.blob()
+      const file = new File([blob], `${preset.label}.png`, { type: blob.type || 'image/png' })
+      handleFile(file)
+    } catch {
+      setError('Could not load that preset. Please browse a file instead.')
+    }
+  }
+
+  useEffect(() => {
+    const handlePaste = (e: ClipboardEvent) => {
+      if (disabled) return
+      const items = e.clipboardData?.items
+      if (!items) return
+
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i]
+        if (item.type.startsWith('image/')) {
+          const file = item.getAsFile()
+          if (file) {
+            e.preventDefault()
+            handleFile(file)
+            break
+          }
+        }
+      }
+    }
+
+    window.addEventListener('paste', handlePaste)
+    return () => window.removeEventListener('paste', handlePaste)
+  }, [disabled])
+
   return (
-    <div className="dropzone-wrap">
+    <div className="scan-station-card">
       <button
         type="button"
-        className={`dropzone${compact ? ' compact' : ''}${dragging ? ' dragging' : ''}`}
+        className={`dropzone-trigger${dragging ? ' dragging' : ''}`}
         disabled={disabled}
         onClick={() => inputRef.current?.click()}
         onDragOver={(e) => {
@@ -68,16 +99,30 @@ export function Dropzone({ onImage, compact = false, disabled = false }: Props) 
           handleFile(e.dataTransfer.files?.[0])
         }}
       >
-        {!compact && <ImagePlusIcon />}
-        <span className="dz-title">{compact ? 'Drop another screenshot' : 'Drop a screenshot here'}</span>
-        {!compact && (
-          <span className="dz-sub">
-            or click to browse — PNG, JPG, WebP or GIF
-            <br />
-            (up to 8 MB)
-          </span>
-        )}
+        <div className="dropzone-icon-ring">
+          <ScannerUploadIcon />
+        </div>
+        <span className="dropzone-title">Drop suspect screenshot to scan</span>
+        <span className="dropzone-sub">or click to browse from device (Ctrl+V to paste)</span>
+        <span className="dropzone-limits">PNG, JPG, WebP or GIF up to 8 MB • Ephemeral zero-storage scan</span>
       </button>
+
+      <div className="station-presets-row">
+        <span className="presets-label">Instant Demo:</span>
+        {QUICK_PRESETS.map((p) => (
+          <button
+            key={p.label}
+            type="button"
+            className="preset-chip-btn"
+            disabled={disabled}
+            onClick={() => void loadPreset(p)}
+          >
+            <span className="preset-chip-dot" aria-hidden="true" />
+            <span>{p.label}</span>
+          </button>
+        ))}
+      </div>
+
       <input
         ref={inputRef}
         type="file"
@@ -88,7 +133,7 @@ export function Dropzone({ onImage, compact = false, disabled = false }: Props) 
           e.target.value = ''
         }}
       />
-      {error && <p className="field-error">{error}</p>}
+      {error && <p className="field-error-msg">{error}</p>}
     </div>
   )
 }

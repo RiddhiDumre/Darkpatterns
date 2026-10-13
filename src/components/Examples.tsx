@@ -28,7 +28,10 @@ export function Examples({ onSelect, activeSrc, disabled = false }: Props) {
   return (
     <section className="examples" id="examples">
       <div className="examples-head">
-        <h2>Try an example</h2>
+        <div>
+          <span className="mono-sub">CASE PRECEDENTS // ARCHIVE</span>
+          <h2>Suspect Exhibits on File</h2>
+        </div>
         <button type="button" className="link-more" onClick={() => setShowAll((v) => !v)}>
           {showAll ? 'Show fewer' : 'See all examples'}
           <svg className="link-arrow" viewBox="0 0 18 14" aria-hidden="true" fill="none">

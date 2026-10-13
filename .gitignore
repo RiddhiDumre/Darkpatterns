@@ -10,3 +10,13 @@ dev.log
 dev.pid
 api.log
 api.pid
+debug.log
+*.log
+
+.claude/
+.codex/
+.gemini/
+.impeccable/
+
+test-landing*.png
+grapghic.png
