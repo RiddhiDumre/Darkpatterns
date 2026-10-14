@@ -14,16 +14,15 @@ export function ScreenshotView({ src, alt, findings, showOverlay, activeId, onAc
   const [lightboxOpen, setLightboxOpen] = useState(false)
 
   return (
-    <div className="editorial-screenshot-container">
-      <div className="editorial-screenshot-frame">
-        {/* Geometric corner reticles */}
-        <span className="editorial-corner-mark top-left" aria-hidden="true" />
-        <span className="editorial-corner-mark top-right" aria-hidden="true" />
-        <span className="editorial-corner-mark bottom-left" aria-hidden="true" />
-        <span className="editorial-corner-mark bottom-right" aria-hidden="true" />
+    <div className="taped-photo-container">
+      {/* Scotch tape strips holding the image to the paper */}
+      <div className="scotch-tape tape-top-left" aria-hidden="true" />
+      <div className="scotch-tape tape-top-right" aria-hidden="true" />
 
-        <div className="editorial-shot-canvas">
-          <img src={src} alt={alt} className="editorial-native-img" />
+      {/* The paper-mounted screenshot */}
+      <div className="taped-photo-paper">
+        <div className="taped-photo-canvas">
+          <img src={src} alt={alt} className="taped-native-img" />
 
           {showOverlay &&
             findings.map((f, i) =>
@@ -31,7 +30,7 @@ export function ScreenshotView({ src, alt, findings, showOverlay, activeId, onAc
                 <button
                   key={f.id}
                   type="button"
-                  className={`editorial-overlay-box${activeId === f.id ? ' is-active' : ''} sev-${f.severity}`}
+                  className={`taped-overlay-pin${activeId === f.id ? ' is-active' : ''}`}
                   style={{
                     left: `${f.bbox.x}%`,
                     top: `${f.bbox.y}%`,
@@ -40,27 +39,19 @@ export function ScreenshotView({ src, alt, findings, showOverlay, activeId, onAc
                   }}
                   onClick={() => onActivate(f.id)}
                   onMouseEnter={() => onActivate(f.id)}
-                  aria-label={`Finding ${i + 1}: ${f.pattern}`}
+                  aria-label={`Dark pattern ${i + 1}: ${f.pattern}`}
                 >
-                  <span className="overlay-corner-tick top-left" aria-hidden="true" />
-                  <span className="overlay-corner-tick top-right" aria-hidden="true" />
-                  <span className="overlay-corner-tick bottom-left" aria-hidden="true" />
-                  <span className="overlay-corner-tick bottom-right" aria-hidden="true" />
-
-                  <span className="overlay-badge-num">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
+                  <span className="taped-pin-badge">{i + 1}</span>
                 </button>
               ) : null,
             )}
         </div>
       </div>
 
-      <div className="editorial-screenshot-bar">
-        <span className="screenshot-meta-mono">[EVIDENCE ARTIFACT // NATURAL SCALE]</span>
+      <div className="taped-photo-footer">
         <button
           type="button"
-          className="editorial-zoom-btn"
+          className="bujo-zoom-btn"
           onClick={() => setLightboxOpen(true)}
           aria-label="Enlarge screenshot view"
         >
@@ -80,32 +71,29 @@ export function ScreenshotView({ src, alt, findings, showOverlay, activeId, onAc
             <line x1="11" y1="8" x2="11" y2="14" />
             <line x1="8" y1="11" x2="14" y2="11" />
           </svg>
-          <span>Enlarge</span>
+          <span>Enlarge image</span>
         </button>
       </div>
 
       {lightboxOpen && (
         <div
-          className="editorial-lightbox"
+          className="bujo-lightbox"
           role="dialog"
           aria-modal="true"
           aria-label="Enlarged screenshot preview"
           onClick={() => setLightboxOpen(false)}
         >
-          <div className="lightbox-editorial-content" onClick={(e) => e.stopPropagation()}>
-            <div className="lightbox-top-bar">
-              <span className="lightbox-label-mono">[FULL RESOLUTION INSPECTION]</span>
-              <button
-                type="button"
-                className="lightbox-close-btn"
-                onClick={() => setLightboxOpen(false)}
-                aria-label="Close full view"
-              >
-                &times; Close
-              </button>
-            </div>
-            <div className="lightbox-img-scroller">
-              <img src={src} alt={alt} className="lightbox-full-img" />
+          <div className="bujo-lightbox-content" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className="bujo-lightbox-close"
+              onClick={() => setLightboxOpen(false)}
+              aria-label="Close full view"
+            >
+              &times; Close
+            </button>
+            <div className="bujo-lightbox-scroll">
+              <img src={src} alt={alt} className="bujo-lightbox-img" />
             </div>
           </div>
         </div>

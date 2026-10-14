@@ -13,7 +13,7 @@ const FIXTURE = {
       severity: 'high',
       evidence: 'No thanks, I prefer paying full price',
       explanation:
-        'The opt-out is framed as an **embarrassing personal flaw**, forcing users to admit they love wasting money just to close a pop-up.',
+        'Framing opting out as an **embarrassing personal flaw** to guilt-trip users into saying yes.',
       guideline: 'CCPA 2023 Guideline 5(c): Confirmshaming',
       bbox: { x: 22, y: 78, w: 56, h: 9 },
     },
@@ -23,7 +23,7 @@ const FIXTURE = {
       severity: 'medium',
       evidence: 'Start your free trial',
       explanation:
-        'The primary button gets a **luminous neon runway**, while the dismissal link is styled to be practically invisible against the background.',
+        'Making the primary button huge and colorful while hiding the decline link in low-contrast text.',
       guideline: 'CCPA 2023 Guideline 5(f): Interface Interference',
       bbox: { x: 18, y: 64, w: 64, h: 11 },
     },
@@ -51,23 +51,22 @@ await fileInput.setInputFiles({
   buffer: imgBuffer,
 })
 
-await page.locator('.editorial-results-viewport').waitFor({ state: 'visible', timeout: 15000 })
+await page.locator('.bujo-page-viewport').waitFor({ state: 'visible', timeout: 15000 })
 await page.waitForTimeout(500)
 
-// Activate Finding 1 so active pin highlight appears directly on screenshot
-await page.locator('.editorial-finding-item').first().click()
+// Click first bullet item to verify active highlight
+await page.locator('.bujo-bullet-item').first().click()
 await page.waitForTimeout(300)
 
 const report = await page.evaluate(() => ({
-  title: document.querySelector('.editorial-results-headline')?.textContent,
-  sub: document.querySelector('.editorial-results-sub')?.textContent,
-  findingsCount: document.querySelectorAll('.editorial-finding-item').length,
-  boxes: document.querySelectorAll('.editorial-overlay-box').length,
-  hasLanding: Boolean(document.querySelector('.editorial-landing-viewport')),
-  hasDropzone: Boolean(document.querySelector('.editorial-dropzone')),
+  title: document.querySelector('.bujo-section-title')?.textContent,
+  bulletCount: document.querySelectorAll('.bujo-bullet-item').length,
+  hasTapedPhoto: Boolean(document.querySelector('.taped-photo-paper')),
+  tapeCount: document.querySelectorAll('.scotch-tape').length,
+  pinCount: document.querySelectorAll('.taped-overlay-pin').length,
   scrollHeight: document.documentElement.scrollHeight,
 }))
 console.log(JSON.stringify({ report, errors }, null, 2))
 
-await page.screenshot({ path: '.shots/editorial-results.png', fullPage: true })
+await page.screenshot({ path: '.shots/paper-results.png', fullPage: true })
 await browser.close()
