@@ -3,6 +3,7 @@ import type { Analysis } from '../shared/types'
 import { Dropzone } from './components/Dropzone'
 import { FindingsPanel } from './components/FindingsPanel'
 import { ScreenshotView } from './components/ScreenshotView'
+import { SunglassesLoader } from './components/SunglassesLoader'
 
 type Status = 'idle' | 'analyzing' | 'done' | 'error'
 
@@ -22,6 +23,8 @@ export default function App() {
   const [showOverlay, setShowOverlay] = useState(true)
   const [activeId, setActiveId] = useState<string | null>(null)
   const [stepIndex, setStepIndex] = useState(0)
+  const [pendingAnalysis, setPendingAnalysis] = useState<Analysis | null>(null)
+  const [canCompleteAnimation, setCanCompleteAnimation] = useState(false)
 
   useEffect(() => {
     if (status !== 'analyzing') return
@@ -32,10 +35,22 @@ export default function App() {
     return () => clearInterval(interval)
   }, [status])
 
+  // Complete loading transition when both API payload and minimum animation are ready
+  useEffect(() => {
+    if (pendingAnalysis && canCompleteAnimation && status === 'analyzing') {
+      setAnalysis(pendingAnalysis)
+      setShowOverlay(true)
+      setStatus('done')
+      setPendingAnalysis(null)
+    }
+  }, [pendingAnalysis, canCompleteAnimation, status])
+
   const runAnalysis = async (target: string) => {
     setStatus('analyzing')
     setError(null)
     setActiveId(null)
+    setPendingAnalysis(null)
+    setCanCompleteAnimation(false)
     try {
       const res = await fetch('/api/analyze', {
         method: 'POST',
@@ -49,9 +64,7 @@ export default function App() {
           `Analysis failed (HTTP ${res.status}).`
         throw new Error(msg)
       }
-      setAnalysis(payload as Analysis)
-      setShowOverlay(true)
-      setStatus('done')
+      setPendingAnalysis(payload as Analysis)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Analysis failed.')
       setStatus('error')
@@ -160,19 +173,14 @@ export default function App() {
           </section>
         )}
 
-        {/* STATE B: ANALYZING STATE */}
+        {/* STATE B: ANALYZING STATE WITH SUNGLASSES LOADER */}
         {status === 'analyzing' && (
-          <section className="paper-analyzing-viewport" role="status" aria-live="polite">
-            <div className="paper-analyzing-card">
-              <h2 className="analyzing-heading">Inspecting screenshot&hellip;</h2>
-              <p className="analyzing-sub">{ANALYSIS_STEPS[stepIndex]}</p>
-              {dataUrl && (
-                <div className="analyzing-thumb-wrap">
-                  <img src={dataUrl} alt="Inspection target preview" className="analyzing-thumb" />
-                </div>
-              )}
-            </div>
-          </section>
+          <SunglassesLoader
+            dataUrl={dataUrl}
+            stepText={ANALYSIS_STEPS[stepIndex]}
+            onCancel={resetAll}
+            onReadyToTransition={() => setCanCompleteAnimation(true)}
+          />
         )}
 
         {/* STATE C: ERROR STATE */}
