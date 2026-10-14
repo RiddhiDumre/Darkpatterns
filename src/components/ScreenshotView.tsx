@@ -11,26 +11,27 @@ interface Props {
 }
 
 export function ScreenshotView({ src, alt, findings, showOverlay, activeId, onActivate }: Props) {
-  const [modalOpen, setModalOpen] = useState(false)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
 
   return (
-    <div className="screenshot-container">
-      <div className="screenshot-canvas">
-        {/* Viewfinder reticle corners */}
-        <div className="canvas-reticle top-left" aria-hidden="true" />
-        <div className="canvas-reticle top-right" aria-hidden="true" />
-        <div className="canvas-reticle bottom-left" aria-hidden="true" />
-        <div className="canvas-reticle bottom-right" aria-hidden="true" />
+    <div className="editorial-screenshot-container">
+      <div className="editorial-screenshot-frame">
+        {/* Geometric corner reticles */}
+        <span className="editorial-corner-mark top-left" aria-hidden="true" />
+        <span className="editorial-corner-mark top-right" aria-hidden="true" />
+        <span className="editorial-corner-mark bottom-left" aria-hidden="true" />
+        <span className="editorial-corner-mark bottom-right" aria-hidden="true" />
 
-        <div className="shot-frame-native">
-          <img src={src} alt={alt} className="native-img" />
+        <div className="editorial-shot-canvas">
+          <img src={src} alt={alt} className="editorial-native-img" />
+
           {showOverlay &&
             findings.map((f, i) =>
               f.bbox ? (
                 <button
                   key={f.id}
                   type="button"
-                  className={`overlay-box sev-${f.severity}${activeId === f.id ? ' active' : ''}`}
+                  className={`editorial-overlay-box${activeId === f.id ? ' is-active' : ''} sev-${f.severity}`}
                   style={{
                     left: `${f.bbox.x}%`,
                     top: `${f.bbox.y}%`,
@@ -41,60 +42,70 @@ export function ScreenshotView({ src, alt, findings, showOverlay, activeId, onAc
                   onMouseEnter={() => onActivate(f.id)}
                   aria-label={`Finding ${i + 1}: ${f.pattern}`}
                 >
-                  <span className="overlay-num">
-                    <span className="overlay-pin-point" aria-hidden="true" />
-                    <span>{String(i + 1).padStart(2, '0')}</span>
+                  <span className="overlay-corner-tick top-left" aria-hidden="true" />
+                  <span className="overlay-corner-tick top-right" aria-hidden="true" />
+                  <span className="overlay-corner-tick bottom-left" aria-hidden="true" />
+                  <span className="overlay-corner-tick bottom-right" aria-hidden="true" />
+
+                  <span className="overlay-badge-num">
+                    {String(i + 1).padStart(2, '0')}
                   </span>
-                  {activeId === f.id && (
-                    <span className="overlay-active-label" aria-hidden="true">
-                      <span className="label-prefix">#{(i + 1)}</span>
-                      <span>{f.pattern}</span>
-                    </span>
-                  )}
                 </button>
               ) : null,
             )}
         </div>
       </div>
-      <div className="screenshot-footer">
-        <div className="screenshot-canvas-meta">
-          <span className="mono-sub">CANVAS // OPTICAL PROJECTION</span>
-        </div>
+
+      <div className="editorial-screenshot-bar">
+        <span className="screenshot-meta-mono">[EVIDENCE ARTIFACT // NATURAL SCALE]</span>
         <button
           type="button"
-          className="btn-zoom-preview"
-          onClick={() => setModalOpen(true)}
-          aria-label="Enlarge screenshot preview"
+          className="editorial-zoom-btn"
+          onClick={() => setLightboxOpen(true)}
+          aria-label="Enlarge screenshot view"
         >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <polyline points="15 3 21 3 21 9"></polyline>
-            <polyline points="9 21 3 21 3 15"></polyline>
-            <line x1="21" y1="3" x2="14" y2="10"></line>
-            <line x1="3" y1="21" x2="10" y2="14"></line>
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            <line x1="11" y1="8" x2="11" y2="14" />
+            <line x1="8" y1="11" x2="14" y2="11" />
           </svg>
-          <span>Enlarge image</span>
+          <span>Enlarge</span>
         </button>
       </div>
 
-      {modalOpen && (
+      {lightboxOpen && (
         <div
-          className="screenshot-lightbox"
+          className="editorial-lightbox"
           role="dialog"
           aria-modal="true"
           aria-label="Enlarged screenshot preview"
-          onClick={() => setModalOpen(false)}
+          onClick={() => setLightboxOpen(false)}
         >
-          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              className="lightbox-close"
-              onClick={() => setModalOpen(false)}
-              aria-label="Close preview"
-            >
-              ✕
-            </button>
-            <div className="lightbox-img-wrap">
-              <img src={src} alt={alt} className="lightbox-img" />
+          <div className="lightbox-editorial-content" onClick={(e) => e.stopPropagation()}>
+            <div className="lightbox-top-bar">
+              <span className="lightbox-label-mono">[FULL RESOLUTION INSPECTION]</span>
+              <button
+                type="button"
+                className="lightbox-close-btn"
+                onClick={() => setLightboxOpen(false)}
+                aria-label="Close full view"
+              >
+                &times; Close
+              </button>
+            </div>
+            <div className="lightbox-img-scroller">
+              <img src={src} alt={alt} className="lightbox-full-img" />
             </div>
           </div>
         </div>
