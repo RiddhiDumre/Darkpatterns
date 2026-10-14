@@ -3,9 +3,13 @@ import type { Analysis } from '../shared/types'
 import { Dropzone } from './components/Dropzone'
 import { FindingsPanel } from './components/FindingsPanel'
 import { ScreenshotView } from './components/ScreenshotView'
-import { SunglassesLoader } from './components/SunglassesLoader'
+import { SunglassesTransition } from './components/SunglassesTransition'
+import { FEATURED_HERO_ANALYSIS } from './data/featuredFindings'
 
-type Status = 'idle' | 'analyzing' | 'done' | 'error'
+type ViewMode = 'investigation' | 'normal'
+type AppStatus = 'initial-loading' | 'idle' | 'analyzing' | 'error'
+
+const FEATURED_SCREENSHOT_SRC = '/featured-screenshot.png'
 
 const ANALYSIS_STEPS = [
   'Checking visual layout and tricky buttons…',
@@ -15,17 +19,33 @@ const ANALYSIS_STEPS = [
 ]
 
 export default function App() {
-  const [dataUrl, setDataUrl] = useState<string | null>(null)
-  const [fileName, setFileName] = useState<string | null>(null)
-  const [status, setStatus] = useState<Status>('idle')
-  const [analysis, setAnalysis] = useState<Analysis | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [showOverlay, setShowOverlay] = useState(true)
+  const [viewMode, setViewMode] = useState<ViewMode>('normal')
+  const [status, setStatus] = useState<AppStatus>('initial-loading')
+  const [initialAssetsReady, setInitialAssetsReady] = useState(false)
   const [activeId, setActiveId] = useState<string | null>(null)
   const [stepIndex, setStepIndex] = useState(0)
-  const [pendingAnalysis, setPendingAnalysis] = useState<Analysis | null>(null)
-  const [canCompleteAnimation, setCanCompleteAnimation] = useState(false)
 
+  // Currently displayed screenshot & findings
+  const [currentImage, setCurrentImage] = useState<string>(FEATURED_SCREENSHOT_SRC)
+  const [currentAnalysis, setCurrentAnalysis] = useState<Analysis>(FEATURED_HERO_ANALYSIS)
+  const [isCustomUpload, setIsCustomUpload] = useState(false)
+  const [uploadFileName, setUploadFileName] = useState<string | null>(null)
+
+  // Upload & analysis state
+  const [uploadDataUrl, setUploadDataUrl] = useState<string | null>(null)
+  const [pendingAnalysis, setPendingAnalysis] = useState<Analysis | null>(null)
+  const [analysisReady, setAnalysisReady] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  // Preload featured screenshot on initial page load
+  useEffect(() => {
+    const img = new Image()
+    img.src = FEATURED_SCREENSHOT_SRC
+    img.onload = () => setInitialAssetsReady(true)
+    img.onerror = () => setInitialAssetsReady(true)
+  }, [])
+
+  // Cycle analysis steps during 'analyzing'
   useEffect(() => {
     if (status !== 'analyzing') return
     setStepIndex(0)
@@ -35,22 +55,24 @@ export default function App() {
     return () => clearInterval(interval)
   }, [status])
 
-  // Complete loading transition when both API payload and minimum animation are ready
+  // Sync document theme with viewMode
   useEffect(() => {
-    if (pendingAnalysis && canCompleteAnimation && status === 'analyzing') {
-      setAnalysis(pendingAnalysis)
-      setShowOverlay(true)
-      setStatus('done')
-      setPendingAnalysis(null)
+    const isDark = viewMode === 'investigation'
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light')
+    if (isDark) {
+      document.body.classList.add('theme-dark')
+    } else {
+      document.body.classList.remove('theme-dark')
     }
-  }, [pendingAnalysis, canCompleteAnimation, status])
+  }, [viewMode])
 
   const runAnalysis = async (target: string) => {
     setStatus('analyzing')
     setError(null)
     setActiveId(null)
     setPendingAnalysis(null)
-    setCanCompleteAnimation(false)
+    setAnalysisReady(false)
+
     try {
       const res = await fetch('/api/analyze', {
         method: 'POST',
@@ -65,6 +87,7 @@ export default function App() {
         throw new Error(msg)
       }
       setPendingAnalysis(payload as Analysis)
+      setAnalysisReady(true)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Analysis failed.')
       setStatus('error')
@@ -72,59 +95,150 @@ export default function App() {
   }
 
   const onImage = (url: string, file: File) => {
-    setDataUrl(url)
-    setFileName(file.name)
-    setAnalysis(null)
+    setUploadDataUrl(url)
+    setUploadFileName(file.name)
     setError(null)
     setActiveId(null)
     void runAnalysis(url)
   }
 
-  const resetAll = () => {
-    setDataUrl(null)
-    setFileName(null)
-    setAnalysis(null)
-    setError(null)
-    setStatus('idle')
+  const resetToDemo = () => {
+    setCurrentImage(FEATURED_SCREENSHOT_SRC)
+    setCurrentAnalysis(FEATURED_HERO_ANALYSIS)
+    setIsCustomUpload(false)
+    setUploadFileName(null)
+    setUploadDataUrl(null)
+    setPendingAnalysis(null)
     setActiveId(null)
   }
 
+  const toggleViewMode = () => {
+    setViewMode((prev) => (prev === 'investigation' ? 'normal' : 'investigation'))
+  }
+
   return (
-    <div className="paper-app-root">
-      {/* Minimal Header */}
+    <div className={`paper-app-root ${viewMode === 'investigation' ? 'mode-investigation' : 'mode-normal'}`}>
+      {/* 1. INITIAL LOAD SUNGLASSES TRANSITION */}
+      {status === 'initial-loading' && (
+        <SunglassesTransition
+          mode="initial-load"
+          isReady={initialAssetsReady}
+          onTransitionComplete={() => {
+            setViewMode('investigation')
+            setStatus('idle')
+          }}
+        />
+      )}
+
+      {/* 2. UPLOAD ANALYSIS SUNGLASSES TRANSITION */}
+      {status === 'analyzing' && (
+        <SunglassesTransition
+          mode="analysis"
+          isReady={analysisReady}
+          stepText={ANALYSIS_STEPS[stepIndex]}
+          previewUrl={uploadDataUrl}
+          onCancel={() => {
+            setStatus('idle')
+            setUploadDataUrl(null)
+            setPendingAnalysis(null)
+          }}
+          onTransitionComplete={() => {
+            if (uploadDataUrl && pendingAnalysis) {
+              setCurrentImage(uploadDataUrl)
+              setCurrentAnalysis(pendingAnalysis)
+              setIsCustomUpload(true)
+              setViewMode('investigation')
+              setStatus('idle')
+            }
+          }}
+        />
+      )}
+
+      {/* Editorial Minimal Header */}
       <header className="paper-header">
         <div className="paper-header-inner">
           <button
             type="button"
             className="paper-brand-logo"
-            onClick={resetAll}
+            onClick={resetToDemo}
             aria-label="Dark Pattern Detector home"
           >
-            <span className="brand-dot" aria-hidden="true" />
+            <span className="brand-dot-anaglyph" aria-hidden="true">
+              <span className="dot-cyan" />
+              <span className="dot-pink" />
+            </span>
             <span className="brand-name">Dark Pattern Detector</span>
           </button>
 
           <div className="paper-header-right">
-            {status === 'done' ? (
+            {/* View Mode Toggle Button */}
+            <button
+              type="button"
+              className={`paper-shades-toggle ${viewMode === 'investigation' ? 'is-active' : ''}`}
+              onClick={toggleViewMode}
+              aria-label={
+                viewMode === 'investigation'
+                  ? 'Investigation view is active. Click to switch to normal view.'
+                  : 'Normal view is active. Click to put on shades and switch to investigation view.'
+              }
+            >
+              <span className="toggle-icon" aria-hidden="true">
+                {viewMode === 'investigation' ? '🕶' : '👓'}
+              </span>
+              <span className="toggle-label">
+                {viewMode === 'investigation' ? 'Shades ON' : 'Put on shades'}
+              </span>
+            </button>
+
+            {isCustomUpload && (
               <button
                 type="button"
                 className="paper-action-btn"
-                onClick={resetAll}
+                onClick={resetToDemo}
               >
-                &larr; Scan another screenshot
+                &larr; View featured demo
               </button>
-            ) : null}
+            )}
           </div>
         </div>
       </header>
 
       {/* Main Content Area */}
       <main className="paper-main-content">
-        {/* STATE A: IDLE / LANDING PAGE */}
-        {status === 'idle' && (
+        {/* ERROR STATE */}
+        {status === 'error' && (
+          <section className="paper-error-viewport" role="alert">
+            <div className="paper-error-card">
+              <h2>Something went wrong</h2>
+              <p>{error}</p>
+              <div className="paper-error-buttons">
+                <button
+                  type="button"
+                  className="paper-action-btn primary"
+                  onClick={() => uploadDataUrl && runAnalysis(uploadDataUrl)}
+                >
+                  Try again
+                </button>
+                <button
+                  type="button"
+                  className="paper-action-btn"
+                  onClick={() => {
+                    setError(null)
+                    setStatus('idle')
+                  }}
+                >
+                  Back to inspection
+                </button>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ACTIVE EDITORIAL INVESTIGATION VIEW */}
+        {(status === 'idle' || status === 'initial-loading') && (
           <section className="paper-landing-viewport">
             <div className="paper-landing-grid">
-              {/* Left Column: Hand-drawn Marker Title, Supporting Text, Upload Area */}
+              {/* Left Column: Marker Title, Supporting Text, Dropzone, and Bullet Journal Findings */}
               <div className="paper-hero-left">
                 <div className="paper-title-wrapper">
                   <h1 className="marker-title">
@@ -154,84 +268,37 @@ export default function App() {
                   Upload a screenshot. Let&apos;s see what sneaky design tricks are hiding in plain sight.
                 </p>
 
+                {/* Dropzone Upload Section: ALWAYS visible & usable */}
                 <div className="paper-upload-box">
                   <Dropzone onImage={onImage} />
                 </div>
-              </div>
 
-              {/* Right Column: Illustration drawn directly onto paper with transparent background */}
-              <div className="paper-hero-right">
-                <div className="paper-drawn-illustration-wrapper">
-                  <img
-                    src="/hero-illustration.png"
-                    alt="Hand drawn illustration showing a mobile character with magnifying glass and sticky notes"
-                    className="paper-drawn-image"
+                {/* Bullet Journal Findings Section */}
+                <div className="paper-findings-box">
+                  <FindingsPanel
+                    findings={currentAnalysis.findings}
+                    summary={currentAnalysis.summary}
+                    activeId={activeId}
+                    onActivate={setActiveId}
                   />
                 </div>
               </div>
-            </div>
-          </section>
-        )}
 
-        {/* STATE B: ANALYZING STATE WITH SUNGLASSES LOADER */}
-        {status === 'analyzing' && (
-          <SunglassesLoader
-            dataUrl={dataUrl}
-            stepText={ANALYSIS_STEPS[stepIndex]}
-            onCancel={resetAll}
-            onReadyToTransition={() => setCanCompleteAnimation(true)}
-          />
-        )}
-
-        {/* STATE C: ERROR STATE */}
-        {status === 'error' && (
-          <section className="paper-error-viewport" role="alert">
-            <div className="paper-error-card">
-              <h2>Something went wrong</h2>
-              <p>{error}</p>
-              <div className="paper-error-buttons">
-                <button
-                  type="button"
-                  className="paper-action-btn primary"
-                  onClick={() => dataUrl && runAnalysis(dataUrl)}
-                >
-                  Try again
-                </button>
-                <button
-                  type="button"
-                  className="paper-action-btn"
-                  onClick={resetAll}
-                >
-                  Pick another screenshot
-                </button>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* STATE D: RESULTS VIEW (CLEAN NORMAL PAGE LIKE A BULLET JOURNAL) */}
-        {status === 'done' && analysis && (
-          <section className="bujo-page-viewport">
-            <div className="bujo-page-spread">
-              {/* Left Column: Scotch-Taped Screenshot */}
-              <div className="bujo-col-screenshot">
+              {/* Right Column: Scotch-Taped Screenshot Specimen */}
+              <div className="paper-hero-right">
                 <ScreenshotView
-                  src={dataUrl!}
-                  alt={fileName ? `Uploaded screenshot: ${fileName}` : 'Uploaded screenshot'}
-                  findings={analysis.findings}
-                  showOverlay={showOverlay}
+                  src={currentImage}
+                  alt={
+                    isCustomUpload
+                      ? `Uploaded screenshot: ${uploadFileName || 'Custom screenshot'}`
+                      : 'Featured e-commerce checkout screenshot'
+                  }
+                  findings={currentAnalysis.findings}
+                  showOverlay={viewMode === 'investigation'}
                   activeId={activeId}
                   onActivate={setActiveId}
-                />
-              </div>
-
-              {/* Right Column: Bullet Journaling Pointers */}
-              <div className="bujo-col-findings">
-                <FindingsPanel
-                  findings={analysis.findings}
-                  summary={analysis.summary}
-                  activeId={activeId}
-                  onActivate={setActiveId}
+                  isCustomUpload={isCustomUpload}
+                  onResetToDemo={resetToDemo}
                 />
               </div>
             </div>

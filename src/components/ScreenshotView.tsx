@@ -8,9 +8,20 @@ interface Props {
   showOverlay: boolean
   activeId: string | null
   onActivate: (id: string) => void
+  isCustomUpload?: boolean
+  onResetToDemo?: () => void
 }
 
-export function ScreenshotView({ src, alt, findings, showOverlay, activeId, onActivate }: Props) {
+export function ScreenshotView({
+  src,
+  alt,
+  findings,
+  showOverlay,
+  activeId,
+  onActivate,
+  isCustomUpload = false,
+  onResetToDemo,
+}: Props) {
   const [lightboxOpen, setLightboxOpen] = useState(false)
 
   return (
@@ -22,33 +33,62 @@ export function ScreenshotView({ src, alt, findings, showOverlay, activeId, onAc
       {/* The paper-mounted screenshot */}
       <div className="taped-photo-paper">
         <div className="taped-photo-canvas">
-          <img src={src} alt={alt} className="taped-native-img" />
+          {/* Threshold container: wraps image & overlays tightly so % coords match perfectly */}
+          <div className="taped-img-frame">
+            <img src={src} alt={alt} className="taped-native-img" />
 
-          {showOverlay &&
-            findings.map((f, i) =>
-              f.bbox ? (
-                <button
-                  key={f.id}
-                  type="button"
-                  className={`taped-overlay-pin${activeId === f.id ? ' is-active' : ''}`}
-                  style={{
-                    left: `${f.bbox.x}%`,
-                    top: `${f.bbox.y}%`,
-                    width: `${f.bbox.w}%`,
-                    height: `${f.bbox.h}%`,
-                  }}
-                  onClick={() => onActivate(f.id)}
-                  onMouseEnter={() => onActivate(f.id)}
-                  aria-label={`Dark pattern ${i + 1}: ${f.pattern}`}
-                >
-                  <span className="taped-pin-badge">{i + 1}</span>
-                </button>
-              ) : null,
-            )}
+            {/* Evidence & Annotations Layer */}
+            {showOverlay &&
+              findings.map((f, i) => {
+                if (!f.bbox) return null
+                const isActive = activeId === f.id
+                // Alternate pink and cyan outlines for distinct visual detection
+                const isCyan = i % 2 === 1
+
+                return (
+                  <button
+                    key={f.id}
+                    type="button"
+                    className={`taped-overlay-pin ${isCyan ? 'pin-cyan' : 'pin-pink'}${
+                      isActive ? ' is-active' : ''
+                    }`}
+                    style={{
+                      left: `${f.bbox.x}%`,
+                      top: `${f.bbox.y}%`,
+                      width: `${f.bbox.w}%`,
+                      height: `${f.bbox.h}%`,
+                    }}
+                    onClick={() => onActivate(f.id)}
+                    onMouseEnter={() => onActivate(f.id)}
+                    aria-label={`Finding ${i + 1}: ${f.pattern}`}
+                  >
+                    {/* Numbered Pin Badge */}
+                    <span className="taped-pin-badge">{i + 1}</span>
+
+                    {/* Annotation Callout Label */}
+                    <span className="taped-annotation-tag" aria-hidden="true">
+                      {f.pattern}
+                    </span>
+                  </button>
+                )
+              })}
+          </div>
         </div>
       </div>
 
+      {/* Footer controls: Enlarge image & Reset to demo */}
       <div className="taped-photo-footer">
+        {isCustomUpload && onResetToDemo && (
+          <button
+            type="button"
+            className="bujo-secondary-btn"
+            onClick={onResetToDemo}
+            aria-label="Reset to featured demo screenshot"
+          >
+            &larr; View featured demo
+          </button>
+        )}
+
         <button
           type="button"
           className="bujo-zoom-btn"
@@ -75,6 +115,7 @@ export function ScreenshotView({ src, alt, findings, showOverlay, activeId, onAc
         </button>
       </div>
 
+      {/* Full Resolution Lightbox */}
       {lightboxOpen && (
         <div
           className="bujo-lightbox"
