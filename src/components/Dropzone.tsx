@@ -218,7 +218,12 @@ export function Dropzone({ onImage, onSelectSample, disabled = false }: Props) {
               className="extended-sample-card"
               onClick={() => onSelectSample('/mobile-checkout-specimen.png')}
             >
-              <span className="sample-card-icon" aria-hidden="true">📱</span>
+              <span className="sample-card-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
+                  <line x1="12" x2="12.01" y1="18" y2="18" />
+                </svg>
+              </span>
               <div className="sample-card-text">
                 <span className="sample-card-title">Mobile Checkout</span>
                 <span className="sample-card-desc">Fake urgency timer & auto-checked warranty</span>
@@ -230,7 +235,11 @@ export function Dropzone({ onImage, onSelectSample, disabled = false }: Props) {
               className="extended-sample-card"
               onClick={() => onSelectSample('/examples/example-dark-checkout.png')}
             >
-              <span className="sample-card-icon" aria-hidden="true">⚡</span>
+              <span className="sample-card-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                </svg>
+              </span>
               <div className="sample-card-text">
                 <span className="sample-card-title">Urgent Booking</span>
                 <span className="sample-card-desc">Manufactured scarcity & countdown pressure</span>
@@ -242,7 +251,11 @@ export function Dropzone({ onImage, onSelectSample, disabled = false }: Props) {
               className="extended-sample-card"
               onClick={() => onSelectSample('/examples/example-tricky-wording.png')}
             >
-              <span className="sample-card-icon" aria-hidden="true">🔒</span>
+              <span className="sample-card-icon" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+              </span>
               <div className="sample-card-text">
                 <span className="sample-card-title">Sneaky Consent</span>
                 <span className="sample-card-desc">Pre-checked tracking & deceptive decline</span>

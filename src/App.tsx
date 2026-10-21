@@ -17,6 +17,27 @@ const ANALYSIS_STEPS = [
   'Listing sneaky patterns with scribbled notes…',
 ]
 
+function SunglassesIcon({ active }: { active: boolean }) {
+  return (
+    <svg
+      width="20"
+      height="12"
+      viewBox="0 0 28 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className="sunglasses-toggle-svg"
+    >
+      <path d="M2 4h7c1 0 2 1 2 2v4c0 2-2 4-4.5 4S2 12 2 10V4z" fill={active ? 'currentColor' : 'none'} />
+      <path d="M26 4h-7c-1 0-2 1-2 2v4c0 2 2 4 4.5 4s4.5-2 4.5-4V4z" fill={active ? 'currentColor' : 'none'} />
+      <line x1="11" y1="6" x2="17" y2="6" />
+    </svg>
+  )
+}
+
 export default function App() {
   const [viewMode, setViewMode] = useState<ViewMode>('normal')
   const [status, setStatus] = useState<AppStatus>('initial-loading')
@@ -175,46 +196,45 @@ export default function App() {
         />
       )}
 
-      {/* Editorial Minimal Clean Header */}
+      {/* Bold Editorial / Neo-Brutalist Masthead Header */}
       <header className="paper-header">
         <div className="paper-header-inner">
           <button
             type="button"
-            className="paper-brand-logo"
+            className="brutalist-brand-badge"
             onClick={resetToDemo}
             aria-label="Dark Pattern Detector home"
           >
-            <span className="brand-dot-black" aria-hidden="true" />
-            <span className="brand-name">Dark Pattern Detector</span>
+            <span className="brand-status-indicator" aria-hidden="true" />
+            <span className="brand-title">DARK PATTERN DETECTOR</span>
+            <span className="brand-tag">UX AUDIT</span>
           </button>
 
           <div className="paper-header-right">
-            {/* View Mode Toggle: Black Shades ON / Put on shades */}
+            {/* View Mode Toggle: Investigation View / Normal Audit View */}
             <button
               type="button"
-              className={`paper-shades-toggle ${viewMode === 'investigation' ? 'is-active' : ''}`}
+              className={`brutalist-mode-toggle ${viewMode === 'investigation' ? 'is-investigation' : 'is-normal'}`}
               onClick={toggleViewMode}
               aria-label={
                 viewMode === 'investigation'
                   ? 'Investigation view is active. Click to switch to normal view.'
-                  : 'Normal view is active. Click to put on shades and switch to investigation view.'
+                  : 'Normal view is active. Click to enter investigation view.'
               }
             >
-              <span className="toggle-icon" aria-hidden="true">
-                {viewMode === 'investigation' ? '🕶️' : '👓'}
-              </span>
+              <SunglassesIcon active={viewMode === 'investigation'} />
               <span className="toggle-label">
-                {viewMode === 'investigation' ? 'Black Shades: ON' : 'Put on shades'}
+                {viewMode === 'investigation' ? 'SHADES: ACTIVE' : 'WEAR SHADES'}
               </span>
             </button>
 
             {isCustomUpload && (
               <button
                 type="button"
-                className="paper-action-btn"
+                className="brutalist-action-btn"
                 onClick={resetToDemo}
               >
-                &larr; View demo specimen
+                &larr; Reset specimen
               </button>
             )}
           </div>
@@ -227,19 +247,19 @@ export default function App() {
         {status === 'error' && (
           <section className="paper-error-viewport" role="alert">
             <div className="paper-error-card">
-              <h2>Something went wrong</h2>
+              <h2>ANALYSIS ERROR</h2>
               <p>{error}</p>
               <div className="paper-error-buttons">
                 <button
                   type="button"
-                  className="paper-action-btn primary"
+                  className="brutalist-action-btn primary"
                   onClick={() => uploadDataUrl && runAnalysis(uploadDataUrl)}
                 >
                   Try again
                 </button>
                 <button
                   type="button"
-                  className="paper-action-btn"
+                  className="brutalist-action-btn"
                   onClick={() => {
                     setError(null)
                     setStatus('idle')
@@ -258,11 +278,17 @@ export default function App() {
             <div className="paper-landing-grid">
               {/* Left Column: Big Prominent Input Area & Bullet Journal Findings */}
               <div className="paper-hero-left">
+                {/* Forensic Telemetry Kicker */}
+                <div className="brutalist-kicker-bar">
+                  <span className="kicker-dot" aria-hidden="true" />
+                  <span className="kicker-text">SYS // FORENSIC UX AUDIT ENGINE — UNMASK DECEPTIVE DESIGN</span>
+                </div>
+
                 <div className="paper-title-wrapper">
                   <h1 className="marker-title">
-                    <span className="marker-line-1">Looks normal?</span>
+                    <span className="marker-line-1">LOOKS NORMAL?</span>
                     <span className="marker-line-2">
-                      <span className="marker-highlight">Think again.</span>
+                      <span className="marker-highlight">THINK AGAIN.</span>
                       <span className="marker-arrow" aria-hidden="true">
                         <svg
                           width="38"
@@ -270,7 +296,7 @@ export default function App() {
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
-                          strokeWidth="3.2"
+                          strokeWidth="3.4"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         >
@@ -283,7 +309,7 @@ export default function App() {
                 </div>
 
                 <p className="paper-supporting-text">
-                  Drop a screenshot or paste a link below. Let&apos;s see what sneaky design tricks are hiding in plain sight.
+                  Apps use manufactured urgency, silent warranty opt-ins, and manipulative guilt-tripping to force decisions. Drop a screenshot to inspect the evidence.
                 </p>
 
                 {/* Big Prominent Direct Input Field */}
@@ -312,6 +338,18 @@ export default function App() {
                     isCustomUpload={isCustomUpload}
                     onResetToDemo={resetToDemo}
                   />
+
+                  {/* Forensic Specimen Metadata Bar */}
+                  <div className="specimen-forensic-bar" aria-label="Specimen classification">
+                    <div className="specimen-tag-left">
+                      <span className="specimen-badge">CASE SPECIMEN #01</span>
+                      <span className="specimen-title">MOBILE CHECKOUT</span>
+                    </div>
+                    <div className="specimen-tag-right">
+                      <span className="specimen-count">4 PATTERNS IDENTIFIED</span>
+                      <span className="specimen-indicator" aria-hidden="true" />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
