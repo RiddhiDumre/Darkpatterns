@@ -196,25 +196,24 @@ export default function App() {
         />
       )}
 
-      {/* Bold Editorial / Neo-Brutalist Masthead Header */}
+      {/* Clean Editorial Masthead Header */}
       <header className="paper-header">
         <div className="paper-header-inner">
           <button
             type="button"
-            className="brutalist-brand-badge"
+            className="clean-brand-button"
             onClick={resetToDemo}
             aria-label="Dark Pattern Detector home"
           >
-            <span className="brand-status-indicator" aria-hidden="true" />
-            <span className="brand-title">DARK PATTERN DETECTOR</span>
-            <span className="brand-tag">UX AUDIT</span>
+            <span className="brand-dot" aria-hidden="true" />
+            <span className="brand-name">Dark Pattern Detector</span>
           </button>
 
           <div className="paper-header-right">
-            {/* View Mode Toggle: Investigation View / Normal Audit View */}
+            {/* View Mode Toggle: Investigation View / Normal View */}
             <button
               type="button"
-              className={`brutalist-mode-toggle ${viewMode === 'investigation' ? 'is-investigation' : 'is-normal'}`}
+              className={`clean-mode-toggle ${viewMode === 'investigation' ? 'is-investigation' : 'is-normal'}`}
               onClick={toggleViewMode}
               aria-label={
                 viewMode === 'investigation'
@@ -224,14 +223,14 @@ export default function App() {
             >
               <SunglassesIcon active={viewMode === 'investigation'} />
               <span className="toggle-label">
-                {viewMode === 'investigation' ? 'SHADES: ACTIVE' : 'WEAR SHADES'}
+                {viewMode === 'investigation' ? 'Shades On' : 'Shades Off'}
               </span>
             </button>
 
             {isCustomUpload && (
               <button
                 type="button"
-                className="brutalist-action-btn"
+                className="clean-reset-btn"
                 onClick={resetToDemo}
               >
                 &larr; Reset specimen
@@ -252,14 +251,14 @@ export default function App() {
               <div className="paper-error-buttons">
                 <button
                   type="button"
-                  className="brutalist-action-btn primary"
+                  className="clean-action-btn primary"
                   onClick={() => uploadDataUrl && runAnalysis(uploadDataUrl)}
                 >
                   Try again
                 </button>
                 <button
                   type="button"
-                  className="brutalist-action-btn"
+                  className="clean-action-btn"
                   onClick={() => {
                     setError(null)
                     setStatus('idle')
@@ -276,41 +275,16 @@ export default function App() {
         {(status === 'idle' || status === 'initial-loading') && (
           <section className="paper-landing-viewport">
             <div className="paper-landing-grid">
-              {/* Left Column: Big Prominent Input Area & Bullet Journal Findings */}
+              {/* Left Column: Big Prominent Input Area & Hero Introduction */}
               <div className="paper-hero-left">
-                {/* Forensic Telemetry Kicker */}
-                <div className="brutalist-kicker-bar">
-                  <span className="kicker-dot" aria-hidden="true" />
-                  <span className="kicker-text">SYS // FORENSIC UX AUDIT ENGINE — UNMASK DECEPTIVE DESIGN</span>
-                </div>
-
-                <div className="paper-title-wrapper">
-                  <h1 className="marker-title">
-                    <span className="marker-line-1">LOOKS NORMAL?</span>
-                    <span className="marker-line-2">
-                      <span className="marker-highlight">THINK AGAIN.</span>
-                      <span className="marker-arrow" aria-hidden="true">
-                        <svg
-                          width="38"
-                          height="38"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="3.4"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <line x1="7" y1="7" x2="17" y2="17" />
-                          <polyline points="7 17 17 17 17 7" />
-                        </svg>
-                      </span>
-                    </span>
+                <div className="clean-hero-intro">
+                  <h1 className="clean-hero-title">
+                    Deceptive design, unmasked.
                   </h1>
+                  <p className="clean-hero-subtitle">
+                    Expose manufactured urgency, sneaky opt-ins, and manipulative guilt-tripping before you check out. Drop a screenshot to inspect what’s happening beneath the surface.
+                  </p>
                 </div>
-
-                <p className="paper-supporting-text">
-                  Apps use manufactured urgency, silent warranty opt-ins, and manipulative guilt-tripping to force decisions. Drop a screenshot to inspect the evidence.
-                </p>
 
                 {/* Big Prominent Direct Input Field */}
                 <div className="paper-upload-box">
@@ -321,7 +295,7 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Right Column: 3D Model of an iPhone with Interactive Drag & Scribbled Handwritten Notes */}
+              {/* Right Column: 3D Model of an iPhone with Floating Scribbled Handwritten Notes */}
               <div className="paper-hero-right">
                 <div className="phone-3d-stage-container">
                   <Phone3DCanvas
@@ -338,18 +312,6 @@ export default function App() {
                     isCustomUpload={isCustomUpload}
                     onResetToDemo={resetToDemo}
                   />
-
-                  {/* Forensic Specimen Metadata Bar */}
-                  <div className="specimen-forensic-bar" aria-label="Specimen classification">
-                    <div className="specimen-tag-left">
-                      <span className="specimen-badge">CASE SPECIMEN #01</span>
-                      <span className="specimen-title">MOBILE CHECKOUT</span>
-                    </div>
-                    <div className="specimen-tag-right">
-                      <span className="specimen-count">4 PATTERNS IDENTIFIED</span>
-                      <span className="specimen-indicator" aria-hidden="true" />
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>

@@ -9,11 +9,32 @@ interface Props {
   disabled?: boolean
 }
 
-function BigUploadIcon() {
+function UploadIcon() {
   return (
     <svg
-      width="34"
-      height="34"
+      width="32"
+      height="32"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className="clean-upload-svg"
+    >
+      <path d="M4 16.5v2.25A2.25 2.25 0 0 0 6.25 21h11.5A2.25 2.25 0 0 0 20 18.75V16.5" />
+      <polyline points="7.5 9.75 12 5.25 16.5 9.75" />
+      <line x1="12" y1="5.25" x2="12" y2="15.75" />
+    </svg>
+  )
+}
+
+function LinkIcon() {
+  return (
+    <svg
+      width="15"
+      height="15"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -21,11 +42,9 @@ function BigUploadIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
-      className="big-upload-icon-svg"
     >
-      <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
-      <polyline points="16 9 12 5 8 9" />
-      <line x1="12" y1="5" x2="12" y2="15" />
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
     </svg>
   )
 }
@@ -40,46 +59,47 @@ export function Dropzone({ onImage, onSelectSample, disabled = false }: Props) {
   const handleFile = (file: File | null | undefined) => {
     if (!file) return
     if (!ACCEPT.includes(file.type)) {
-      setError('Unsupported format. Please upload a PNG, JPEG, WebP, or GIF screenshot.')
+      setError('Please upload a PNG, JPEG, WebP, or GIF screenshot.')
       return
     }
     if (file.size > MAX_BYTES) {
-      setError('File is over 8 MB. Please upload a smaller screenshot.')
+      setError('File is over 8 MB. Please choose a smaller image.')
       return
     }
     setError(null)
     const reader = new FileReader()
     reader.onload = () => onImage(String(reader.result), file)
-    reader.onerror = () => setError('Could not read file. Try another screenshot.')
+    reader.onerror = () => setError('Could not read file. Please try another screenshot.')
     reader.readAsDataURL(file)
   }
 
   // Handle direct image URL input
   const handleUrlSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!urlInput.trim() || disabled) return
+    const targetUrl = urlInput.trim()
+    if (!targetUrl || disabled) return
 
     setLoadingUrl(true)
     setError(null)
 
     try {
-      const res = await fetch(urlInput.trim())
-      if (!res.ok) throw new Error(`Could not fetch image (HTTP ${res.status})`)
+      const res = await fetch(targetUrl)
+      if (!res.ok) throw new Error(`Could not fetch image (${res.status})`)
       const blob = await res.blob()
       if (!ACCEPT.includes(blob.type)) {
-        throw new Error('URL does not return a supported image (PNG, JPEG, WebP, or GIF).')
+        throw new Error('Link must point directly to a PNG, JPEG, or WebP image.')
       }
-      const file = new File([blob], 'url-screenshot.png', { type: blob.type })
+      const file = new File([blob], 'scanned-screenshot.png', { type: blob.type })
       handleFile(file)
       setUrlInput('')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load image from URL. Check CORS or link.')
+      setError(err instanceof Error ? err.message : 'Could not fetch image. Check the URL.')
     } finally {
       setLoadingUrl(false)
     }
   }
 
-  // Direct clipboard paste anywhere
+  // Global clipboard paste support
   useEffect(() => {
     const handlePaste = (e: ClipboardEvent) => {
       if (disabled) return
@@ -104,13 +124,13 @@ export function Dropzone({ onImage, onSelectSample, disabled = false }: Props) {
   }, [disabled])
 
   return (
-    <div className="big-input-zone-container">
-      {/* Extended Hero Input Dropzone Card */}
+    <div className="clean-dropzone-stack">
+      {/* Primary Drop Canvas */}
       <div
         role="button"
         tabIndex={disabled ? -1 : 0}
-        aria-label="Upload screenshot for dark pattern analysis. Drop a screenshot here or press Enter to browse files."
-        className={`big-input-dropcard extended-dropcard${dragging ? ' is-dragging' : ''}${disabled ? ' is-disabled' : ''}`}
+        aria-label="Drop screenshot or click to browse files"
+        className={`clean-dropzone-canvas${dragging ? ' is-dragging' : ''}${disabled ? ' is-disabled' : ''}`}
         onClick={() => !disabled && inputRef.current?.click()}
         onKeyDown={(e) => {
           if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
@@ -131,38 +151,26 @@ export function Dropzone({ onImage, onSelectSample, disabled = false }: Props) {
           }
         }}
       >
-        {/* Subtle architectural corner markers */}
-        <span className="editorial-corner-mark top-left" aria-hidden="true" />
-        <span className="editorial-corner-mark top-right" aria-hidden="true" />
-        <span className="editorial-corner-mark bottom-left" aria-hidden="true" />
-        <span className="editorial-corner-mark bottom-right" aria-hidden="true" />
-
-        <div className="extended-drop-inner">
-          <div className="extended-icon-orb" aria-hidden="true">
-            <BigUploadIcon />
+        <div className="clean-dropzone-content">
+          <div className="clean-upload-badge" aria-hidden="true">
+            <UploadIcon />
           </div>
 
-          <div className="extended-content-block">
-            <h3 className="extended-primary-heading">
-              Drop any screenshot here
+          <div className="clean-dropzone-headings">
+            <h3 className="clean-dropzone-title">
+              Drop screenshot here
             </h3>
-            <p className="extended-subheading">
-              or <span className="extended-browse-text">browse files</span> from your computer
+            <p className="clean-dropzone-desc">
+              or <span className="clean-browse-link">browse files</span> from your computer
             </p>
+          </div>
 
-            <div className="extended-badges-row">
-              <span className="extended-badge-pill">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
-                  <circle cx="9" cy="9" r="2"/>
-                  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
-                </svg>
-                PNG, JPEG, WebP up to 8MB
-              </span>
-              <span className="extended-badge-pill">
-                <kbd className="big-input-kbd">⌘V</kbd> / <kbd className="big-input-kbd">Ctrl+V</kbd> paste anywhere
-              </span>
-            </div>
+          <div className="clean-dropzone-meta">
+            <span className="clean-meta-tag">PNG, JPG, WebP</span>
+            <span className="clean-meta-separator" aria-hidden="true">·</span>
+            <span className="clean-meta-tag">
+              <kbd className="clean-kbd">⌘V</kbd> paste supported
+            </span>
           </div>
         </div>
       </div>
@@ -179,95 +187,61 @@ export function Dropzone({ onImage, onSelectSample, disabled = false }: Props) {
         }}
       />
 
-      {/* Direct URL / Link Input Field */}
-      <form onSubmit={handleUrlSubmit} className="direct-url-input-form extended-url-form">
-        <div className="direct-url-input-wrap extended-url-wrap">
-          <span className="direct-url-icon" aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-            </svg>
-          </span>
-          <input
-            type="url"
-            value={urlInput}
-            onChange={(e) => setUrlInput(e.target.value)}
-            placeholder="Or enter public image URL to scan directly…"
-            className="direct-url-input-field"
-            disabled={disabled || loadingUrl}
-          />
-          <button
-            type="submit"
-            className="direct-url-submit-btn extended-url-btn"
-            disabled={disabled || loadingUrl || !urlInput.trim()}
-          >
-            {loadingUrl ? 'Fetching…' : 'Scan URL ↗'}
-          </button>
-        </div>
+      {/* Secondary URL Input Bar */}
+      <form onSubmit={handleUrlSubmit} className="clean-url-bar">
+        <span className="clean-url-icon" aria-hidden="true">
+          <LinkIcon />
+        </span>
+        <input
+          type="url"
+          value={urlInput}
+          onChange={(e) => setUrlInput(e.target.value)}
+          placeholder="Or paste direct image URL to scan…"
+          className="clean-url-input"
+          disabled={disabled || loadingUrl}
+        />
+        <button
+          type="submit"
+          className="clean-url-btn"
+          disabled={disabled || loadingUrl || !urlInput.trim()}
+        >
+          {loadingUrl ? 'Loading…' : 'Scan'}
+        </button>
       </form>
 
-      {/* Quick Example Presets with descriptive pills */}
+      {/* Curated Sample Specimen Chips */}
       {onSelectSample && (
-        <div className="extended-sample-section">
-          <div className="extended-sample-header">
-            <span className="sample-chips-label">Or test drive a sample specimen:</span>
-          </div>
-          <div className="extended-sample-grid">
+        <div className="clean-sample-row">
+          <span className="clean-sample-label">Try sample:</span>
+          <div className="clean-sample-chips">
             <button
               type="button"
-              className="extended-sample-card"
+              className="clean-sample-chip"
               onClick={() => onSelectSample('/mobile-checkout-specimen.png')}
             >
-              <span className="sample-card-icon" aria-hidden="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
-                  <line x1="12" x2="12.01" y1="18" y2="18" />
-                </svg>
-              </span>
-              <div className="sample-card-text">
-                <span className="sample-card-title">Mobile Checkout</span>
-                <span className="sample-card-desc">Fake urgency timer & auto-checked warranty</span>
-              </div>
+              Mobile Checkout
             </button>
-
             <button
               type="button"
-              className="extended-sample-card"
+              className="clean-sample-chip"
               onClick={() => onSelectSample('/examples/example-dark-checkout.png')}
             >
-              <span className="sample-card-icon" aria-hidden="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-                </svg>
-              </span>
-              <div className="sample-card-text">
-                <span className="sample-card-title">Urgent Booking</span>
-                <span className="sample-card-desc">Manufactured scarcity & countdown pressure</span>
-              </div>
+              Urgent Booking
             </button>
-
             <button
               type="button"
-              className="extended-sample-card"
+              className="clean-sample-chip"
               onClick={() => onSelectSample('/examples/example-tricky-wording.png')}
             >
-              <span className="sample-card-icon" aria-hidden="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                </svg>
-              </span>
-              <div className="sample-card-text">
-                <span className="sample-card-title">Sneaky Consent</span>
-                <span className="sample-card-desc">Pre-checked tracking & deceptive decline</span>
-              </div>
+              Sneaky Consent
             </button>
           </div>
         </div>
       )}
 
       {error && (
-        <div className="editorial-dropzone-error" role="alert">
-          <span className="error-indicator" aria-hidden="true">&times;</span>
+        <div className="clean-dropzone-error" role="alert">
+          <span className="error-dot" aria-hidden="true" />
           <span>{error}</span>
         </div>
       )}

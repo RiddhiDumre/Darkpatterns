@@ -450,38 +450,22 @@ export function Phone3DCanvas({
       {showOverlay && (
         <svg className="phone-scribble-svg-overlay" aria-hidden="true">
           <defs>
-            {/* Arrowhead marker in electric pink ink */}
+            {/* Unified forensic ink arrowhead marker */}
             <marker
-              id="scribble-arrowhead-pink"
+              id="scribble-arrowhead-unified"
               viewBox="0 0 10 10"
               refX="7"
               refY="5"
-              markerWidth="7"
-              markerHeight="7"
+              markerWidth="6"
+              markerHeight="6"
               orient="auto"
             >
-              <path d="M 0 1.5 L 7 5 L 0 8.5 z" fill="#ff006e" />
-            </marker>
-
-            {/* Arrowhead marker in cyan ink */}
-            <marker
-              id="scribble-arrowhead-cyan"
-              viewBox="0 0 10 10"
-              refX="7"
-              refY="5"
-              markerWidth="7"
-              markerHeight="7"
-              orient="auto"
-            >
-              <path d="M 0 1.5 L 7 5 L 0 8.5 z" fill="#00f0ff" />
+              <path d="M 0 2 L 7 5 L 0 8 z" fill="currentColor" />
             </marker>
           </defs>
 
-          {projectedPoints.map((pt, idx) => {
+          {projectedPoints.map((pt) => {
             const isRight = pt.side === 'right'
-            const isCyan = idx % 2 === 1
-            const inkColor = isCyan ? '#00f0ff' : '#ff006e'
-            const markerId = isCyan ? 'url(#scribble-arrowhead-cyan)' : 'url(#scribble-arrowhead-pink)'
 
             // Arrow originates from handwritten note in the margin and arches cleanly to the side of the element
             const arrowStartX = isRight ? pt.noteX - 8 : pt.noteX + 8
@@ -502,11 +486,11 @@ export function Phone3DCanvas({
                 <path
                   d={`M ${arrowStartX} ${arrowStartY} Q ${midX} ${midY} ${pt.targetX} ${pt.targetY}`}
                   fill="none"
-                  stroke={inkColor}
-                  strokeWidth={pt.active ? 3.4 : 2.4}
+                  stroke="currentColor"
+                  strokeWidth={pt.active ? 3 : 2.2}
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  markerEnd={markerId}
+                  markerEnd="url(#scribble-arrowhead-unified)"
                   className="scribble-arrow-path"
                 />
               </g>
@@ -518,10 +502,8 @@ export function Phone3DCanvas({
       {/* Floating Handwritten Notes Elements (HTML for natural handwriting text wrapping) */}
       {showOverlay && (
         <div className="phone-scribble-notes-layer" aria-label="Dark pattern handwritten notes">
-          {projectedPoints.map((pt, idx) => {
+          {projectedPoints.map((pt) => {
             const isRight = pt.side === 'right'
-            const isCyan = idx % 2 === 1
-            const inkColor = isCyan ? '#00f0ff' : '#ff006e'
 
             return (
               <div
@@ -533,7 +515,6 @@ export function Phone3DCanvas({
                   right: !isRight
                     ? `${containerRef.current ? containerRef.current.clientWidth - pt.noteX : 340}px`
                     : undefined,
-                  color: inkColor,
                 }}
                 onClick={() => onActivate(pt.id)}
                 onMouseEnter={() => onActivate(pt.id)}

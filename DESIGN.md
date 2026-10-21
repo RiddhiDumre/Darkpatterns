@@ -1,73 +1,66 @@
 ---
 name: Dark Pattern Detector
-description: High-contrast Bold Editorial / Neo-Brutalist consumer defense interface featuring stark solid ink borders, hard offset block shadows, Safety Yellow and Acid Magenta highlighter accents, tactile mechanical keycaps, and a 3D Space Black titanium iPhone specimen with floating handwritten notes.
+description: Refined, high-craft editorial consumer defense interface featuring calm natural surfaces, precise typography, a Three.js 3D Space Black iPhone, forensic red handwritten audit notes, and polarized sunglasses transition.
 colors:
-  bg: "#f5f3ec"
-  bg-dark: "#0c0d12"
+  bg: "#fafaf9"
+  bg-dark: "#0a0b0e"
   surface: "#ffffff"
-  surface-dark: "#13141d"
-  surface-inset: "#ebe7dc"
-  ink: "#000000"
-  ink-secondary: "#424248"
-  ink-muted: "#6e6e76"
-  ink-dark: "#ffffff"
-  border: "#000000"
-  border-dark: "#ffffff"
-  yellow: "#ffe600"
-  magenta: "#ff0055"
-  cyan: "#00f0ff"
-  lime: "#00f576"
+  surface-dark: "#12141a"
+  surface-inset: "#f3f3f0"
+  surface-inset-dark: "#1a1c24"
+  text-primary: "#121316"
+  text-primary-dark: "#f6f6f8"
+  text-secondary: "#575a65"
+  text-secondary-dark: "#9da1ad"
+  text-tertiary: "#878b96"
+  text-tertiary-dark: "#6b6f7b"
+  border-subtle: "rgba(18, 19, 22, 0.09)"
+  border-subtle-dark: "rgba(255, 255, 255, 0.08)"
+  ink-audit: "#d32f2f"
+  ink-audit-dark: "#ff453a"
 typography:
   display:
     fontFamily: "Archivo, -apple-system, BlinkMacSystemFont, sans-serif"
-    fontSize: "clamp(2.6rem, 4.5vw, 4.2rem)"
-    fontWeight: 900
-    lineHeight: 1.04
-    letterSpacing: "-0.04em"
+    fontSize: "clamp(2.4rem, 4vw, 3.4rem)"
+    fontWeight: 800
+    lineHeight: 1.08
+    letterSpacing: "-0.035em"
   h1:
     fontFamily: "Archivo, -apple-system, BlinkMacSystemFont, sans-serif"
     fontSize: "2.4rem"
-    fontWeight: 900
+    fontWeight: 800
     lineHeight: 1.1
-    letterSpacing: "-0.035em"
+    letterSpacing: "-0.03em"
   h2:
     fontFamily: "Archivo, -apple-system, BlinkMacSystemFont, sans-serif"
-    fontSize: "1.6rem"
-    fontWeight: 800
+    fontSize: "1.45rem"
+    fontWeight: 700
     lineHeight: 1.2
-    letterSpacing: "-0.025em"
-  h3:
-    fontFamily: "Archivo, -apple-system, BlinkMacSystemFont, sans-serif"
-    fontSize: "1.25rem"
-    fontWeight: 800
-    lineHeight: 1.25
-    letterSpacing: "-0.02em"
+    letterSpacing: "-0.015em"
   body:
     fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif"
     fontSize: "0.95rem"
     fontWeight: 400
-    lineHeight: 1.5
+    lineHeight: 1.55
   mono:
     fontFamily: "JetBrains Mono, SFMono-Regular, Consolas, monospace"
     fontSize: "0.74rem"
-    fontWeight: 700
+    fontWeight: 600
     lineHeight: 1.4
-    letterSpacing: "0.06em"
   hand:
     fontFamily: "Caveat, cursive"
-    fontSize: "1.25rem"
+    fontSize: "1.45rem"
     fontWeight: 700
-    lineHeight: 1.2
+    lineHeight: 1.1
 rounded:
-  none: "0px"
-  sm: "2px"
-  md: "3px"
-  lg: "4px"
+  sm: "6px"
+  md: "10px"
+  lg: "14px"
+  full: "9999px"
 shadows:
-  brutal-sm: "3px 3px 0 #000000"
-  brutal: "5px 5px 0 #000000"
-  brutal-lg: "8px 8px 0 #000000"
-  brutal-dark: "5px 5px 0 #ff0055"
+  sm: "0 1px 2px rgba(0, 0, 0, 0.04)"
+  md: "0 4px 16px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.03)"
+  lg: "0 16px 36px -4px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04)"
 ---
 
 # Design System
@@ -75,32 +68,36 @@ shadows:
 <!-- impeccable:design-schema 1 -->
 
 ## Overview
-A high-conviction Bold Editorial / Neo-Brutalist visual world engineered for forensic consumer defense. Designed to cut through marketing deception with unapologetic clarity, heavy solid borders (`2.5px`), tactile mechanical block shadows (`5px 5px 0`), high-voltage highlighter stickers, and architectural precision.
+A distilled, crafted consumer defense tool engineered for clarity and authority. Replaces generic AI tropes, faux-terminal telemetry, loud neon badges, and grid-paper textures with calm surfaces, precise typography, authentic forensic ink annotations, and deliberate negative space.
 
 ## Key Design Signatures
 
-1. **Neo-Brutalist Architectural Framing**:
-   - High-contrast solid borders (`2.5px`) with hard offset drop shadows (`5px 5px 0 #000` in light, `5px 5px 0 #ff0055` in dark).
-   - Crisp geometric corners (`2px` to `4px`) replacing generic rounded bubbly pills.
-   - Satisfying mechanical tactile click states (`active: translate(2px, 2px); box-shadow: 1px 1px 0`).
+1. **Calm, High-Craft Editorial Canvas**:
+   - Clean, solid surfaces without decorative grids or noisy textures.
+   - Dual-view model:
+     - **Normal View ("Shades Off")**: Warm, quiet paper ground (`#fafaf9`) representing standard browsing.
+     - **Investigation View ("Shades On")**: Deep matte obsidian (`#0a0b0e`) with subtle ambient depth behind the 3D specimen.
+   - Restrained hairline borders (`1px` to `1.5px`) and natural layered drop shadows.
 
-2. **Provocative Editorial Typography**:
-   - Massive, unapologetic display headlines in tight-tracked `Archivo` (weight 900, tracking `-0.04em`, uppercase).
-   - Acid highlighter badges with solid outlines and directional arrows.
-   - Monospace forensic telemetry stamps (`[CASE SPECIMEN #01]`, `[SYS // FORENSIC AUDIT ENGINE]`).
+2. **Confident Human Typography**:
+   - Clear, authoritative display headlines in sentence case using tight-tracked `Archivo` (weight 800): *"Deceptive design, unmasked."*
+   - Clean `Inter` body text at comfortable reading line-height.
+   - Zero kickers, eyebrows, or decorative section numbers.
 
-3. **Dual Forensic Mode**:
-   - **Normal View (Dossier Audit)**: Raw tactile paper ground (`#f5f3ec`), stark jet-black borders, Safety Yellow (`#ffe600`) highlights, and hard black shadows.
-   - **Investigation View (Black Shades Active)**: Deep matte obsidian (`#0c0d12`), bone-white borders, Electric Signal Magenta (`#ff0055`), and toxic cyan accents with glowing brutalist offsets.
+3. **Floating 3D Phone Specimen & Forensic Scribble Notes**:
+   - Procedural Three.js Space Black titanium iPhone floating serenely in ambient space.
+   - Non-interactive to drags and touches to keep scrolling frictionless.
+   - Floating handwritten notes (`Caveat`) positioned strictly in the outer margins to leave interface details 100% visible:
+     - Top: Big index numeral (`1`, `2`, `3`, `4`)
+     - Middle: Deceptive pattern title
+     - Bottom: Plain-language translation
+   - Cohesive, authentic red forensic ink (`#ff453a` in dark mode, `#d32f2f` in light mode) with curved pen stroke arrows pointing cleanly to the side of suspect elements.
 
-4. **Floating 3D Phone Specimen & Handwritten Forensic Notes**:
-   - Three.js procedural Space Black titanium iPhone floating serenely in ambient space.
-   - Floating handwritten scribble notes (`Caveat`) with big index numbers (`1`, `2`, `3`, `4`), pattern titles, and concise explanations outside in the margins, leaving the screen 100% visible.
-   - Curved SVG ink arrows pointing cleanly to the side/edge of suspicious UI elements.
-   - Monospace specimen classification bar anchored beneath the stage.
+4. **Streamlined Intake Canvas**:
+   - Generous dropzone with dashed border and smooth physical hover lift.
+   - Direct file browsing, drag-and-drop, and `<kbd>⌘V</kbd>` clipboard paste.
+   - Integrated URL scanner bar.
+   - Quick sample specimen chips (*Mobile Checkout*, *Urgent Booking*, *Sneaky Consent*) replacing repetitive card grids.
 
-5. **Direct Drop Canvas & Authored SVG Icons**:
-   - Clean, assertive upload dropzone with architectural crosshair corner markers.
-   - Direct `<kbd>⌘V</kbd>` clipboard paste anywhere.
-   - Integrated URL scanner with mechanical submit button.
-   - Curated specimen preset cards with custom SVG line icons (no emojis).
+5. **Polarized Sunglasses Transition**:
+   - Custom lens zoom animation serving as the signature portal between innocent browsing and deceptive pattern exposure.
