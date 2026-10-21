@@ -3,8 +3,8 @@ import * as THREE from 'three'
 import type { Finding } from '../../shared/types'
 
 export interface ScribbleFinding extends Finding {
-  headline?: string
-  detail?: string
+  patternTitle?: string
+  explanationText?: string
   noteScribble?: string
   anchor?: { x: number; y: number }
   side?: 'left' | 'right'
@@ -55,11 +55,9 @@ export function Phone3DCanvas({
   const [projectedPoints, setProjectedPoints] = useState<
     Array<{
       id: string
-      pattern: string
-      tag: string
-      headline: string
-      detail: string
-      severity?: 'high' | 'medium' | 'low'
+      indexNum: number
+      patternTitle: string
+      explanationText: string
       targetX: number
       targetY: number
       noteX: number
@@ -78,54 +76,30 @@ export function Phone3DCanvas({
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
 
-  // Structured note hierarchy extractor
+  // Extract handwritten note parts: number at top, pattern title below, then explanation
   const getNoteHierarchy = (f: Finding, idx: number) => {
     const scribbleF = f as ScribbleFinding
-    const tag = `#${String(idx + 1).padStart(2, '0')} · ${f.pattern.toUpperCase()}`
-    const severity = f.severity
+    const patternTitle = scribbleF.patternTitle || f.pattern
+    let explanationText = scribbleF.explanationText || scribbleF.noteScribble
 
-    if (scribbleF.headline && scribbleF.detail) {
-      return { tag, headline: scribbleF.headline, detail: scribbleF.detail, severity }
-    }
-
-    if (f.pattern === 'False Urgency') {
-      return {
-        tag,
-        headline: '⚡ Fake 2-Hour Timer!',
-        detail: 'Fabricates scarcity countdown to panic you into buying',
-        severity,
-      }
-    }
-    if (f.pattern === 'Preselection') {
-      return {
-        tag,
-        headline: 'Sneaky Auto-Check!',
-        detail: 'Silently bills +$9.95/mo recurring warranty without consent',
-        severity,
-      }
-    }
-    if (f.pattern === 'Interface Interference') {
-      return {
-        tag,
-        headline: 'Deceptive Button Weight',
-        detail: 'Giant primary button vs camouflaged microscopic decline text',
-        severity,
-      }
-    }
-    if (f.pattern === 'Confirmshaming') {
-      return {
-        tag,
-        headline: 'Guilt-Trip Copy',
-        detail: 'Shames you as "reckless" for simply saying no to add-ons',
-        severity,
+    if (!explanationText) {
+      if (f.pattern === 'False Urgency') {
+        explanationText = 'Resetting countdown timer to panic you into buying before comparing options'
+      } else if (f.pattern === 'Preselection') {
+        explanationText = 'Silently auto-checks an extra $9.95/mo recurring warranty fee'
+      } else if (f.pattern === 'Interface Interference') {
+        explanationText = 'Giant primary button vs camouflaged microscopic decline text'
+      } else if (f.pattern === 'Confirmshaming') {
+        explanationText = 'Guilt-trips you as "reckless" for simply declining paid coverage'
+      } else {
+        explanationText = f.translation || f.explanation || f.evidence
       }
     }
 
     return {
-      tag,
-      headline: f.pattern,
-      detail: f.translation || f.explanation || f.evidence,
-      severity,
+      indexNum: idx + 1,
+      patternTitle,
+      explanationText,
     }
   }
 
@@ -427,11 +401,9 @@ export function Phone3DCanvas({
 
           return {
             id: f.id,
-            pattern: f.pattern,
-            tag: noteData.tag,
-            headline: noteData.headline,
-            detail: noteData.detail,
-            severity: noteData.severity,
+            indexNum: noteData.indexNum,
+            patternTitle: noteData.patternTitle,
+            explanationText: noteData.explanationText,
             targetX: Math.round(screenPixelX),
             targetY: Math.round(screenPixelY),
             noteX: Math.round(noteX),
@@ -621,7 +593,7 @@ export function Phone3DCanvas({
                 key={pt.id}
                 className={`scribble-note-item side-${pt.side}${pt.active ? ' is-active' : ''}`}
                 style={{
-                  top: `${pt.targetY - 26}px`,
+                  top: `${pt.targetY - 30}px`,
                   left: isRight ? `${pt.noteX}px` : undefined,
                   right: !isRight
                     ? `${containerRef.current ? containerRef.current.clientWidth - pt.noteX : 340}px`
@@ -638,28 +610,21 @@ export function Phone3DCanvas({
                     onActivate(pt.id)
                   }
                 }}
-                aria-label={`${pt.tag}: ${pt.headline} — ${pt.detail}`}
+                aria-label={`Note #${pt.indexNum}: ${pt.patternTitle} — ${pt.explanationText}`}
               >
-                {/* LEVEL 1: Forensic Tag & Pattern Classification */}
-                <div className="scribble-meta-row">
-                  <span className="scribble-tag-pill">
-                    <span className="scribble-tag-index">{String(idx + 1).padStart(2, '0')}</span>
-                    <span className="scribble-tag-sep">/</span>
-                    <span className="scribble-tag-pattern">{pt.pattern.toUpperCase()}</span>
-                  </span>
-                  {pt.severity && (
-                    <span className={`scribble-severity-dot severity-${pt.severity}`} title={`${pt.severity} severity`} />
-                  )}
-                </div>
+                {/* 1. TOP: Handwritten Number */}
+                <span className="scribble-top-number">
+                  #{pt.indexNum}
+                </span>
 
-                {/* LEVEL 2: Bold Expressive Handwritten Headline */}
-                <h4 className="scribble-headline">
-                  {pt.headline}
+                {/* 2. BELOW NUMBER: Dark Pattern Title */}
+                <h4 className="scribble-pattern-title">
+                  {pt.patternTitle}
                 </h4>
 
-                {/* LEVEL 3: Subordinate Explanatory Detail */}
-                <p className="scribble-detail">
-                  {pt.detail}
+                {/* 3. BELOW TITLE: The Explanation */}
+                <p className="scribble-explanation">
+                  {pt.explanationText}
                 </p>
               </div>
             )

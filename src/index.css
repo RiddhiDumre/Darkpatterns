@@ -965,7 +965,7 @@ body {
   position: absolute;
   pointer-events: auto;
   cursor: pointer;
-  max-width: 240px;
+  max-width: 250px;
   padding: 0;
   background: transparent !important;
   border: none !important;
@@ -974,6 +974,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  font-family: var(--font-hand), 'Caveat', cursive, sans-serif;
   transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
 }
 
@@ -995,76 +996,47 @@ body {
   opacity: 1;
 }
 
-/* Level 1: Forensic Meta Row (Tag & Severity) */
-.scribble-meta-row {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  opacity: 0.85;
-  margin-bottom: 1px;
-}
-
-.scribble-tag-pill {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: currentColor;
-}
-
-.scribble-tag-index {
-  opacity: 0.95;
-}
-
-.scribble-tag-sep {
-  opacity: 0.45;
-  margin: 0 3px;
-}
-
-.scribble-tag-pattern {
-  letter-spacing: 0.05em;
-}
-
-.scribble-severity-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background-color: currentColor;
-  box-shadow: 0 0 8px currentColor;
-  display: inline-block;
-  flex-shrink: 0;
-}
-
-/* Level 2: Bold Expressive Handwritten Headline */
-.scribble-headline {
+/* 1. TOP: Handwritten Number */
+.scribble-top-number {
   font-family: var(--font-hand), 'Caveat', cursive, sans-serif;
-  font-size: 1.48rem;
+  font-size: 1.28rem;
   font-weight: 700;
-  line-height: 1.1;
-  margin: 0;
+  line-height: 1;
   color: currentColor;
-  letter-spacing: -0.01em;
+  margin-bottom: 2px;
+  display: inline-block;
+  border-bottom: 1.8px solid currentColor;
+  padding-bottom: 1px;
+}
+
+/* 2. BELOW NUMBER: Dark Pattern Title */
+.scribble-pattern-title {
+  font-family: var(--font-hand), 'Caveat', cursive, sans-serif;
+  font-size: 1.68rem;
+  font-weight: 700;
+  line-height: 1.05;
+  margin: 0 0 3px 0;
+  color: currentColor;
+  letter-spacing: -0.015em;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
-.theme-dark .scribble-headline {
+.theme-dark .scribble-pattern-title {
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
 }
 
-/* Level 3: Subordinate Explanatory Detail */
-.scribble-detail {
+/* 3. BELOW TITLE: The Explanation */
+.scribble-explanation {
   font-family: var(--font-hand), 'Caveat', cursive, sans-serif;
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   font-weight: 600;
-  line-height: 1.24;
+  line-height: 1.25;
   margin: 0;
-  opacity: 0.88;
   color: var(--ink-secondary);
 }
 
-.theme-dark .scribble-detail {
-  color: rgba(235, 235, 245, 0.84);
+.theme-dark .scribble-explanation {
+  color: rgba(240, 240, 248, 0.88);
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
 }
 
