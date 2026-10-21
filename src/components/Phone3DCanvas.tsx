@@ -3,6 +3,8 @@ import * as THREE from 'three'
 import type { Finding } from '../../shared/types'
 
 export interface ScribbleFinding extends Finding {
+  headline?: string
+  detail?: string
   noteScribble?: string
   anchor?: { x: number; y: number }
   side?: 'left' | 'right'
@@ -54,7 +56,10 @@ export function Phone3DCanvas({
     Array<{
       id: string
       pattern: string
-      scribble: string
+      tag: string
+      headline: string
+      detail: string
+      severity?: 'high' | 'medium' | 'low'
       targetX: number
       targetY: number
       noteX: number
@@ -73,15 +78,55 @@ export function Phone3DCanvas({
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
 
-  // Default fallback scribble text if finding has no custom scribble
-  const getScribbleText = (f: Finding, idx: number) => {
-    const custom = (f as ScribbleFinding).noteScribble
-    if (custom) return custom
-    if (f.pattern === 'False Urgency') return '⚡ Fake urgency! Resetting countdown'
-    if (f.pattern === 'Preselection') return 'Sneaky auto-check! Recurring fee pre-selected'
-    if (f.pattern === 'Confirmshaming') return 'Guilt-trip copy: Shaming you for saying no'
-    if (f.pattern === 'Interface Interference') return 'Visual asymmetry: Oversized primary button'
-    return `Finding #${idx + 1}: ${f.pattern}`
+  // Structured note hierarchy extractor
+  const getNoteHierarchy = (f: Finding, idx: number) => {
+    const scribbleF = f as ScribbleFinding
+    const tag = `#${String(idx + 1).padStart(2, '0')} · ${f.pattern.toUpperCase()}`
+    const severity = f.severity
+
+    if (scribbleF.headline && scribbleF.detail) {
+      return { tag, headline: scribbleF.headline, detail: scribbleF.detail, severity }
+    }
+
+    if (f.pattern === 'False Urgency') {
+      return {
+        tag,
+        headline: '⚡ Fake 2-Hour Timer!',
+        detail: 'Fabricates scarcity countdown to panic you into buying',
+        severity,
+      }
+    }
+    if (f.pattern === 'Preselection') {
+      return {
+        tag,
+        headline: 'Sneaky Auto-Check!',
+        detail: 'Silently bills +$9.95/mo recurring warranty without consent',
+        severity,
+      }
+    }
+    if (f.pattern === 'Interface Interference') {
+      return {
+        tag,
+        headline: 'Deceptive Button Weight',
+        detail: 'Giant primary button vs camouflaged microscopic decline text',
+        severity,
+      }
+    }
+    if (f.pattern === 'Confirmshaming') {
+      return {
+        tag,
+        headline: 'Guilt-Trip Copy',
+        detail: 'Shames you as "reckless" for simply saying no to add-ons',
+        severity,
+      }
+    }
+
+    return {
+      tag,
+      headline: f.pattern,
+      detail: f.translation || f.explanation || f.evidence,
+      severity,
+    }
   }
 
   // Pointer interaction handlers
@@ -378,10 +423,15 @@ export function Phone3DCanvas({
               ? Math.max(phoneRightPixelX + noteMargin, Math.round(screenPixelX) + 110)
               : Math.min(phoneLeftPixelX - noteMargin, Math.round(screenPixelX) - 110)
 
+          const noteData = getNoteHierarchy(f, i)
+
           return {
             id: f.id,
             pattern: f.pattern,
-            scribble: getScribbleText(f, i),
+            tag: noteData.tag,
+            headline: noteData.headline,
+            detail: noteData.detail,
+            severity: noteData.severity,
             targetX: Math.round(screenPixelX),
             targetY: Math.round(screenPixelY),
             noteX: Math.round(noteX),
@@ -519,7 +569,7 @@ export function Phone3DCanvas({
 
             // Arrow originates from handwritten note in the margin and arches into the phone screen
             const arrowStartX = isRight ? pt.noteX - 10 : pt.noteX + 10
-            const arrowStartY = pt.targetY - 4
+            const arrowStartY = pt.targetY + 2
 
             // Organic curved control point for hand-drawn pen stroke
             const midX = (arrowStartX + pt.targetX) / 2
@@ -588,13 +638,29 @@ export function Phone3DCanvas({
                     onActivate(pt.id)
                   }
                 }}
-                aria-label={`Note #${idx + 1}: ${pt.scribble}`}
+                aria-label={`${pt.tag}: ${pt.headline} — ${pt.detail}`}
               >
-                {/* Handwritten ink scribble text - NO BOX, NO BORDER, PURE HANDWRITING */}
-                <span className="scribble-note-text">
-                  <span className="scribble-num">#{idx + 1} </span>
-                  {pt.scribble}
-                </span>
+                {/* LEVEL 1: Forensic Tag & Pattern Classification */}
+                <div className="scribble-meta-row">
+                  <span className="scribble-tag-pill">
+                    <span className="scribble-tag-index">{String(idx + 1).padStart(2, '0')}</span>
+                    <span className="scribble-tag-sep">/</span>
+                    <span className="scribble-tag-pattern">{pt.pattern.toUpperCase()}</span>
+                  </span>
+                  {pt.severity && (
+                    <span className={`scribble-severity-dot severity-${pt.severity}`} title={`${pt.severity} severity`} />
+                  )}
+                </div>
+
+                {/* LEVEL 2: Bold Expressive Handwritten Headline */}
+                <h4 className="scribble-headline">
+                  {pt.headline}
+                </h4>
+
+                {/* LEVEL 3: Subordinate Explanatory Detail */}
+                <p className="scribble-detail">
+                  {pt.detail}
+                </p>
               </div>
             )
           })}
