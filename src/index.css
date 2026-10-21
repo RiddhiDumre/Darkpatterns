@@ -996,17 +996,21 @@ body {
   opacity: 1;
 }
 
-/* 1. TOP: Handwritten Number */
+/* 1. TOP: Big Handwritten Number (no #) */
 .scribble-top-number {
   font-family: var(--font-hand), 'Caveat', cursive, sans-serif;
-  font-size: 1.28rem;
+  font-size: 2.75rem;
   font-weight: 700;
-  line-height: 1;
+  line-height: 0.92;
   color: currentColor;
-  margin-bottom: 2px;
+  margin: 0 0 3px 0;
   display: inline-block;
-  border-bottom: 1.8px solid currentColor;
-  padding-bottom: 1px;
+  letter-spacing: -0.02em;
+  opacity: 0.95;
+}
+
+.theme-dark .scribble-top-number {
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
 }
 
 /* 2. BELOW NUMBER: Dark Pattern Title */
