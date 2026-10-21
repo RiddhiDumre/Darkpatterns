@@ -57,7 +57,7 @@ export const FEATURED_HERO_FINDINGS: ScribbleFinding[] = [
     translation: 'Either buy our warranty or admit you make irresponsible life choices.',
     recommendation: 'Use neutral, dignified decline options like "No thanks" or "Continue without coverage".',
     guideline: 'CCPA 2023 Guideline 5(c): Confirmshaming',
-    bbox: { x: 6.2, y: 76.1, w: 87.7, h: 3.6 },
+    bbox: { x: 20.0, y: 76.0, w: 60.0, h: 3.8 },
     patternTitle: 'Confirmshaming',
     explanationText: 'Guilt-trips you as "reckless" for simply declining paid coverage',
     side: 'right',

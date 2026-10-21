@@ -6,7 +6,7 @@ import { SunglassesTransition } from './components/SunglassesTransition'
 import { FEATURED_HERO_ANALYSIS } from './data/featuredFindings'
 
 type ViewMode = 'investigation' | 'normal'
-type AppStatus = 'initial-loading' | 'idle' | 'analyzing' | 'wearing-shades' | 'error'
+type AppStatus = 'initial-loading' | 'idle' | 'analyzing' | 'error'
 
 const DEFAULT_SPECIMEN_SRC = '/mobile-checkout-specimen.png'
 
@@ -19,7 +19,7 @@ const ANALYSIS_STEPS = [
 
 export default function App() {
   const [viewMode, setViewMode] = useState<ViewMode>('normal')
-  const [status, setStatus] = useState<AppStatus>('idle')
+  const [status, setStatus] = useState<AppStatus>('initial-loading')
   const [initialAssetsReady, setInitialAssetsReady] = useState(false)
   const [activeId, setActiveId] = useState<string | null>(null)
   const [stepIndex, setStepIndex] = useState(0)
@@ -133,33 +133,13 @@ export default function App() {
     setActiveId(null)
   }
 
-  const handleWearSunglasses = () => {
-    setStatus('wearing-shades')
-  }
-
   const toggleViewMode = () => {
-    if (viewMode === 'normal') {
-      handleWearSunglasses()
-    } else {
-      setViewMode('normal')
-    }
+    setViewMode((prev) => (prev === 'investigation' ? 'normal' : 'investigation'))
   }
 
   return (
     <div className={`paper-app-root ${viewMode === 'investigation' ? 'mode-investigation' : 'mode-normal'}`}>
-      {/* 1. WEAR SUNGLASSES / PLAY PUT ON TRANSITION */}
-      {status === 'wearing-shades' && (
-        <SunglassesTransition
-          mode="wear"
-          isReady={true}
-          onTransitionComplete={() => {
-            setViewMode('investigation')
-            setStatus('idle')
-          }}
-        />
-      )}
-
-      {/* 2. INITIAL LOAD FALLBACK (if ever invoked) */}
+      {/* 1. INITIAL LOAD FULL BLACK SUNGLASSES TRANSITION */}
       {status === 'initial-loading' && (
         <SunglassesTransition
           mode="initial-load"
@@ -171,7 +151,7 @@ export default function App() {
         />
       )}
 
-      {/* 3. UPLOAD ANALYSIS FULL BLACK SUNGLASSES TRANSITION */}
+      {/* 2. UPLOAD ANALYSIS FULL BLACK SUNGLASSES TRANSITION */}
       {status === 'analyzing' && (
         <SunglassesTransition
           mode="analysis"
@@ -273,7 +253,7 @@ export default function App() {
         )}
 
         {/* ACTIVE EDITORIAL INVESTIGATION VIEW */}
-        {(status === 'idle' || status === 'wearing-shades' || status === 'initial-loading') && (
+        {(status === 'idle' || status === 'initial-loading') && (
           <section className="paper-landing-viewport">
             <div className="paper-landing-grid">
               {/* Left Column: Big Prominent Input Area & Bullet Journal Findings */}
@@ -326,11 +306,9 @@ export default function App() {
                         : 'Mobile checkout specimen inside 3D iPhone'
                     }
                     findings={currentAnalysis.findings}
-                    viewMode={viewMode}
                     showOverlay={viewMode === 'investigation'}
                     activeId={activeId}
                     onActivate={setActiveId}
-                    onWearSunglasses={handleWearSunglasses}
                     isCustomUpload={isCustomUpload}
                     onResetToDemo={resetToDemo}
                   />

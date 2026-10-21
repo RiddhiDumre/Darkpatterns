@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 export interface SunglassesTransitionProps {
-  mode: 'initial-load' | 'analysis' | 'wear'
+  mode: 'initial-load' | 'analysis'
   isReady: boolean
   stepText?: string
   previewUrl?: string | null
@@ -40,7 +40,7 @@ export function SunglassesTransition({
     // When ready, initiate smooth approach & lens zoom
     if (isReady && (phase === 'waiting' || phase === 'approach')) {
       const elapsed = Date.now() - startTimeRef.current
-      const minWaiting = mode === 'wear' ? 60 : mode === 'initial-load' ? 350 : 400
+      const minWaiting = mode === 'initial-load' ? 350 : 400
       const delay = Math.max(0, minWaiting - elapsed)
 
       const timer = setTimeout(() => {
