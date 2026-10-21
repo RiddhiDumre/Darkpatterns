@@ -12,8 +12,8 @@ interface Props {
 function BigUploadIcon() {
   return (
     <svg
-      width="28"
-      height="28"
+      width="34"
+      height="34"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -105,12 +105,12 @@ export function Dropzone({ onImage, onSelectSample, disabled = false }: Props) {
 
   return (
     <div className="big-input-zone-container">
-      {/* Big Main Input Dropzone Card */}
+      {/* Extended Hero Input Dropzone Card */}
       <div
         role="button"
         tabIndex={disabled ? -1 : 0}
         aria-label="Upload screenshot for dark pattern analysis. Drop a screenshot here or press Enter to browse files."
-        className={`big-input-dropcard${dragging ? ' is-dragging' : ''}${disabled ? ' is-disabled' : ''}`}
+        className={`big-input-dropcard extended-dropcard${dragging ? ' is-dragging' : ''}${disabled ? ' is-disabled' : ''}`}
         onClick={() => !disabled && inputRef.current?.click()}
         onKeyDown={(e) => {
           if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
@@ -137,18 +137,32 @@ export function Dropzone({ onImage, onSelectSample, disabled = false }: Props) {
         <span className="editorial-corner-mark bottom-left" aria-hidden="true" />
         <span className="editorial-corner-mark bottom-right" aria-hidden="true" />
 
-        <div className="big-input-inner-layout">
-          <div className="big-input-icon-orb" aria-hidden="true">
+        <div className="extended-drop-inner">
+          <div className="extended-icon-orb" aria-hidden="true">
             <BigUploadIcon />
           </div>
 
-          <div className="big-input-content-block">
-            <h3 className="big-input-primary-heading">
-              Drop screenshot here <span className="big-input-or-browse">or click to browse</span>
+          <div className="extended-content-block">
+            <h3 className="extended-primary-heading">
+              Drop any screenshot here
             </h3>
-            <p className="big-input-instruction">
-              PNG, JPEG, WebP up to 8MB &middot; Direct paste with <kbd className="big-input-kbd">⌘V</kbd> / <kbd className="big-input-kbd">Ctrl+V</kbd>
+            <p className="extended-subheading">
+              or <span className="extended-browse-text">browse files</span> from your computer
             </p>
+
+            <div className="extended-badges-row">
+              <span className="extended-badge-pill">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                  <circle cx="9" cy="9" r="2"/>
+                  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+                </svg>
+                PNG, JPEG, WebP up to 8MB
+              </span>
+              <span className="extended-badge-pill">
+                <kbd className="big-input-kbd">⌘V</kbd> / <kbd className="big-input-kbd">Ctrl+V</kbd> paste anywhere
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -166,52 +180,75 @@ export function Dropzone({ onImage, onSelectSample, disabled = false }: Props) {
       />
 
       {/* Direct URL / Link Input Field */}
-      <form onSubmit={handleUrlSubmit} className="direct-url-input-form">
-        <div className="direct-url-input-wrap">
-          <span className="direct-url-icon" aria-hidden="true">🔗</span>
+      <form onSubmit={handleUrlSubmit} className="direct-url-input-form extended-url-form">
+        <div className="direct-url-input-wrap extended-url-wrap">
+          <span className="direct-url-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+            </svg>
+          </span>
           <input
             type="url"
             value={urlInput}
             onChange={(e) => setUrlInput(e.target.value)}
-            placeholder="Or paste screenshot image URL to scan directly…"
+            placeholder="Or enter public image URL to scan directly…"
             className="direct-url-input-field"
             disabled={disabled || loadingUrl}
           />
           <button
             type="submit"
-            className="direct-url-submit-btn"
+            className="direct-url-submit-btn extended-url-btn"
             disabled={disabled || loadingUrl || !urlInput.trim()}
           >
-            {loadingUrl ? 'Loading…' : 'Scan URL'}
+            {loadingUrl ? 'Fetching…' : 'Scan URL ↗'}
           </button>
         </div>
       </form>
 
-      {/* Quick Example Presets for 1-Click Exploration */}
+      {/* Quick Example Presets with descriptive pills */}
       {onSelectSample && (
-        <div className="big-input-sample-chips">
-          <span className="sample-chips-label">Try example:</span>
-          <button
-            type="button"
-            className="sample-chip-btn"
-            onClick={() => onSelectSample('/mobile-checkout-specimen.png')}
-          >
-            📱 Mobile Checkout
-          </button>
-          <button
-            type="button"
-            className="sample-chip-btn"
-            onClick={() => onSelectSample('/examples/example-dark-checkout.png')}
-          >
-            ⚡ Urgent Checkout
-          </button>
-          <button
-            type="button"
-            className="sample-chip-btn"
-            onClick={() => onSelectSample('/examples/example-tricky-wording.png')}
-          >
-            🔒 Sneaky Consent
-          </button>
+        <div className="extended-sample-section">
+          <div className="extended-sample-header">
+            <span className="sample-chips-label">Or test drive a sample specimen:</span>
+          </div>
+          <div className="extended-sample-grid">
+            <button
+              type="button"
+              className="extended-sample-card"
+              onClick={() => onSelectSample('/mobile-checkout-specimen.png')}
+            >
+              <span className="sample-card-icon" aria-hidden="true">📱</span>
+              <div className="sample-card-text">
+                <span className="sample-card-title">Mobile Checkout</span>
+                <span className="sample-card-desc">Fake urgency timer & auto-checked warranty</span>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              className="extended-sample-card"
+              onClick={() => onSelectSample('/examples/example-dark-checkout.png')}
+            >
+              <span className="sample-card-icon" aria-hidden="true">⚡</span>
+              <div className="sample-card-text">
+                <span className="sample-card-title">Urgent Booking</span>
+                <span className="sample-card-desc">Manufactured scarcity & countdown pressure</span>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              className="extended-sample-card"
+              onClick={() => onSelectSample('/examples/example-tricky-wording.png')}
+            >
+              <span className="sample-card-icon" aria-hidden="true">🔒</span>
+              <div className="sample-card-text">
+                <span className="sample-card-title">Sneaky Consent</span>
+                <span className="sample-card-desc">Pre-checked tracking & deceptive decline</span>
+              </div>
+            </button>
+          </div>
         </div>
       )}
 

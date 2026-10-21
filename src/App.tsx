@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Analysis } from '../shared/types'
 import { Dropzone } from './components/Dropzone'
-import { FindingsPanel } from './components/FindingsPanel'
 import { Phone3DCanvas } from './components/Phone3DCanvas'
 import { SunglassesTransition } from './components/SunglassesTransition'
 import { FEATURED_HERO_ANALYSIS } from './data/featuredFindings'
@@ -292,16 +291,6 @@ export default function App() {
                   <Dropzone
                     onImage={onImage}
                     onSelectSample={handleSelectSample}
-                  />
-                </div>
-
-                {/* Bullet Journal Findings Section */}
-                <div className="paper-findings-box">
-                  <FindingsPanel
-                    findings={currentAnalysis.findings}
-                    summary={currentAnalysis.summary}
-                    activeId={activeId}
-                    onActivate={setActiveId}
                   />
                 </div>
               </div>
