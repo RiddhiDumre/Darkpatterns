@@ -17,6 +17,7 @@ debug.log
 .codex/
 .gemini/
 .impeccable/
+.agent/
 
 test-landing*.png
 grapghic.png

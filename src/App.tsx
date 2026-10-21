@@ -2,20 +2,20 @@ import { useEffect, useState } from 'react'
 import type { Analysis } from '../shared/types'
 import { Dropzone } from './components/Dropzone'
 import { FindingsPanel } from './components/FindingsPanel'
-import { ScreenshotView } from './components/ScreenshotView'
+import { Phone3DCanvas } from './components/Phone3DCanvas'
 import { SunglassesTransition } from './components/SunglassesTransition'
 import { FEATURED_HERO_ANALYSIS } from './data/featuredFindings'
 
 type ViewMode = 'investigation' | 'normal'
 type AppStatus = 'initial-loading' | 'idle' | 'analyzing' | 'error'
 
-const FEATURED_SCREENSHOT_SRC = '/featured-screenshot.png'
+const DEFAULT_SPECIMEN_SRC = '/mobile-checkout-specimen.png'
 
 const ANALYSIS_STEPS = [
   'Checking visual layout and tricky buttons…',
   'Looking for fake countdowns and manufactured urgency…',
   'Reading the fine print and guilt-trip copy…',
-  'Listing any sneaky patterns found…',
+  'Listing sneaky patterns with scribbled notes…',
 ]
 
 export default function App() {
@@ -26,7 +26,7 @@ export default function App() {
   const [stepIndex, setStepIndex] = useState(0)
 
   // Currently displayed screenshot & findings
-  const [currentImage, setCurrentImage] = useState<string>(FEATURED_SCREENSHOT_SRC)
+  const [currentImage, setCurrentImage] = useState<string>(DEFAULT_SPECIMEN_SRC)
   const [currentAnalysis, setCurrentAnalysis] = useState<Analysis>(FEATURED_HERO_ANALYSIS)
   const [isCustomUpload, setIsCustomUpload] = useState(false)
   const [uploadFileName, setUploadFileName] = useState<string | null>(null)
@@ -37,10 +37,10 @@ export default function App() {
   const [analysisReady, setAnalysisReady] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Preload featured screenshot on initial page load
+  // Preload featured mobile specimen on initial page load
   useEffect(() => {
     const img = new Image()
-    img.src = FEATURED_SCREENSHOT_SRC
+    img.src = DEFAULT_SPECIMEN_SRC
     img.onload = () => setInitialAssetsReady(true)
     img.onerror = () => setInitialAssetsReady(true)
   }, [])
@@ -102,8 +102,30 @@ export default function App() {
     void runAnalysis(url)
   }
 
+  // Handle sample preset selection
+  const handleSelectSample = async (samplePath: string) => {
+    try {
+      if (samplePath === DEFAULT_SPECIMEN_SRC) {
+        resetToDemo()
+        return
+      }
+      const res = await fetch(samplePath)
+      const blob = await res.blob()
+      const reader = new FileReader()
+      reader.onload = () => {
+        const dataUrl = String(reader.result)
+        const file = new File([blob], samplePath.split('/').pop() || 'sample.png', { type: blob.type })
+        onImage(dataUrl, file)
+      }
+      reader.readAsDataURL(blob)
+    } catch {
+      // Fallback: direct set if fetch fails
+      setCurrentImage(samplePath)
+    }
+  }
+
   const resetToDemo = () => {
-    setCurrentImage(FEATURED_SCREENSHOT_SRC)
+    setCurrentImage(DEFAULT_SPECIMEN_SRC)
     setCurrentAnalysis(FEATURED_HERO_ANALYSIS)
     setIsCustomUpload(false)
     setUploadFileName(null)
@@ -118,7 +140,7 @@ export default function App() {
 
   return (
     <div className={`paper-app-root ${viewMode === 'investigation' ? 'mode-investigation' : 'mode-normal'}`}>
-      {/* 1. INITIAL LOAD SUNGLASSES TRANSITION */}
+      {/* 1. INITIAL LOAD FULL BLACK SUNGLASSES TRANSITION */}
       {status === 'initial-loading' && (
         <SunglassesTransition
           mode="initial-load"
@@ -130,7 +152,7 @@ export default function App() {
         />
       )}
 
-      {/* 2. UPLOAD ANALYSIS SUNGLASSES TRANSITION */}
+      {/* 2. UPLOAD ANALYSIS FULL BLACK SUNGLASSES TRANSITION */}
       {status === 'analyzing' && (
         <SunglassesTransition
           mode="analysis"
@@ -154,7 +176,7 @@ export default function App() {
         />
       )}
 
-      {/* Editorial Minimal Header */}
+      {/* Editorial Minimal Clean Header */}
       <header className="paper-header">
         <div className="paper-header-inner">
           <button
@@ -163,15 +185,12 @@ export default function App() {
             onClick={resetToDemo}
             aria-label="Dark Pattern Detector home"
           >
-            <span className="brand-dot-anaglyph" aria-hidden="true">
-              <span className="dot-cyan" />
-              <span className="dot-pink" />
-            </span>
+            <span className="brand-dot-black" aria-hidden="true" />
             <span className="brand-name">Dark Pattern Detector</span>
           </button>
 
           <div className="paper-header-right">
-            {/* View Mode Toggle Button */}
+            {/* View Mode Toggle: Black Shades ON / Put on shades */}
             <button
               type="button"
               className={`paper-shades-toggle ${viewMode === 'investigation' ? 'is-active' : ''}`}
@@ -183,10 +202,10 @@ export default function App() {
               }
             >
               <span className="toggle-icon" aria-hidden="true">
-                {viewMode === 'investigation' ? '🕶' : '👓'}
+                {viewMode === 'investigation' ? '🕶️' : '👓'}
               </span>
               <span className="toggle-label">
-                {viewMode === 'investigation' ? 'Shades ON' : 'Put on shades'}
+                {viewMode === 'investigation' ? 'Black Shades: ON' : 'Put on shades'}
               </span>
             </button>
 
@@ -196,7 +215,7 @@ export default function App() {
                 className="paper-action-btn"
                 onClick={resetToDemo}
               >
-                &larr; View featured demo
+                &larr; View demo specimen
               </button>
             )}
           </div>
@@ -238,7 +257,7 @@ export default function App() {
         {(status === 'idle' || status === 'initial-loading') && (
           <section className="paper-landing-viewport">
             <div className="paper-landing-grid">
-              {/* Left Column: Marker Title, Supporting Text, Dropzone, and Bullet Journal Findings */}
+              {/* Left Column: Big Prominent Input Area & Bullet Journal Findings */}
               <div className="paper-hero-left">
                 <div className="paper-title-wrapper">
                   <h1 className="marker-title">
@@ -265,12 +284,15 @@ export default function App() {
                 </div>
 
                 <p className="paper-supporting-text">
-                  Upload a screenshot. Let&apos;s see what sneaky design tricks are hiding in plain sight.
+                  Drop a screenshot or paste a link below. Let&apos;s see what sneaky design tricks are hiding in plain sight.
                 </p>
 
-                {/* Dropzone Upload Section: ALWAYS visible & usable */}
+                {/* Big Prominent Direct Input Field */}
                 <div className="paper-upload-box">
-                  <Dropzone onImage={onImage} />
+                  <Dropzone
+                    onImage={onImage}
+                    onSelectSample={handleSelectSample}
+                  />
                 </div>
 
                 {/* Bullet Journal Findings Section */}
@@ -284,22 +306,24 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Right Column: Scotch-Taped Screenshot Specimen */}
+              {/* Right Column: 3D Model of an iPhone with Interactive Drag & Scribbled Handwritten Notes */}
               <div className="paper-hero-right">
-                <ScreenshotView
-                  src={currentImage}
-                  alt={
-                    isCustomUpload
-                      ? `Uploaded screenshot: ${uploadFileName || 'Custom screenshot'}`
-                      : 'Featured e-commerce checkout screenshot'
-                  }
-                  findings={currentAnalysis.findings}
-                  showOverlay={viewMode === 'investigation'}
-                  activeId={activeId}
-                  onActivate={setActiveId}
-                  isCustomUpload={isCustomUpload}
-                  onResetToDemo={resetToDemo}
-                />
+                <div className="phone-3d-stage-container">
+                  <Phone3DCanvas
+                    src={currentImage}
+                    alt={
+                      isCustomUpload
+                        ? `Uploaded screenshot: ${uploadFileName || 'Custom screenshot'}`
+                        : 'Mobile checkout specimen inside 3D iPhone'
+                    }
+                    findings={currentAnalysis.findings}
+                    showOverlay={viewMode === 'investigation'}
+                    activeId={activeId}
+                    onActivate={setActiveId}
+                    isCustomUpload={isCustomUpload}
+                    onResetToDemo={resetToDemo}
+                  />
+                </div>
               </div>
             </div>
           </section>

@@ -80,85 +80,92 @@ export function SunglassesTransition({
       role="status"
       aria-live="polite"
     >
-      {/* 3D Glasses Vector Rig */}
+      {/* Full Black Designer Sunglasses Vector Rig */}
       <div className="shades-loader-rig" aria-hidden="true">
         <svg
-          viewBox="0 0 260 110"
+          viewBox="0 0 280 120"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           className="shades-loader-svg"
         >
           <defs>
-            {/* Cyan lens gradient (left eye) */}
-            <linearGradient id="anaglyph-cyan-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#00f0ff" stopOpacity="0.95" />
-              <stop offset="60%" stopColor="#00b4d8" stopOpacity="0.88" />
-              <stop offset="100%" stopColor="#0077b6" stopOpacity="0.95" />
+            {/* Deep Black Polarized Lens Gradient */}
+            <linearGradient id="black-lens-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#1a1a22" stopOpacity="0.98" />
+              <stop offset="50%" stopColor="#0e0e13" stopOpacity="0.96" />
+              <stop offset="100%" stopColor="#050508" stopOpacity="0.99" />
             </linearGradient>
 
-            {/* Red / Magenta lens gradient (right eye) */}
-            <linearGradient id="anaglyph-pink-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#ff2e93" stopOpacity="0.95" />
-              <stop offset="60%" stopColor="#ff006e" stopOpacity="0.88" />
-              <stop offset="100%" stopColor="#b8005b" stopOpacity="0.95" />
+            {/* Sharp Specular Diagonal Glare for Sunglasses Glass */}
+            <linearGradient id="black-lens-glare" x1="0%" y1="0%" x2="65%" y2="100%">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.45" />
+              <stop offset="25%" stopColor="#ffffff" stopOpacity="0.08" />
+              <stop offset="55%" stopColor="#ffffff" stopOpacity="0.0" />
             </linearGradient>
 
-            {/* Specular glare */}
-            <linearGradient id="anaglyph-glare" x1="0%" y1="0%" x2="60%" y2="100%">
-              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.5" />
-              <stop offset="40%" stopColor="#ffffff" stopOpacity="0.1" />
-              <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+            {/* High-end Acetate Frame Gradient */}
+            <linearGradient id="black-frame-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#222228" />
+              <stop offset="30%" stopColor="#121216" />
+              <stop offset="100%" stopColor="#08080a" />
             </linearGradient>
 
-            <filter id="anaglyph-shades-shadow" x="-10%" y="-10%" width="120%" height="130%">
-              <feDropShadow dx="0" dy="8" stdDeviation="10" floodColor="#000000" floodOpacity="0.35" />
+            {/* Drop Shadow */}
+            <filter id="black-shades-shadow" x="-10%" y="-10%" width="120%" height="130%">
+              <feDropShadow dx="0" dy="10" stdDeviation="12" floodColor="#000000" floodOpacity="0.45" />
             </filter>
           </defs>
 
-          <g filter="url(#anaglyph-shades-shadow)">
-            {/* Dark Retro Frame */}
+          <g filter="url(#black-shades-shadow)">
+            {/* Dark Glossy Acetate Frame */}
             <path
-              d="M 12 24 C 36 21 88 20 108 24 C 114 25 118 30 120 34 C 122 30 126 25 132 24 C 152 20 204 21 228 24 C 234 25 238 31 236 38 L 226 78 C 223 88 215 94 204 94 L 140 94 C 128 94 122 84 120 78 C 118 84 112 94 100 94 L 36 94 C 25 94 17 88 14 78 L 4 38 C 2 31 6 25 12 24 Z"
-              fill="#121216"
-              stroke="#08080a"
+              d="M 14 26 C 40 22 96 21 118 25 C 124 26 128 31 130 35 C 132 31 136 26 142 25 C 164 21 220 22 246 26 C 253 27 257 33 255 40 L 244 84 C 241 95 232 101 220 101 L 152 101 C 139 101 132 90 130 84 C 128 90 121 101 108 101 L 40 101 C 28 101 19 95 16 84 L 5 40 C 3 33 7 27 14 26 Z"
+              fill="url(#black-frame-grad)"
+              stroke="#0a0a0c"
               strokeWidth="3.5"
             />
 
-            {/* Top browline highlight */}
+            {/* Subtle Metallic Browline Bevel Highlight */}
             <path
-              d="M 16 26 C 40 23 88 22 108 26 M 132 26 C 152 22 200 23 224 26"
-              stroke="#2d2d35"
-              strokeWidth="2"
+              d="M 18 28 C 44 24 96 23 118 27 M 142 27 C 164 23 216 24 242 28"
+              stroke="#3a3a44"
+              strokeWidth="1.8"
               strokeLinecap="round"
             />
 
-            {/* Left Lens: Cyan */}
-            <g className="loader-lens-cyan">
+            {/* Left Full Black Polarized Lens */}
+            <g className="black-lens-left">
               <path
-                d="M 22 34 C 44 31 82 31 98 34 C 104 36 108 42 106 50 L 100 74 C 98 82 92 86 84 86 L 36 86 C 28 86 22 82 20 74 L 14 50 C 13 42 16 36 22 34 Z"
-                fill="url(#anaglyph-cyan-grad)"
+                d="M 24 36 C 48 33 90 33 108 36 C 114 38 118 44 116 52 L 110 80 C 108 88 101 92 92 92 L 40 92 C 31 92 24 88 22 80 L 16 52 C 15 44 18 38 24 36 Z"
+                fill="url(#black-lens-grad)"
               />
+              {/* Glossy Diagonal Specular Glare */}
               <path
-                d="M 24 36 L 46 34 L 28 84 L 22 74 Z"
-                fill="url(#anaglyph-glare)"
-              />
-            </g>
-
-            {/* Right Lens: Red / Magenta */}
-            <g className="loader-lens-pink">
-              <path
-                d="M 142 34 C 158 31 196 31 218 34 C 224 36 227 42 226 50 L 220 74 C 218 82 212 86 204 86 L 156 86 C 148 86 142 82 140 74 L 134 50 C 132 42 136 36 142 34 Z"
-                fill="url(#anaglyph-pink-grad)"
-              />
-              <path
-                d="M 144 36 L 166 34 L 148 84 L 142 74 Z"
-                fill="url(#anaglyph-glare)"
+                d="M 26 38 L 52 35 L 32 90 L 24 80 Z"
+                fill="url(#black-lens-glare)"
               />
             </g>
 
-            {/* Bridge */}
+            {/* Right Full Black Polarized Lens */}
+            <g className="black-lens-right">
+              <path
+                d="M 152 36 C 170 33 212 33 236 36 C 242 38 245 44 244 52 L 238 80 C 236 88 229 92 220 92 L 168 92 C 159 92 152 88 150 80 L 144 52 C 143 44 146 38 152 36 Z"
+                fill="url(#black-lens-grad)"
+              />
+              {/* Glossy Diagonal Specular Glare */}
+              <path
+                d="M 154 38 L 180 35 L 160 90 L 152 80 Z"
+                fill="url(#black-lens-glare)"
+              />
+            </g>
+
+            {/* Dual Silver Temple Rivets (Classic Wayfarer signature) */}
+            <ellipse cx="14" cy="38" rx="2.5" ry="1.5" fill="#d0d0d8" />
+            <ellipse cx="246" cy="38" rx="2.5" ry="1.5" fill="#d0d0d8" />
+
+            {/* Center Bridge Detail */}
             <path
-              d="M 112 36 C 116 33 124 33 128 36"
+              d="M 122 38 C 126 35 134 35 138 38"
               stroke="#2e2e36"
               strokeWidth="2.5"
               strokeLinecap="round"
@@ -167,17 +174,16 @@ export function SunglassesTransition({
         </svg>
       </div>
 
-      {/* Lens Transition Veil (cyan wash expanding as lens fills viewport) */}
+      {/* Deep Obsidian Lens Transition Veil (replaces old cyan veil) */}
       <div className="shades-lens-veil" aria-hidden="true" />
 
-      {/* Waiting State UI */}
+      {/* Waiting State UI for Upload Analysis */}
       {phase === 'waiting' && mode === 'analysis' && (
         <div className="shades-telemetry-card">
           <div className="telemetry-badge-row">
             <span className="telemetry-anaglyph-badge">
-              <span className="badge-dot-cyan" aria-hidden="true" />
-              <span className="badge-dot-pink" aria-hidden="true" />
-              3D SHADES INSPECTION
+              <span className="badge-dot-obsidian" aria-hidden="true" />
+              BLACK SHADES FORENSIC SCAN
             </span>
           </div>
 
@@ -209,8 +215,7 @@ export function SunglassesTransition({
       {phase === 'waiting' && mode === 'initial-load' && (
         <div className="initial-load-telemetry">
           <span className="telemetry-anaglyph-badge">
-            <span className="badge-dot-cyan" aria-hidden="true" />
-            <span className="badge-dot-pink" aria-hidden="true" />
+            <span className="badge-dot-obsidian" aria-hidden="true" />
             PUTTING ON THE SHADES&hellip;
           </span>
         </div>
