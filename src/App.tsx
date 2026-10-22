@@ -229,6 +229,14 @@ export default function App() {
                       isCustomUpload={isCustomUpload}
                       onResetToDemo={resetToDemo}
                     />
+
+                    {/* Physical Phone Stand Plaque */}
+                    <div className="phone-doodle-stand" aria-hidden="true">
+                      <div className="stand-base-bevel" />
+                      <div className="stand-plaque">
+                        <span className="stand-text">YOU'VE BEEN SERVED ⚖️</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
