@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react'
 import type { Analysis } from '../shared/types'
 import { Dropzone } from './components/Dropzone'
 import { Phone3DCanvas } from './components/Phone3DCanvas'
-import { SunglassesTransition } from './components/SunglassesTransition'
+import { AppIconBackground } from './components/AppIconBackground'
+import { AnalysisLoadingOverlay } from './components/AnalysisLoadingOverlay'
 import { FEATURED_HERO_ANALYSIS } from './data/featuredFindings'
 
-type ViewMode = 'investigation' | 'normal'
-type AppStatus = 'initial-loading' | 'idle' | 'analyzing' | 'error'
+type AppStatus = 'idle' | 'analyzing' | 'error'
 
 const DEFAULT_SPECIMEN_SRC = '/mobile-checkout-specimen.png'
 
@@ -17,31 +17,8 @@ const ANALYSIS_STEPS = [
   'Listing sneaky patterns with scribbled notes…',
 ]
 
-function SunglassesIcon({ active }: { active: boolean }) {
-  return (
-    <svg
-      width="20"
-      height="12"
-      viewBox="0 0 28 16"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className="sunglasses-toggle-svg"
-    >
-      <path d="M2 4h7c1 0 2 1 2 2v4c0 2-2 4-4.5 4S2 12 2 10V4z" fill={active ? 'currentColor' : 'none'} />
-      <path d="M26 4h-7c-1 0-2 1-2 2v4c0 2 2 4 4.5 4s4.5-2 4.5-4V4z" fill={active ? 'currentColor' : 'none'} />
-      <line x1="11" y1="6" x2="17" y2="6" />
-    </svg>
-  )
-}
-
 export default function App() {
-  const [viewMode, setViewMode] = useState<ViewMode>('normal')
-  const [status, setStatus] = useState<AppStatus>('initial-loading')
-  const [initialAssetsReady, setInitialAssetsReady] = useState(false)
+  const [status, setStatus] = useState<AppStatus>('idle')
   const [activeId, setActiveId] = useState<string | null>(null)
   const [stepIndex, setStepIndex] = useState(0)
 
@@ -57,12 +34,10 @@ export default function App() {
   const [analysisReady, setAnalysisReady] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Preload featured mobile specimen on initial page load
+  // Ensure Light theme permanently
   useEffect(() => {
-    const img = new Image()
-    img.src = DEFAULT_SPECIMEN_SRC
-    img.onload = () => setInitialAssetsReady(true)
-    img.onerror = () => setInitialAssetsReady(true)
+    document.documentElement.setAttribute('data-theme', 'light')
+    document.body.classList.remove('theme-dark')
   }, [])
 
   // Cycle analysis steps during 'analyzing'
@@ -74,17 +49,6 @@ export default function App() {
     }, 1200)
     return () => clearInterval(interval)
   }, [status])
-
-  // Sync document theme with viewMode
-  useEffect(() => {
-    const isDark = viewMode === 'investigation'
-    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light')
-    if (isDark) {
-      document.body.classList.add('theme-dark')
-    } else {
-      document.body.classList.remove('theme-dark')
-    }
-  }, [viewMode])
 
   const runAnalysis = async (target: string) => {
     setStatus('analyzing')
@@ -154,28 +118,14 @@ export default function App() {
     setActiveId(null)
   }
 
-  const toggleViewMode = () => {
-    setViewMode((prev) => (prev === 'investigation' ? 'normal' : 'investigation'))
-  }
-
   return (
-    <div className={`paper-app-root ${viewMode === 'investigation' ? 'mode-investigation' : 'mode-normal'}`}>
-      {/* 1. INITIAL LOAD FULL BLACK SUNGLASSES TRANSITION */}
-      {status === 'initial-loading' && (
-        <SunglassesTransition
-          mode="initial-load"
-          isReady={initialAssetsReady}
-          onTransitionComplete={() => {
-            setViewMode('investigation')
-            setStatus('idle')
-          }}
-        />
-      )}
+    <div className="paper-app-root">
+      {/* 3D App Icon Grid Background (Spotify, Swiggy, Zomato, etc. with 20% opacity and 3D hover tilt) */}
+      <AppIconBackground />
 
-      {/* 2. UPLOAD ANALYSIS FULL BLACK SUNGLASSES TRANSITION */}
+      {/* Upload Analysis Loading State */}
       {status === 'analyzing' && (
-        <SunglassesTransition
-          mode="analysis"
+        <AnalysisLoadingOverlay
           isReady={analysisReady}
           stepText={ANALYSIS_STEPS[stepIndex]}
           previewUrl={uploadDataUrl}
@@ -189,7 +139,6 @@ export default function App() {
               setCurrentImage(uploadDataUrl)
               setCurrentAnalysis(pendingAnalysis)
               setIsCustomUpload(true)
-              setViewMode('investigation')
               setStatus('idle')
             }
           }}
@@ -210,23 +159,6 @@ export default function App() {
           </button>
 
           <div className="paper-header-right">
-            {/* View Mode Toggle: Investigation View / Normal View */}
-            <button
-              type="button"
-              className={`clean-mode-toggle ${viewMode === 'investigation' ? 'is-investigation' : 'is-normal'}`}
-              onClick={toggleViewMode}
-              aria-label={
-                viewMode === 'investigation'
-                  ? 'Investigation view is active. Click to switch to normal view.'
-                  : 'Normal view is active. Click to enter investigation view.'
-              }
-            >
-              <SunglassesIcon active={viewMode === 'investigation'} />
-              <span className="toggle-label">
-                {viewMode === 'investigation' ? 'Shades On' : 'Shades Off'}
-              </span>
-            </button>
-
             {isCustomUpload && (
               <button
                 type="button"
@@ -272,7 +204,7 @@ export default function App() {
         )}
 
         {/* ACTIVE EDITORIAL INVESTIGATION VIEW */}
-        {(status === 'idle' || status === 'initial-loading') && (
+        {status === 'idle' && (
           <section className="paper-landing-viewport">
             <div className="paper-landing-grid">
               {/* Left Column: Big Prominent Input Area & Hero Introduction */}
@@ -306,7 +238,7 @@ export default function App() {
                         : 'Mobile checkout specimen inside 3D iPhone'
                     }
                     findings={currentAnalysis.findings}
-                    showOverlay={viewMode === 'investigation'}
+                    showOverlay={true}
                     activeId={activeId}
                     onActivate={setActiveId}
                     isCustomUpload={isCustomUpload}

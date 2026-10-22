@@ -1,23 +1,17 @@
 ---
 name: Dark Pattern Detector
-description: Refined, high-craft editorial consumer defense interface featuring calm natural surfaces, precise typography, a Three.js 3D Space Black iPhone, forensic red handwritten audit notes, and polarized sunglasses transition.
+description: Refined light editorial consumer defense interface featuring ambient floating 3D famous app icons background with interactive tilt, precise typography, a Three.js 3D Space Black iPhone, and forensic red handwritten audit notes.
 colors:
   bg: "#fafaf9"
-  bg-dark: "#0a0b0e"
   surface: "#ffffff"
-  surface-dark: "#12141a"
   surface-inset: "#f3f3f0"
-  surface-inset-dark: "#1a1c24"
   text-primary: "#121316"
-  text-primary-dark: "#f6f6f8"
   text-secondary: "#575a65"
-  text-secondary-dark: "#9da1ad"
   text-tertiary: "#878b96"
-  text-tertiary-dark: "#6b6f7b"
-  border-subtle: "rgba(18, 19, 22, 0.09)"
-  border-subtle-dark: "rgba(255, 255, 255, 0.08)"
+  border-subtle: "rgba(18, 19, 22, 0.08)"
+  border-medium: "rgba(18, 19, 22, 0.15)"
+  border-focus: "rgba(18, 19, 22, 0.35)"
   ink-audit: "#d32f2f"
-  ink-audit-dark: "#ff453a"
 typography:
   display:
     fontFamily: "Archivo, -apple-system, BlinkMacSystemFont, sans-serif"
@@ -58,8 +52,8 @@ rounded:
   lg: "14px"
   full: "9999px"
 shadows:
-  sm: "0 1px 2px rgba(0, 0, 0, 0.04)"
-  md: "0 4px 16px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.03)"
+  sm: "0 1px 3px rgba(0, 0, 0, 0.04)"
+  md: "0 4px 18px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.03)"
   lg: "0 16px 36px -4px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04)"
 ---
 
@@ -68,36 +62,35 @@ shadows:
 <!-- impeccable:design-schema 1 -->
 
 ## Overview
-A distilled, crafted consumer defense tool engineered for clarity and authority. Replaces generic AI tropes, faux-terminal telemetry, loud neon badges, and grid-paper textures with calm surfaces, precise typography, authentic forensic ink annotations, and deliberate negative space.
+A crafted, pure light editorial consumer defense tool engineered for clarity and authority. Replaces all sunglasses gimmicks with a clean light theme, and introduces an ambient background grid of famous 3D app icons (Spotify, Apple Music, Swiggy, Zomato, Amazon, Netflix, etc.) floating at 20% opacity with responsive 3D hover tilt.
 
 ## Key Design Signatures
 
-1. **Calm, High-Craft Editorial Canvas**:
-   - Clean, solid surfaces without decorative grids or noisy textures.
-   - Dual-view model:
-     - **Normal View ("Shades Off")**: Warm, quiet paper ground (`#fafaf9`) representing standard browsing.
-     - **Investigation View ("Shades On")**: Deep matte obsidian (`#0a0b0e`) with subtle ambient depth behind the 3D specimen.
-   - Restrained hairline borders (`1px` to `1.5px`) and natural layered drop shadows.
+1. **Ambient 3D Famous App Icon Background**:
+   - A grid of household app icons (Spotify, Apple Music, Swiggy, Zomato, Amazon, Netflix, Uber, Airbnb, YouTube, etc.) with tactile 3D squircle styling, top gloss highlights, and bottom depth bevels.
+   - Set to a subtle 20% opacity to remain an atmospheric backdrop without competing with the foreground.
+   - Continuous organic ambient floating motion with staggered delays.
+   - Responsive 3D perspective tilt on hover, tracking the cursor angle.
 
-2. **Confident Human Typography**:
-   - Clear, authoritative display headlines in sentence case using tight-tracked `Archivo` (weight 800): *"Deceptive design, unmasked."*
+2. **Pure Light Theme Aesthetic**:
+   - Clean, warm paper ground (`#fafaf9`) paired with crisp white card surfaces (`#ffffff`).
+   - Hairline borders (`1px` to `1.5px`) and layered natural drop shadows.
+   - Zero sunglasses motifs, lenses, or dark theme switching.
+
+3. **Confident Human Typography**:
+   - Authoritative display headlines in sentence case using tight-tracked `Archivo` (weight 800): *"Deceptive design, unmasked."*
    - Clean `Inter` body text at comfortable reading line-height.
-   - Zero kickers, eyebrows, or decorative section numbers.
 
-3. **Floating 3D Phone Specimen & Forensic Scribble Notes**:
+4. **Floating 3D Phone Specimen & Forensic Scribble Notes**:
    - Procedural Three.js Space Black titanium iPhone floating serenely in ambient space.
-   - Non-interactive to drags and touches to keep scrolling frictionless.
-   - Floating handwritten notes (`Caveat`) positioned strictly in the outer margins to leave interface details 100% visible:
+   - Floating handwritten notes (`Caveat`) positioned strictly in the outer margins in high-contrast red forensic ink (`#d32f2f`):
      - Top: Big index numeral (`1`, `2`, `3`, `4`)
      - Middle: Deceptive pattern title
      - Bottom: Plain-language translation
-   - Cohesive, authentic red forensic ink (`#ff453a` in dark mode, `#d32f2f` in light mode) with curved pen stroke arrows pointing cleanly to the side of suspect elements.
+   - Curved ink arrows pointing cleanly to the side of suspect elements without obscuring interface details.
 
-4. **Streamlined Intake Canvas**:
-   - Generous dropzone with dashed border and smooth physical hover lift.
-   - Direct file browsing, drag-and-drop, and `<kbd>⌘V</kbd>` clipboard paste.
-   - Integrated URL scanner bar.
-   - Quick sample specimen chips (*Mobile Checkout*, *Urgent Booking*, *Sneaky Consent*) replacing repetitive card grids.
-
-5. **Polarized Sunglasses Transition**:
-   - Custom lens zoom animation serving as the signature portal between innocent browsing and deceptive pattern exposure.
+5. **Streamlined Intake Canvas & Loading State**:
+   - Spacious dropzone with dashed border and smooth hover lift.
+   - Direct file browsing, drag-and-drop, `<kbd>⌘V</kbd>` clipboard paste, and URL scanner.
+   - Curated sample specimen chips (*Mobile Checkout*, *Urgent Booking*, *Sneaky Consent*).
+   - Clean, non-distracting scanning overlay during analysis without sunglasses transitions.

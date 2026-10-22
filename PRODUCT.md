@@ -22,23 +22,22 @@ Instant, zero-friction AI vision analysis combining visual bounding-box highligh
 
 ## Operating Context
 
-- Single-page web experience with dual visual states: light editorial normal view and deep charcoal/obsidian investigation view.
-- Recurring full black sunglasses zoom transition connecting initial page load and analysis completion into the investigation view.
+- Single-page pure light theme experience on warm paper canvas with an ambient background grid of floating 3D famous app icons (Spotify, Swiggy, Zomato, Apple Music, etc.) at 20% opacity with responsive 3D tilt.
+- Clean and direct workflow without sunglasses transitions or dark mode toggles.
 - Hero composition featuring:
   - Left column: spacious, direct upload drop canvas supporting drag-and-drop, `<kbd>⌘V</kbd> / <kbd>Ctrl+V</kbd>` clipboard paste, public image URL scanner, and curated sample specimens.
   - Right column: Three.js procedural 3D iPhone model in Space Black titanium, floating peacefully in ambient space with an edge-to-edge mobile checkout screen.
-- Floating handwritten scribble notes (`Caveat`) with large prominent index numbers (`1`, `2`, `3`, `4`), pattern titles, and concise explanations positioned strictly in the outer margins to leave the interface 100% visible, paired with curved ink arrows pointing directly to the side of suspicious elements.
+- Floating handwritten scribble notes (`Caveat`) in high-contrast forensic red ink with large prominent index numbers (`1`, `2`, `3`, `4`), pattern titles, and concise explanations positioned strictly in the outer margins to leave the interface 100% visible, paired with curved ink arrows pointing directly to the side of suspicious elements.
 
 ## Capabilities and Constraints
 
 - **Capabilities**:
   - Image upload with client-side drag-and-drop, direct file browsing, clipboard paste, and URL import.
-  - Full black sunglasses entrance and analysis transition with camera zoom into the dark investigation view.
+  - Ambient grid of 3D household app icons floating in the background with responsive 3D hover tilt.
   - Procedural 3D iPhone in Three.js with normalized screen UV mapping and continuous ambient floating motion.
   - Gemini Vision API-powered multi-category dark pattern analysis (Urgency, Preselection, Confirmshaming, Hidden Costs, Sneak into Basket, Forced Continuity, etc.).
   - Side-anchored SVG ink arrows and handwritten notes that never obscure screen elements.
   - Severity-tagged findings with plain-language reality-check translations and ethical recommendations.
-  - Toggle between normal view and investigation view anytime.
 - **Constraints**:
   - Requires Google Gemini API key configured for backend server analysis.
   - Zero server persistence of user-submitted screenshots (privacy-first ephemeral processing).
@@ -47,7 +46,7 @@ Instant, zero-friction AI vision analysis combining visual bounding-box highligh
 ## Brand Commitments
 
 - **Tone & Voice**: Playful yet authoritative, clear, conversational, and direct editorial voice. Demystifies deceptive patterns without dry legal jargon.
-- **Visual Identity**: Warm editorial aesthetic featuring distinct headline typography (`Archivo`), full black polarized sunglasses transition motif, and candid handwritten forensic scribble annotations (`Caveat`).
+- **Visual Identity**: Warm light editorial aesthetic featuring distinct headline typography (`Archivo`), ambient 3D app icon background, and candid handwritten forensic scribble annotations (`Caveat`).
 
 ## Evidence on Hand
 

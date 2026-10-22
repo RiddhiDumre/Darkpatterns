@@ -1,16 +1,15 @@
 /* ==========================================================================
-   DARK PATTERN DETECTOR — CRAFTED EDITORIAL DESIGN SYSTEM
-   Clean, confident, human interface engineered for consumer protection.
-   Featuring precise typography, warm surfaces, custom Three.js 3D iPhone,
-   forensic handwritten audit notes, and polarized sunglasses transition.
+   DARK PATTERN DETECTOR — CRAFTED LIGHT EDITORIAL DESIGN SYSTEM
+   Featuring warm surfaces, 3D floating famous app icons background with interactive tilt,
+   Three.js 3D iPhone with high-contrast forensic handwritten notes, and streamlined intake.
    ========================================================================== */
 
 :root {
-  /* Surfaces & Canvas — Normal Mode */
+  /* Surfaces & Canvas — Pure Light Theme */
   --bg-canvas: #fafaf9;
   --bg-surface: #ffffff;
   --bg-inset: #f3f3f0;
-  --bg-overlay: rgba(250, 250, 249, 0.94);
+  --bg-overlay: rgba(250, 250, 249, 0.90);
 
   /* Typography Colors */
   --text-primary: #121316;
@@ -18,16 +17,16 @@
   --text-tertiary: #878b96;
 
   /* Borders & Lines */
-  --border-subtle: rgba(18, 19, 22, 0.09);
-  --border-medium: rgba(18, 19, 22, 0.16);
+  --border-subtle: rgba(18, 19, 22, 0.08);
+  --border-medium: rgba(18, 19, 22, 0.15);
   --border-focus: rgba(18, 19, 22, 0.35);
 
   /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 16px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 18px -2px rgba(0, 0, 0, 0.06), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
   --shadow-lg: 0 16px 36px -4px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
 
-  /* Forensic Audit Ink */
+  /* Forensic Audit Red Ink */
   --ink-audit: #d32f2f;
   --ink-audit-bg: rgba(211, 47, 47, 0.08);
 
@@ -38,32 +37,6 @@
   --font-hand: 'Caveat', cursive, sans-serif;
 
   --container-max: 1320px;
-}
-
-/* ==========================================================================
-   INVESTIGATION VIEW / DARK MODE
-   ========================================================================== */
-[data-theme="dark"],
-.theme-dark {
-  --bg-canvas: #0a0b0e;
-  --bg-surface: #12141a;
-  --bg-inset: #1a1c24;
-  --bg-overlay: rgba(10, 11, 14, 0.95);
-
-  --text-primary: #f6f6f8;
-  --text-secondary: #9da1ad;
-  --text-tertiary: #6b6f7b;
-
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-medium: rgba(255, 255, 255, 0.14);
-  --border-focus: rgba(255, 255, 255, 0.32);
-
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 6px 20px -2px rgba(0, 0, 0, 0.5), 0 2px 8px -1px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 20px 44px -6px rgba(0, 0, 0, 0.65), 0 6px 16px -2px rgba(0, 0, 0, 0.45);
-
-  --ink-audit: #ff453a;
-  --ink-audit-bg: rgba(255, 69, 58, 0.12);
 }
 
 /* ==========================================================================
@@ -93,7 +66,7 @@ body {
   line-height: 1.5;
   overflow-y: auto;
   overflow-x: hidden;
-  transition: background-color 0.25s ease, color 0.25s ease;
+  position: relative;
 }
 
 ::selection {
@@ -131,6 +104,120 @@ body {
   flex-direction: column;
   min-height: 100vh;
   width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+/* ==========================================================================
+   3D APP ICON BACKGROUND GRID (20% OPACITY + 3D HOVER TILT)
+   ========================================================================== */
+.app-icon-bg-container {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  user-select: none;
+}
+
+.app-icon-grid-viewport {
+  position: absolute;
+  inset: 0;
+  padding: 24px 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: 34px 20px;
+  justify-items: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.app-icon-grid-cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  animation: floatAppIcon 5s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes floatAppIcon {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* 3D App Icon Box */
+.app-icon-3d-box {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.20;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: opacity 0.25s ease, transform 0.12s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+  box-shadow: 
+    0 4px 10px rgba(0, 0, 0, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    inset 0 1px 1px rgba(255, 255, 255, 0.65),
+    inset 0 -1.5px 2px rgba(0, 0, 0, 0.22);
+}
+
+.app-icon-3d-box:hover,
+.app-icon-3d-box.is-hovered {
+  opacity: 0.55;
+  box-shadow: 
+    0 14px 26px -4px rgba(0, 0, 0, 0.18),
+    0 6px 12px -2px rgba(0, 0, 0, 0.1),
+    inset 0 1.5px 1.5px rgba(255, 255, 255, 0.8),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.3);
+  z-index: 5;
+}
+
+/* 3D Gloss Highlight */
+.app-icon-gloss {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48%;
+  border-radius: 12px 12px 28px 28px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0.12) 80%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  pointer-events: none;
+}
+
+.app-icon-bevel-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 2px;
+  right: 2px;
+  height: 3px;
+  border-radius: 0 0 10px 10px;
+  background: rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+.app-icon-svg-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateZ(6px);
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
 }
 
 /* ==========================================================================
@@ -142,8 +229,9 @@ body {
   position: relative;
   z-index: 50;
   border-bottom: 1px solid var(--border-subtle);
-  background-color: var(--bg-canvas);
-  transition: border-color 0.25s ease, background-color 0.25s ease;
+  background-color: rgba(250, 250, 249, 0.90);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .paper-header-inner {
@@ -195,67 +283,26 @@ body {
   gap: 12px;
 }
 
-/* Mode Toggle Button (Full Black Sunglasses Motif) */
-.clean-mode-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  padding: 8px 16px;
-  font-family: var(--font-body);
-  font-size: 0.84rem;
-  font-weight: 600;
-  cursor: pointer;
-  border: 1px solid var(--border-medium);
-  border-radius: 9999px;
-  background: var(--bg-surface);
-  color: var(--text-primary);
-  box-shadow: var(--shadow-sm);
-  outline: none;
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-  user-select: none;
-}
-
-.clean-mode-toggle:hover {
-  border-color: var(--border-focus);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
-}
-
-.clean-mode-toggle:active {
-  transform: translateY(0);
-}
-
-.clean-mode-toggle.is-investigation {
-  background: var(--bg-inset);
-  border-color: var(--border-focus);
-}
-
-.sunglasses-toggle-svg {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-  color: var(--text-primary);
-}
-
 .clean-reset-btn {
   display: inline-flex;
   align-items: center;
-  padding: 8px 14px;
+  padding: 8px 16px;
   font-family: var(--font-body);
   font-size: 0.82rem;
   font-weight: 500;
   cursor: pointer;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-medium);
   border-radius: 9999px;
-  background: transparent;
+  background: var(--bg-surface);
   color: var(--text-secondary);
+  box-shadow: var(--shadow-sm);
   transition: all 0.15s ease;
 }
 
 .clean-reset-btn:hover {
   color: var(--text-primary);
-  border-color: var(--border-medium);
-  background: var(--bg-surface);
+  border-color: var(--border-focus);
+  transform: translateY(-1px);
 }
 
 /* ==========================================================================
@@ -267,6 +314,8 @@ body {
   flex-direction: column;
   width: 100%;
   padding: 44px clamp(20px, 4vw, 56px) 72px;
+  position: relative;
+  z-index: 10;
 }
 
 .paper-landing-viewport {
@@ -631,7 +680,7 @@ body {
 .scribble-arrow-path {
   color: var(--ink-audit);
   transition: stroke 0.2s ease, stroke-width 0.2s ease;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
 }
 
 .scribble-note-group:hover .scribble-arrow-path,
@@ -718,11 +767,7 @@ body {
   line-height: 1.28;
   margin: 0;
   color: var(--text-primary);
-  opacity: 0.88;
-}
-
-.theme-dark .scribble-explanation {
-  color: rgba(246, 246, 248, 0.88);
+  opacity: 0.9;
 }
 
 /* Demo reset button if custom upload */
@@ -753,229 +798,145 @@ body {
 }
 
 /* ==========================================================================
-   POLARIZED SUNGLASSES TRANSITION RIG
+   CLEAN ANALYSIS LOADING OVERLAY
    ========================================================================== */
-.sunglasses-transition-overlay {
+.clean-analysis-overlay {
   position: fixed;
   inset: 0;
   z-index: 9999;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: var(--bg-overlay);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  overflow: hidden;
-  transition: opacity 0.35s ease;
+  background: rgba(250, 250, 249, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 24px;
 }
 
-.shades-loader-rig {
-  position: absolute;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 280px;
-  height: 120px;
-  transform-origin: 36% 50%;
-  will-change: transform, opacity;
-  pointer-events: none;
-}
-
-.shades-loader-svg {
-  width: 100%;
-  height: 100%;
-  filter: drop-shadow(0 14px 36px rgba(0, 0, 0, 0.5));
-}
-
-.phase-waiting .shades-loader-rig {
-  animation: shadesRockingAnim 2.2s ease-in-out infinite;
-}
-
-@keyframes shadesRockingAnim {
-  0%, 100% {
-    transform: scale(0.7) rotate(-3.5deg);
-  }
-  50% {
-    transform: scale(0.7) rotate(3.5deg);
-  }
-}
-
-.phase-zoom .shades-loader-rig {
-  animation: shadesLensZoomAnim 0.5s cubic-bezier(0.5, 0, 0.1, 1) forwards;
-}
-
-@keyframes shadesLensZoomAnim {
-  0% {
-    opacity: 1;
-    transform: scale(0.7);
-  }
-  30% {
-    opacity: 1;
-    transform: scale(1.6);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(24);
-  }
-}
-
-.phase-revealing .shades-loader-rig {
-  display: none;
-}
-
-.shades-lens-veil {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(circle at 45% 50%, rgba(10, 11, 14, 0.98), rgba(6, 6, 8, 1) 75%);
-  opacity: 0;
-  transition: opacity 0.35s ease;
-  z-index: 10;
-}
-
-.phase-zoom .shades-lens-veil {
-  opacity: 1;
-}
-
-.phase-revealing .shades-lens-veil {
-  opacity: 0;
-}
-
-.sunglasses-transition-overlay.mode-analysis.phase-waiting .shades-loader-rig {
-  position: relative;
-  margin-bottom: 24px;
-}
-
-/* Analysis Waiting Telemetry Card */
-.shades-telemetry-card {
-  position: relative;
-  z-index: 30;
-  background: var(--bg-surface);
-  border-radius: 14px;
+.clean-analysis-card {
+  background: #ffffff;
   border: 1px solid var(--border-medium);
+  border-radius: 16px;
   box-shadow: var(--shadow-lg);
-  padding: 30px 36px;
-  text-align: center;
+  padding: 32px 36px;
   max-width: 440px;
-  width: 90%;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 0;
-  animation: telemetrySlideUp 0.3s ease forwards;
+  gap: 18px;
+  animation: analysisCardEntrance 0.25s ease-out;
 }
 
-@keyframes telemetrySlideUp {
-  0% { opacity: 0; transform: translateY(16px); }
-  100% { opacity: 1; transform: translateY(0); }
+@keyframes analysisCardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-.initial-load-telemetry {
-  position: relative;
-  z-index: 30;
-  margin-top: 140px;
-}
-
-.telemetry-badge-row {
+.clean-analysis-header {
   display: flex;
-  justify-content: center;
-}
-
-.telemetry-anaglyph-badge {
-  display: inline-flex;
   align-items: center;
-  gap: 7px;
-  font-size: 0.76rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  color: var(--text-primary);
-  background: var(--bg-inset);
-  padding: 4px 12px;
-  border-radius: 9999px;
-  border: 1px solid var(--border-subtle);
+  gap: 16px;
 }
 
-.badge-dot-obsidian {
-  width: 7px;
-  height: 7px;
+.clean-analysis-spinner {
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background-color: var(--ink-audit);
+  border: 3px solid rgba(211, 47, 47, 0.15);
+  border-top-color: var(--ink-audit);
+  animation: analysisSpin 0.9s linear infinite;
+  flex-shrink: 0;
 }
 
-.telemetry-title {
+@keyframes analysisSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.clean-analysis-headings {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.clean-analysis-title {
   font-family: var(--font-display);
-  font-size: 1.45rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  letter-spacing: -0.015em;
   color: var(--text-primary);
+  letter-spacing: -0.015em;
 }
 
-.telemetry-sub {
+.clean-analysis-step {
   font-size: 0.88rem;
   color: var(--text-secondary);
-  line-height: 1.45;
+  line-height: 1.4;
 }
 
-.telemetry-preview-frame {
+.clean-analysis-preview-frame {
   position: relative;
-  margin-top: 6px;
-  max-height: 160px;
+  max-height: 180px;
+  border-radius: 10px;
   overflow: hidden;
-  border-radius: 8px;
   border: 1px solid var(--border-subtle);
   background: #000000;
 }
 
-.telemetry-thumb-img {
+.clean-analysis-thumb {
   width: 100%;
   height: 100%;
   object-fit: cover;
   opacity: 0.85;
+  display: block;
 }
 
-.telemetry-scan-reticle {
+.clean-analysis-scanline {
   position: absolute;
   inset: 0;
   pointer-events: none;
   background: linear-gradient(
     to bottom,
     transparent 0%,
-    rgba(255, 69, 58, 0.25) 50%,
+    rgba(211, 47, 47, 0.28) 50%,
     transparent 100%
   );
-  animation: telemetryScanSweep 1.6s infinite ease-in-out;
+  animation: analysisScanSweep 1.8s infinite ease-in-out;
 }
 
-@keyframes telemetryScanSweep {
+@keyframes analysisScanSweep {
   0% { transform: translateY(-100%); }
   100% { transform: translateY(100%); }
 }
 
-.telemetry-actions {
-  margin-top: 6px;
+.clean-analysis-footer {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
 }
 
-.telemetry-cancel-btn {
-  background: var(--bg-surface);
+.clean-analysis-cancel-btn {
+  background: transparent;
   border: 1px solid var(--border-medium);
   border-radius: 9999px;
   padding: 7px 18px;
   font-family: var(--font-body);
   font-size: 0.82rem;
   font-weight: 500;
-  color: var(--text-primary);
+  color: var(--text-secondary);
   cursor: pointer;
-  box-shadow: var(--shadow-sm);
   transition: all 0.15s ease;
 }
 
-.telemetry-cancel-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
+.clean-analysis-cancel-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-inset);
+  border-color: var(--border-focus);
 }
 
 /* ==========================================================================
