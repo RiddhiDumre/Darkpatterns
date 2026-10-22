@@ -188,7 +188,7 @@ export function Dropzone({ onImage, onSelectSample, disabled = false }: Props) {
           type="url"
           value={urlInput}
           onChange={(e) => setUrlInput(e.target.value)}
-          placeholder="Or paste direct image URL to scan…"
+          placeholder="Paste image URL (e.g. https://.../checkout.png)"
           className="clean-url-input"
           disabled={disabled || loadingUrl}
         />
@@ -197,7 +197,7 @@ export function Dropzone({ onImage, onSelectSample, disabled = false }: Props) {
           className="clean-url-btn"
           disabled={disabled || loadingUrl || !urlInput.trim()}
         >
-          {loadingUrl ? 'Loading…' : 'Scan URL'}
+          {loadingUrl ? 'Loading…' : 'Scan'}
         </button>
       </form>
 
