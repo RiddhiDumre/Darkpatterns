@@ -17,16 +17,16 @@ export interface VisualAdjustments {
 const STORAGE_KEY = 'visual_adjustments_live'
 
 export const DEFAULT_ADJUSTMENTS: VisualAdjustments = {
-  doodleX: 20,
-  doodleY: -32,
-  doodleScale: 175, // width in px
+  doodleX: 177,
+  doodleY: -220,
+  doodleScale: 290, // width in px
   doodleRotate: 0,
-  bubbleX: 0,
+  bubbleX: 87,
   bubbleY: 0,
   bubbleScale: 1,
   bubbleText: 'Aha! Look at this sneakiness right here...',
-  phoneX: 0,
-  phoneY: 0,
+  phoneX: 21,
+  phoneY: 88,
   phoneScale: 1,
 }
 
