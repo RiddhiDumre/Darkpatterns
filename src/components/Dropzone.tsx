@@ -49,36 +49,6 @@ function LinkIcon() {
   )
 }
 
-function ShieldCheckIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-      <polyline points="9 12 11 14 15 10" />
-    </svg>
-  )
-}
-
-function BoltIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-    </svg>
-  )
-}
-
-function EyeTargetIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="10" />
-      <circle cx="12" cy="12" r="3" />
-      <line x1="12" y1="2" x2="12" y2="5" />
-      <line x1="12" y1="19" x2="12" y2="22" />
-      <line x1="2" y1="12" x2="5" y2="12" />
-      <line x1="19" y1="12" x2="22" y2="12" />
-    </svg>
-  )
-}
-
 export function Dropzone({ onImage, onSelectSample, disabled = false }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [dragging, setDragging] = useState(false)
@@ -188,36 +158,11 @@ export function Dropzone({ onImage, onSelectSample, disabled = false }: Props) {
 
           <div className="clean-dropzone-headings">
             <h3 className="clean-dropzone-title">
-              Drop screenshot here, or browse files
+              Drop screenshot here, or <span className="clean-browse-link">browse files</span>
             </h3>
             <p className="clean-dropzone-desc">
               Supports PNG, JPG, WebP · <kbd className="clean-kbd">⌘V</kbd> paste anywhere
             </p>
-          </div>
-
-          <div className="clean-upload-cta-row">
-            <button
-              type="button"
-              className="clean-browse-cta-btn"
-              onClick={(e) => {
-                e.stopPropagation()
-                inputRef.current?.click()
-              }}
-            >
-              Choose Screenshot
-            </button>
-          </div>
-
-          <div className="clean-trust-badge-row">
-            <span className="clean-trust-pill">
-              <BoltIcon /> Instant Vision Scan
-            </span>
-            <span className="clean-trust-pill">
-              <EyeTargetIcon /> Region Highlights
-            </span>
-            <span className="clean-trust-pill">
-              <ShieldCheckIcon /> Zero Data Retention
-            </span>
           </div>
         </div>
       </div>
@@ -259,31 +204,28 @@ export function Dropzone({ onImage, onSelectSample, disabled = false }: Props) {
       {/* Curated Sample Specimen Chips */}
       {onSelectSample && (
         <div className="clean-sample-row">
-          <span className="clean-sample-label">Or test an example:</span>
+          <span className="clean-sample-label">Examples:</span>
           <div className="clean-sample-chips">
             <button
               type="button"
               className="clean-sample-chip"
               onClick={() => onSelectSample('/mobile-checkout-specimen.png')}
             >
-              <span className="chip-badge">Checkout</span>
-              <span className="chip-desc">Sneak-in fee & urgency</span>
+              Checkout Sneak-in
             </button>
             <button
               type="button"
               className="clean-sample-chip"
               onClick={() => onSelectSample('/examples/example-dark-checkout.png')}
             >
-              <span className="chip-badge">Booking</span>
-              <span className="chip-desc">Fake scarcity counter</span>
+              Scarcity Countdown
             </button>
             <button
               type="button"
               className="clean-sample-chip"
               onClick={() => onSelectSample('/examples/example-tricky-wording.png')}
             >
-              <span className="chip-badge">Consent</span>
-              <span className="chip-desc">Guilt-trip decline</span>
+              Guilt-trip Consent
             </button>
           </div>
         </div>
