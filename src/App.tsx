@@ -159,6 +159,11 @@ export default function App() {
           </button>
 
           <div className="paper-header-right">
+            <div className="header-stat-pill" aria-label="System status">
+              <span className="stat-indicator" aria-hidden="true" />
+              <span>24 Deceptive Patterns Monitored</span>
+            </div>
+
             {isCustomUpload && (
               <button
                 type="button"
@@ -210,11 +215,15 @@ export default function App() {
               {/* Left Column: Big Prominent Input Area & Hero Introduction */}
               <div className="paper-hero-left">
                 <div className="clean-hero-intro">
+                  <div className="clean-hero-badge">
+                    <span className="badge-glow" aria-hidden="true" />
+                    <span>AI Forensic Vision Engine</span>
+                  </div>
                   <h1 className="clean-hero-title">
                     Deceptive design, unmasked.
                   </h1>
                   <p className="clean-hero-subtitle">
-                    Expose manufactured urgency, sneaky opt-ins, and manipulative guilt-tripping before you check out. Drop a screenshot to inspect what’s happening beneath the surface.
+                    Expose manufactured urgency, preselected opt-ins, disguised subscriptions, and manipulative guilt-tripping before you pay. Drop any checkout or signup screenshot to inspect the evidence.
                   </p>
                 </div>
 
@@ -244,6 +253,12 @@ export default function App() {
                     isCustomUpload={isCustomUpload}
                     onResetToDemo={resetToDemo}
                   />
+
+                  {/* Specimen classification footnote */}
+                  <div className="specimen-pedestal-badge">
+                    <span className="pedestal-dot" aria-hidden="true" />
+                    <span>Specimen: Mobile Checkout · 4 dark patterns spotted</span>
+                  </div>
                 </div>
               </div>
             </div>
