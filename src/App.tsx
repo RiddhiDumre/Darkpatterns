@@ -182,6 +182,16 @@ export default function App() {
             <div className="paper-landing-grid">
               {/* Left Column: Big Prominent Input Area & Hero Introduction */}
               <div className="paper-hero-left">
+                {/* Creator Credit Top-Badge */}
+                <div className="creator-top-pill">
+                  <span className="creator-by">By Riddhi Dumre</span>
+                  <span className="creator-sep">/</span>
+                  <a href="mailto:riddhidumre@gmail.com" className="creator-mail">
+                    riddhidumre@gmail.com
+                  </a>
+                  <span className="creator-tag">Don't click weird buttons</span>
+                </div>
+
                 {isCustomUpload && (
                   <button
                     type="button"
@@ -253,26 +263,6 @@ export default function App() {
         {status === 'idle' && (
           <div className="bottom-dock-wrapper">
             <CaseStudyMarquee />
-            
-            {/* Quirky Creator Signature Footer */}
-            <footer className="riddhi-creator-footer">
-              <span className="footer-tagline">
-                Crafted with forensic suspicion by{' '}
-                <strong className="footer-name">Riddhi Dumre</strong>
-              </span>
-              <span className="footer-divider">·</span>
-              <a
-                href="mailto:riddhidumre@gmail.com"
-                className="footer-email-link"
-                title="Send a tip or say hi!"
-              >
-                riddhidumre@gmail.com
-              </a>
-              <span className="footer-divider">·</span>
-              <span className="footer-quirk-badge">
-                🕵️ 0% deceptive cookies · 100% free range pixels
-              </span>
-            </footer>
           </div>
         )}
       </main>
