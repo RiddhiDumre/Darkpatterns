@@ -64,9 +64,10 @@ export function CaseStudyMarquee() {
 
   return (
     <div className="case-marquee-container" aria-label="Hall of Deceptive Patterns Hall of Fame">
-      <div className="case-marquee-label">
-        <span className="case-marquee-dot" />
-        <span>Forensic Evidence Dossier · Hall of Shame</span>
+      <div className="case-marquee-heading-wrap">
+        <h3 className="case-marquee-title">
+          <span className="case-title-highlight">DECEPTIVE PATTERN HALL OF SHAME</span>
+        </h3>
       </div>
       <div className="case-marquee-track-wrapper">
         <div className="case-marquee-track">

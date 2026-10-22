@@ -145,33 +145,6 @@ export default function App() {
         />
       )}
 
-      {/* Clean Editorial Masthead Header */}
-      <header className="paper-header">
-        <div className="paper-header-inner">
-          <button
-            type="button"
-            className="clean-brand-button"
-            onClick={resetToDemo}
-            aria-label="Dark Pattern Detector home"
-          >
-            <span className="brand-dot" aria-hidden="true" />
-            <span className="brand-name">Dark Pattern Detector</span>
-          </button>
-
-          <div className="paper-header-right">
-            {isCustomUpload && (
-              <button
-                type="button"
-                className="clean-reset-btn"
-                onClick={resetToDemo}
-              >
-                &larr; Reset specimen
-              </button>
-            )}
-          </div>
-        </div>
-      </header>
-
       {/* Main Content Area */}
       <main className="paper-main-content">
         {/* ERROR STATE */}
@@ -209,6 +182,16 @@ export default function App() {
             <div className="paper-landing-grid">
               {/* Left Column: Big Prominent Input Area & Hero Introduction */}
               <div className="paper-hero-left">
+                {isCustomUpload && (
+                  <button
+                    type="button"
+                    className="clean-reset-btn"
+                    onClick={resetToDemo}
+                    style={{ alignSelf: 'flex-start', marginBottom: '-8px' }}
+                  >
+                    &larr; Reset to demo specimen
+                  </button>
+                )}
                 <div className="clean-hero-intro">
                   <h1 className="clean-hero-title">
                     Deceptive design, unmasked.
