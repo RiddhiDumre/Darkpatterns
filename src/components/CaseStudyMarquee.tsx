@@ -107,7 +107,7 @@ export function CaseStudyMarquee() {
                     <span className="doodle-squiggle-under">
                       {item.patternSquiggle}
                       <svg className="squiggle-svg-under" viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true">
-                        <path d="M 0 5 Q 12 1 25 5 Q 38 9 50 5 Q 62 1 75 5 Q 88 9 100 5" fill="none" stroke="#d32f2f" strokeWidth="2.4" strokeLinecap="round" />
+                        <path d="M 0 5 Q 12 1 25 5 Q 38 9 50 5 Q 62 1 75 5 Q 88 9 100 5" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
                       </svg>
                     </span>
                     {item.patternAfter}
