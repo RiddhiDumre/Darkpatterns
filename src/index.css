@@ -65,6 +65,8 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--bg-canvas);
+  overflow: hidden;
+  height: 100%;
 }
 
 body {
@@ -74,7 +76,7 @@ body {
   font-family: var(--font-body);
   background-color: var(--bg-canvas);
   line-height: 1.5;
-  overflow: hidden; /* App should not be scrolled at all */
+  overflow: hidden;
   position: relative;
 }
 
@@ -117,6 +119,7 @@ body {
   position: relative;
   z-index: 2;
   overflow: hidden;
+  justify-content: space-between;
 }
 
 /* ==========================================================================
@@ -144,7 +147,7 @@ body {
 .case-marquee-container {
   width: 100%;
   max-width: var(--container-max);
-  margin: 18px auto 0;
+  margin: 16px auto 8px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -247,15 +250,94 @@ body {
 
 /* Inner hand-drawn mat frame line */
 .case-frame-inner-mat {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 10px 14px 10px 14px;
+  gap: 10px;
+  padding: 14px 16px 12px 16px;
   border: 1.8px solid #18181b;
   border-radius: 3px;
   background: #fafaf9;
-  min-height: 100px;
+  min-height: 140px;
   justify-content: space-between;
+}
+
+/* Round "YOU'VE BEEN SERVED" Court Stamp at Top Right */
+.court-served-stamp {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: 2px dashed #b91c1c;
+  padding: 2px;
+  background: rgba(254, 242, 242, 0.95);
+  box-shadow: 0 2px 6px rgba(185, 28, 28, 0.22);
+  transform: rotate(14deg);
+  pointer-events: none;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.case-doodle-frame-card:hover .court-served-stamp {
+  transform: rotate(20deg) scale(1.08);
+}
+
+.stamp-inner-ring {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 1.5px solid #dc2626;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 0.9;
+}
+
+.stamp-top-arc {
+  font-family: var(--font-mono);
+  font-size: 0.44rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #dc2626;
+  text-transform: uppercase;
+}
+
+.stamp-center-text {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: #b91c1c;
+  text-transform: uppercase;
+  margin: 1px 0;
+}
+
+.stamp-bottom-arc {
+  font-family: var(--font-mono);
+  font-size: 0.42rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #dc2626;
+}
+
+.case-card-header-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-right: 42px; /* Avoid overlapping the round stamp */
+}
+
+.case-company-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 /* Four Triangular Doodle Photo Mount Corners */
@@ -473,8 +555,7 @@ body {
   flex-direction: column;
   justify-content: space-between;
   width: 100%;
-  height: 100vh;
-  height: 100dvh;
+  height: 100%;
   padding: 24px clamp(20px, 4vw, 56px) 16px;
   position: relative;
   z-index: 10;
@@ -493,7 +574,7 @@ body {
 .paper-landing-grid {
   display: grid;
   grid-template-columns: 1fr 1.08fr;
-  gap: clamp(24px, 4vw, 56px);
+  gap: clamp(24px, 4vw, 64px);
   align-items: center;
   width: 100%;
 }
@@ -502,31 +583,30 @@ body {
 .paper-hero-left {
   display: flex;
   flex-direction: column;
-  gap: 28px;
-  padding-top: 8px;
+  gap: 20px;
 }
 
 .clean-hero-intro {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .clean-hero-title {
   font-family: var(--font-display);
-  font-size: clamp(2.4rem, 4vw, 3.4rem);
+  font-size: clamp(2rem, 3.4vw, 3rem);
   font-weight: 800;
-  line-height: 1.08;
-  letter-spacing: -0.035em;
+  line-height: 1.06;
+  letter-spacing: -0.03em;
   color: var(--text-primary);
 }
 
 .clean-hero-subtitle {
   font-family: var(--font-body);
-  font-size: clamp(1rem, 1.15vw, 1.1rem);
-  line-height: 1.55;
+  font-size: clamp(0.92rem, 1vw, 1rem);
+  line-height: 1.5;
   color: var(--text-secondary);
-  max-width: 52ch;
+  max-width: 50ch;
 }
 
 /* ==========================================================================
@@ -720,7 +800,8 @@ body {
 .phone-3d-stage-container {
   position: relative;
   width: 100%;
-  min-height: 560px;
+  height: clamp(480px, 58vh, 600px);
+  min-height: 480px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -728,142 +809,10 @@ body {
   overflow: visible;
 }
 
-/* Doodle Physical Phone Stand Plaque */
-.phone-doodle-stand {
-  position: absolute;
-  bottom: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  z-index: 12;
-  pointer-events: none;
-}
-
-.stand-base-bevel {
-  width: 180px;
-  height: 12px;
-  background: #18181b;
-  border-radius: 6px 6px 2px 2px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-}
-
-.stand-plaque {
-  margin-top: -6px;
-  background: #ffffff;
-  border: 2.2px solid #18181b;
-  border-radius: 4px;
-  padding: 4px 14px;
-  box-shadow: 2px 3px 0px #18181b;
-  transform: rotate(-1deg);
-}
-
-.stand-text {
-  font-family: var(--font-display);
-  font-size: 0.82rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  color: #dc2626; /* Warning red */
-  white-space: nowrap;
-}
-
-.phone-3d-stage-wrapper-interactive {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  transform: translate(0px, 0px) scale(1);
-}
-
-/* Detective Doodle & Comic Speech Bubble */
-.detective-doodle-wrapper {
-  position: fixed;
-  right: 24px;
-  bottom: -15px;
-  z-index: 40;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  pointer-events: none;
-  animation: doodleBob 4s ease-in-out infinite;
-  transform: rotate(0deg);
-}
-
-@keyframes doodleBob {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-}
-
-.detective-speech-bubble {
-  position: relative;
-  background: #ffffff;
-  border: 2px solid #111827;
-  border-radius: 16px;
-  padding: 8px 14px;
-  box-shadow: 2px 3px 0px rgba(0, 0, 0, 0.9);
-  margin-bottom: 8px;
-  max-width: 220px;
-  text-align: center;
-  pointer-events: auto;
-  transform: translate(-10px, 0px) scale(1) rotate(-3deg);
-  transition: transform 0.2s ease;
-}
-
-.detective-speech-bubble:hover {
-  transform: translate(-10px, 0px) scale(1.05) rotate(0deg);
-}
-
-.speech-quote {
-  font-family: var(--font-hand), cursive, sans-serif;
-  font-size: 1.15rem;
-  font-weight: 700;
-  line-height: 1.15;
-  color: #111827;
-  display: block;
-}
-
-/* Comic Speech Bubble Tail pointing towards character's head */
-.speech-bubble-tail {
-  position: absolute;
-  bottom: -9px;
-  left: 36px;
-  width: 0;
-  height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-top: 9px solid #111827;
-}
-
-.speech-bubble-tail::after {
-  content: '';
-  position: absolute;
-  top: -11px;
-  left: -6px;
-  width: 0;
-  height: 0;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-top: 8px solid #ffffff;
-}
-
-.detective-doodle-img {
-  width: 230px;
-  height: auto;
-  display: block;
-  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.12));
-  transform-origin: bottom center;
-}
-
 .phone-3d-wrapper {
   position: relative;
   width: 100%;
-  height: 560px;
+  height: clamp(480px, 58vh, 600px);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -81,16 +81,26 @@ export function CaseStudyMarquee() {
 
               {/* Inner Hand-Drawn Card Frame */}
               <div className="case-frame-inner-mat">
-                <span className="case-icon-badge" style={{ backgroundColor: item.iconBg }}>
-                  {item.iconChar}
-                </span>
-                <div className="case-text-group">
-                  <div className="case-title-row">
+                {/* Round Stamp at Top Right */}
+                <div className="court-served-stamp" aria-label="Served stamp">
+                  <div className="stamp-inner-ring">
+                    <span className="stamp-top-arc">OFFICIAL</span>
+                    <span className="stamp-center-text">SERVED</span>
+                    <span className="stamp-bottom-arc">★ GUILTY ★</span>
+                  </div>
+                </div>
+
+                <div className="case-card-header-row">
+                  <span className="case-icon-badge" style={{ backgroundColor: item.iconBg }}>
+                    {item.iconChar}
+                  </span>
+                  <div className="case-company-header">
                     <span className="case-company-name">{item.company}</span>
                     <span className="case-fine-badge">{item.fine}</span>
                   </div>
-                  <span className="case-pattern-desc">{item.pattern}</span>
                 </div>
+
+                <p className="case-pattern-desc">{item.pattern}</p>
               </div>
             </div>
           ))}
