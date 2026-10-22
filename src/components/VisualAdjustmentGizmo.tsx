@@ -17,16 +17,16 @@ export interface VisualAdjustments {
 const STORAGE_KEY = 'visual_adjustments_live'
 
 export const DEFAULT_ADJUSTMENTS: VisualAdjustments = {
-  doodleX: 177,
-  doodleY: -220,
-  doodleScale: 290, // width in px
+  doodleX: 40, // padding from right in px
+  doodleY: -20, // bottom offset in px
+  doodleScale: 250, // width in px
   doodleRotate: 0,
-  bubbleX: 87,
+  bubbleX: -20,
   bubbleY: 0,
   bubbleScale: 1,
   bubbleText: 'Aha! Look at this sneakiness right here...',
-  phoneX: 21,
-  phoneY: 88,
+  phoneX: 0,
+  phoneY: 0,
   phoneScale: 1,
 }
 
@@ -99,15 +99,15 @@ export function VisualAdjustmentGizmo({ adjustments, onChange, onReset }: Props)
 
           {/* DOODLE SECTION */}
           <div className="tuner-group">
-            <h4 className="tuner-group-title">🕵️ Detective Doodle</h4>
+            <h4 className="tuner-group-title">🕵️ Detective Doodle (Bottom Right)</h4>
             
             <label className="tuner-slider-label">
-              <span>Horizontal (X): <strong>{adjustments.doodleX}px</strong></span>
+              <span>Padding from Right: <strong>{adjustments.doodleX}px</strong></span>
               <input
                 type="range"
-                min="-200"
+                min="-60"
                 max="400"
-                step="1"
+                step="2"
                 value={adjustments.doodleX}
                 onChange={(e) => update('doodleX', Number(e.target.value))}
               />
@@ -118,8 +118,8 @@ export function VisualAdjustmentGizmo({ adjustments, onChange, onReset }: Props)
               <input
                 type="range"
                 min="-120"
-                max="300"
-                step="1"
+                max="250"
+                step="2"
                 value={adjustments.doodleY}
                 onChange={(e) => update('doodleY', Number(e.target.value))}
               />

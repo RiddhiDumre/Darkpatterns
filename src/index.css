@@ -599,10 +599,10 @@ body {
 
 /* Detective Doodle & Comic Speech Bubble */
 .detective-doodle-wrapper {
-  position: absolute;
-  left: 177px;
-  bottom: -220px;
-  z-index: 25;
+  position: fixed;
+  right: 40px;
+  bottom: -20px;
+  z-index: 40;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -631,12 +631,12 @@ body {
   max-width: 220px;
   text-align: center;
   pointer-events: auto;
-  transform: translate(87px, 0px) scale(1) rotate(-3deg);
+  transform: translate(-20px, 0px) scale(1) rotate(-3deg);
   transition: transform 0.2s ease;
 }
 
 .detective-speech-bubble:hover {
-  transform: translate(87px, 0px) scale(1.05) rotate(0deg);
+  transform: translate(-20px, 0px) scale(1.05) rotate(0deg);
 }
 
 .speech-quote {
@@ -673,7 +673,7 @@ body {
 }
 
 .detective-doodle-img {
-  width: 290px;
+  width: 250px;
   height: auto;
   display: block;
   filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.12));
@@ -681,7 +681,7 @@ body {
 }
 
 .phone-3d-stage-wrapper-interactive {
-  transform: translate(21px, 88px) scale(1);
+  transform: translate(0px, 0px) scale(1);
 }
 
 .phone-3d-wrapper {

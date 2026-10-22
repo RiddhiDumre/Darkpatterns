@@ -244,6 +244,7 @@ export default function App() {
               {/* Right Column: 3D Model of an iPhone with Floating Scribbled Handwritten Notes */}
               <div className="paper-hero-right">
                 <div className="phone-3d-stage-container">
+                  {/* 3D Phone Canvas */}
                   <div
                     className="phone-3d-stage-wrapper-interactive"
                     style={{
@@ -267,43 +268,43 @@ export default function App() {
                       onResetToDemo={resetToDemo}
                     />
                   </div>
-
-                  {/* Detective Doodle inspecting for evidence at the bottom */}
-                  <div
-                    className="detective-doodle-wrapper"
-                    aria-hidden="true"
-                    style={{
-                      left: `${adjustments.doodleX}px`,
-                      bottom: `${adjustments.doodleY}px`,
-                      transform: `rotate(${adjustments.doodleRotate}deg)`,
-                      transition: 'transform 0.05s ease-out',
-                    }}
-                  >
-                    <div
-                      className="detective-speech-bubble"
-                      style={{
-                        transform: `translate(${adjustments.bubbleX}px, ${adjustments.bubbleY}px) scale(${adjustments.bubbleScale}) rotate(-3deg)`,
-                        transition: 'transform 0.05s ease-out',
-                      }}
-                    >
-                      <span className="speech-quote">"{adjustments.bubbleText}"</span>
-                      <div className="speech-bubble-tail" />
-                    </div>
-                    <img
-                      src="/detective-doodle.png"
-                      alt="Detective cartoon looking for dark pattern evidence with magnifying glass"
-                      className="detective-doodle-img"
-                      style={{
-                        width: `${adjustments.doodleScale}px`,
-                        height: 'auto',
-                      }}
-                    />
-                  </div>
                 </div>
               </div>
             </div>
           </section>
         )}
+
+        {/* Detective Doodle inspecting for evidence fixed at the bottom right corner */}
+        <div
+          className="detective-doodle-wrapper"
+          aria-hidden="true"
+          style={{
+            right: `${adjustments.doodleX}px`,
+            bottom: `${adjustments.doodleY}px`,
+            transform: `rotate(${adjustments.doodleRotate}deg)`,
+            transition: 'transform 0.05s ease-out',
+          }}
+        >
+          <div
+            className="detective-speech-bubble"
+            style={{
+              transform: `translate(${adjustments.bubbleX}px, ${adjustments.bubbleY}px) scale(${adjustments.bubbleScale}) rotate(-3deg)`,
+              transition: 'transform 0.05s ease-out',
+            }}
+          >
+            <span className="speech-quote">"{adjustments.bubbleText}"</span>
+            <div className="speech-bubble-tail" />
+          </div>
+          <img
+            src="/detective-doodle.png"
+            alt="Detective cartoon looking for dark pattern evidence with magnifying glass"
+            className="detective-doodle-img"
+            style={{
+              width: `${adjustments.doodleScale}px`,
+              height: 'auto',
+            }}
+          />
+        </div>
       </main>
 
       {/* Floating Interactive Visual Editor Gizmo */}
