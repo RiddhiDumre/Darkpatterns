@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import type { Analysis } from '../shared/types'
 import { Dropzone } from './components/Dropzone'
 import { Phone3DCanvas } from './components/Phone3DCanvas'
-import { AppIconBackground } from './components/AppIconBackground'
+import { CaseStudyMarquee } from './components/CaseStudyMarquee'
 import { AnalysisLoadingOverlay } from './components/AnalysisLoadingOverlay'
 import { FEATURED_HERO_ANALYSIS } from './data/featuredFindings'
 
@@ -120,8 +120,8 @@ export default function App() {
 
   return (
     <div className="paper-app-root">
-      {/* 3D App Icon Grid Background (Spotify, Swiggy, Zomato, etc. with 20% opacity and 3D hover tilt) */}
-      <AppIconBackground />
+      {/* Subtle Warm Investigation Backdrop with Focus Glow */}
+      <div className="desk-ambient-backdrop" aria-hidden="true" />
 
       {/* Upload Analysis Loading State */}
       {status === 'analyzing' && (
@@ -265,6 +265,9 @@ export default function App() {
             className="detective-doodle-img"
           />
         </div>
+
+        {/* Real Dark-Pattern Hall of Shame Marquee Ticker */}
+        {status === 'idle' && <CaseStudyMarquee />}
       </main>
     </div>
   )
