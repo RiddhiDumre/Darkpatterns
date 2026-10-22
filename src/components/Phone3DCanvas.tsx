@@ -362,7 +362,7 @@ export function Phone3DCanvas({
           const screenPixelY = (-(tempVec.y * 0.5) + 0.5) * curH
 
           // Position note completely outside the phone screen in the margin!
-          const noteMargin = 28
+          const noteMargin = 48
           const noteX =
             preferredSide === 'right'
               ? Math.round(phoneRightPixelX + noteMargin)

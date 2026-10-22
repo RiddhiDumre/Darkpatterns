@@ -5,11 +5,6 @@ import { Phone3DCanvas } from './components/Phone3DCanvas'
 import { AppIconBackground } from './components/AppIconBackground'
 import { AnalysisLoadingOverlay } from './components/AnalysisLoadingOverlay'
 import { FEATURED_HERO_ANALYSIS } from './data/featuredFindings'
-import {
-  VisualAdjustmentGizmo,
-  DEFAULT_ADJUSTMENTS,
-  type VisualAdjustments,
-} from './components/VisualAdjustmentGizmo'
 
 type AppStatus = 'idle' | 'analyzing' | 'error'
 
@@ -38,15 +33,6 @@ export default function App() {
   const [pendingAnalysis, setPendingAnalysis] = useState<Analysis | null>(null)
   const [analysisReady, setAnalysisReady] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  // Interactive Live Visual Adjustment State
-  const [adjustments, setAdjustments] = useState<VisualAdjustments>(() => {
-    try {
-      const saved = localStorage.getItem('visual_adjustments_live')
-      if (saved) return { ...DEFAULT_ADJUSTMENTS, ...JSON.parse(saved) }
-    } catch {}
-    return DEFAULT_ADJUSTMENTS
-  })
 
   // Ensure Light theme permanently
   useEffect(() => {
@@ -245,14 +231,7 @@ export default function App() {
               <div className="paper-hero-right">
                 <div className="phone-3d-stage-container">
                   {/* 3D Phone Canvas */}
-                  <div
-                    className="phone-3d-stage-wrapper-interactive"
-                    style={{
-                      transform: `translate(${adjustments.phoneX}px, ${adjustments.phoneY}px) scale(${adjustments.phoneScale})`,
-                      transformOrigin: 'center center',
-                      transition: 'transform 0.05s ease-out',
-                    }}
-                  >
+                  <div className="phone-3d-stage-wrapper-interactive">
                     <Phone3DCanvas
                       src={currentImage}
                       alt={
@@ -275,49 +254,18 @@ export default function App() {
         )}
 
         {/* Detective Doodle inspecting for evidence fixed at the bottom right corner */}
-        <div
-          className="detective-doodle-wrapper"
-          aria-hidden="true"
-          style={{
-            right: `${adjustments.doodleX}px`,
-            bottom: `${adjustments.doodleY}px`,
-            transform: `rotate(${adjustments.doodleRotate}deg)`,
-            transition: 'transform 0.05s ease-out',
-          }}
-        >
-          <div
-            className="detective-speech-bubble"
-            style={{
-              transform: `translate(${adjustments.bubbleX}px, ${adjustments.bubbleY}px) scale(${adjustments.bubbleScale}) rotate(-3deg)`,
-              transition: 'transform 0.05s ease-out',
-            }}
-          >
-            <span className="speech-quote">"{adjustments.bubbleText}"</span>
+        <div className="detective-doodle-wrapper" aria-hidden="true">
+          <div className="detective-speech-bubble">
+            <span className="speech-quote">"Aha! Look at this sneakiness right here..."</span>
             <div className="speech-bubble-tail" />
           </div>
           <img
             src="/detective-doodle.png"
             alt="Detective cartoon looking for dark pattern evidence with magnifying glass"
             className="detective-doodle-img"
-            style={{
-              width: `${adjustments.doodleScale}px`,
-              height: 'auto',
-            }}
           />
         </div>
       </main>
-
-      {/* Floating Interactive Visual Editor Gizmo */}
-      <VisualAdjustmentGizmo
-        adjustments={adjustments}
-        onChange={setAdjustments}
-        onReset={() => {
-          setAdjustments(DEFAULT_ADJUSTMENTS)
-          try {
-            localStorage.removeItem('visual_adjustments_live')
-          } catch {}
-        }}
-      />
     </div>
   )
 }
