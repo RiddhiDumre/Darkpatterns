@@ -647,46 +647,95 @@ body {
   position: absolute;
   pointer-events: auto;
   cursor: pointer;
-  max-width: 250px;
-  padding: 0;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
+  max-width: 220px;
+  min-width: 175px;
   outline: none;
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  color: var(--ink-audit);
+  gap: 2px;
   font-family: var(--font-hand), cursive, sans-serif;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, opacity 0.2s ease;
+}
+
+/* Tactile Post-It Note Styling */
+.scribble-note-item.post-it-note {
+  position: absolute;
+  padding: 16px 16px 14px 16px;
+  border-radius: 2px 2px 5px 2px;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  color: var(--text-primary);
+}
+
+/* Alternating subtle warm pastel post-it hues */
+.scribble-note-item:nth-child(1) {
+  background: #fef9c3; /* Classic soft canary yellow */
+  border-bottom: 2px solid #fde047;
+}
+
+.scribble-note-item:nth-child(2) {
+  background: #ffedd5; /* Soft warm peach / melon */
+  border-bottom: 2px solid #fed7aa;
+}
+
+.scribble-note-item:nth-child(3) {
+  background: #fef08a; /* Warm sunny lemon */
+  border-bottom: 2px solid #fde047;
+}
+
+.scribble-note-item:nth-child(4) {
+  background: #fee2e2; /* Soft pastel rose / audit pink */
+  border-bottom: 2px solid #fecaca;
+}
+
+/* Semi-translucent Washi Masking Tape on top */
+.post-it-tape {
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-1.5deg);
+  width: 52px;
+  height: 16px;
+  background-color: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  border-left: 2px dashed rgba(200, 200, 200, 0.4);
+  border-right: 2px dashed rgba(200, 200, 200, 0.4);
+  pointer-events: none;
 }
 
 .scribble-note-item.side-right {
-  transform: rotate(-1deg);
+  transform: rotate(-1.8deg);
   text-align: left;
   align-items: flex-start;
 }
 
 .scribble-note-item.side-left {
-  transform: rotate(1deg);
-  text-align: right;
-  align-items: flex-end;
+  transform: rotate(1.8deg);
+  text-align: left;
+  align-items: flex-start;
 }
 
 .scribble-note-item:hover,
 .scribble-note-item.is-active {
-  transform: scale(1.05) rotate(0deg);
-  opacity: 1;
+  transform: scale(1.05) rotate(0deg) translateY(-3px);
+  box-shadow: 
+    0 12px 28px -4px rgba(0, 0, 0, 0.16),
+    0 4px 10px rgba(0, 0, 0, 0.08);
+  z-index: 35;
 }
 
 /* 1. TOP: Big Handwritten Number (no #) */
 .scribble-top-number {
   font-family: var(--font-hand), cursive, sans-serif;
-  font-size: 2.6rem;
+  font-size: 2.2rem;
   font-weight: 700;
-  line-height: 0.95;
+  line-height: 0.9;
   color: var(--ink-audit);
-  margin: 0 0 2px 0;
+  margin: 0;
   display: inline-block;
   letter-spacing: -0.02em;
 }
@@ -694,10 +743,10 @@ body {
 /* 2. BELOW NUMBER: Dark Pattern Title */
 .scribble-pattern-title {
   font-family: var(--font-hand), cursive, sans-serif;
-  font-size: 1.45rem;
+  font-size: 1.35rem;
   font-weight: 700;
   line-height: 1.1;
-  margin: 0 0 3px 0;
+  margin: 2px 0 2px 0;
   color: var(--ink-audit);
   letter-spacing: -0.01em;
 }
@@ -705,12 +754,12 @@ body {
 /* 3. BELOW TITLE: The Explanation */
 .scribble-explanation {
   font-family: var(--font-hand), cursive, sans-serif;
-  font-size: 1.08rem;
+  font-size: 1rem;
   font-weight: 600;
-  line-height: 1.28;
+  line-height: 1.25;
   margin: 0;
-  color: var(--text-primary);
-  opacity: 0.9;
+  color: #1f2937;
+  opacity: 0.95;
 }
 
 /* Demo reset button if custom upload */

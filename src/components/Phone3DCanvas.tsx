@@ -508,9 +508,9 @@ export function Phone3DCanvas({
             return (
               <div
                 key={pt.id}
-                className={`scribble-note-item side-${pt.side}${pt.active ? ' is-active' : ''}`}
+                className={`scribble-note-item post-it-note side-${pt.side}${pt.active ? ' is-active' : ''}`}
                 style={{
-                  top: `${pt.targetY - 38}px`,
+                  top: `${pt.targetY - 45}px`,
                   left: isRight ? `${pt.noteX}px` : undefined,
                   right: !isRight
                     ? `${containerRef.current ? containerRef.current.clientWidth - pt.noteX : 340}px`
@@ -528,6 +528,9 @@ export function Phone3DCanvas({
                 }}
                 aria-label={`Note ${pt.indexNum}: ${pt.patternTitle} — ${pt.explanationText}`}
               >
+                {/* Post-it Washi Tape accent at top */}
+                <div className="post-it-tape" aria-hidden="true" />
+
                 {/* 1. TOP: Big Handwritten Number (no #) */}
                 <span className="scribble-top-number">
                   {pt.indexNum}
