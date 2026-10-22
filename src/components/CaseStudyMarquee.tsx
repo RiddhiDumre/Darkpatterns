@@ -1,6 +1,8 @@
 export interface CaseStudyItem {
   company: string
-  pattern: string
+  patternBefore: string
+  patternSquiggle: string
+  patternAfter: string
   fine: string
   year: string
   iconBg: string
@@ -10,7 +12,9 @@ export interface CaseStudyItem {
 const SHAME_CASES: CaseStudyItem[] = [
   {
     company: 'Amazon Prime',
-    pattern: 'Roach Motel · 6-Step Hidden Cancellation',
+    patternBefore: '',
+    patternSquiggle: 'Roach Motel',
+    patternAfter: ' · 6-Step Hidden Cancellation Maze',
     fine: 'FTC Lawsuit 2023',
     year: '2023',
     iconBg: '#ff9900',
@@ -18,7 +22,9 @@ const SHAME_CASES: CaseStudyItem[] = [
   },
   {
     company: 'Epic Games',
-    pattern: 'Sneak into Basket & Tricky Button Config',
+    patternBefore: '',
+    patternSquiggle: 'Sneak into Basket',
+    patternAfter: ' & Tricky Dark UI Configuration',
     fine: '$520M FTC Penalty',
     year: '2022',
     iconBg: '#232323',
@@ -26,7 +32,9 @@ const SHAME_CASES: CaseStudyItem[] = [
   },
   {
     company: 'Ryanair',
-    pattern: 'Camouflaged Seat Insurance & Misdirection',
+    patternBefore: 'Camouflaged Seat Insurance & ',
+    patternSquiggle: 'Misdirection',
+    patternAfter: '',
     fine: 'EU ASA Ban',
     year: '2021',
     iconBg: '#073590',
@@ -34,7 +42,9 @@ const SHAME_CASES: CaseStudyItem[] = [
   },
   {
     company: 'Temu',
-    pattern: 'Fake Spin-the-Wheel Urgency & Countdown Panic',
+    patternBefore: 'Fake Spin-the-Wheel Urgency & ',
+    patternSquiggle: 'Countdown Panic',
+    patternAfter: '',
     fine: 'Consumer Watchlist',
     year: '2024',
     iconBg: '#fb7701',
@@ -42,7 +52,9 @@ const SHAME_CASES: CaseStudyItem[] = [
   },
   {
     company: 'LinkedIn',
-    pattern: 'Friend Spam & Address Book Harvesting',
+    patternBefore: '',
+    patternSquiggle: 'Friend Spam',
+    patternAfter: ' & Deceptive Address Book Harvesting',
     fine: '$13M Settlement',
     year: '2015',
     iconBg: '#0077b5',
@@ -50,7 +62,9 @@ const SHAME_CASES: CaseStudyItem[] = [
   },
   {
     company: 'Match Group',
-    pattern: 'Fake Love Messages on Free Accounts',
+    patternBefore: 'Manufactured ',
+    patternSquiggle: 'Fake Love Messages',
+    patternAfter: ' on Free Accounts',
     fine: 'FTC Action',
     year: '2019',
     iconBg: '#ff4458',
@@ -73,34 +87,32 @@ export function CaseStudyMarquee() {
         <div className="case-marquee-track">
           {items.map((item, index) => (
             <div key={`${item.company}-${index}`} className="case-doodle-frame-card">
-              {/* Four Hand-Drawn Triangular Photo Corner Tabs */}
+              {/* Three Hand-Drawn Triangular Photo Corner Tabs (Top-Right open/rounded as requested) */}
               <div className="doodle-corner corner-top-left" aria-hidden="true" />
-              <div className="doodle-corner corner-top-right" aria-hidden="true" />
               <div className="doodle-corner corner-bottom-left" aria-hidden="true" />
               <div className="doodle-corner corner-bottom-right" aria-hidden="true" />
 
               {/* Inner Hand-Drawn Card Frame */}
               <div className="case-frame-inner-mat">
-                {/* Round Stamp at Top Right */}
-                <div className="court-served-stamp" aria-label="Served stamp">
-                  <div className="stamp-inner-ring">
-                    <span className="stamp-top-arc">OFFICIAL</span>
-                    <span className="stamp-center-text">SERVED</span>
-                    <span className="stamp-bottom-arc">★ GUILTY ★</span>
-                  </div>
-                </div>
-
-                <div className="case-card-header-row">
-                  <span className="case-icon-badge" style={{ backgroundColor: item.iconBg }}>
-                    {item.iconChar}
-                  </span>
-                  <div className="case-company-header">
+                <span className="case-icon-badge" style={{ backgroundColor: item.iconBg }}>
+                  {item.iconChar}
+                </span>
+                <div className="case-text-group">
+                  <div className="case-title-row">
                     <span className="case-company-name">{item.company}</span>
                     <span className="case-fine-badge">{item.fine}</span>
                   </div>
+                  <span className="case-pattern-desc">
+                    {item.patternBefore}
+                    <span className="doodle-squiggle-under">
+                      {item.patternSquiggle}
+                      <svg className="squiggle-svg-under" viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true">
+                        <path d="M 0 5 Q 12 1 25 5 Q 38 9 50 5 Q 62 1 75 5 Q 88 9 100 5" fill="none" stroke="#d32f2f" strokeWidth="2.4" strokeLinecap="round" />
+                      </svg>
+                    </span>
+                    {item.patternAfter}
+                  </span>
                 </div>
-
-                <p className="case-pattern-desc">{item.pattern}</p>
               </div>
             </div>
           ))}

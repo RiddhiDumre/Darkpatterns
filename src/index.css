@@ -65,8 +65,8 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--bg-canvas);
-  overflow: hidden;
   height: 100%;
+  overflow: hidden;
 }
 
 body {
@@ -75,7 +75,7 @@ body {
   color: var(--text-primary);
   font-family: var(--font-body);
   background-color: var(--bg-canvas);
-  line-height: 1.5;
+  line-height: 1.45;
   overflow: hidden;
   position: relative;
 }
@@ -147,13 +147,12 @@ body {
 .case-marquee-container {
   width: 100%;
   max-width: var(--container-max);
-  margin: 16px auto 8px;
+  margin: clamp(12px, 2vh, 24px) auto 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
   position: relative;
   z-index: 10;
-  flex-shrink: 0;
 }
 
 .case-marquee-heading-wrap {
@@ -229,7 +228,7 @@ body {
   position: relative;
   background: #ffffff;
   border: 2.6px solid #18181b;
-  border-radius: 6px;
+  border-radius: 6px 16px 6px 6px; /* Rounded on top-right */
   padding: 8px;
   min-width: 290px;
   max-width: 330px;
@@ -250,97 +249,18 @@ body {
 
 /* Inner hand-drawn mat frame line */
 .case-frame-inner-mat {
-  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 14px 16px 12px 16px;
+  gap: 12px;
+  padding: 16px 18px 14px 18px;
   border: 1.8px solid #18181b;
-  border-radius: 3px;
+  border-radius: 3px 12px 3px 3px; /* Rounded on top-right matching outer frame */
   background: #fafaf9;
-  min-height: 140px;
+  min-height: 145px;
   justify-content: space-between;
 }
 
-/* Round "YOU'VE BEEN SERVED" Court Stamp at Top Right */
-.court-served-stamp {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  width: 58px;
-  height: 58px;
-  border-radius: 50%;
-  border: 2px dashed #b91c1c;
-  padding: 2px;
-  background: rgba(254, 242, 242, 0.95);
-  box-shadow: 0 2px 6px rgba(185, 28, 28, 0.22);
-  transform: rotate(14deg);
-  pointer-events: none;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s ease;
-}
-
-.case-doodle-frame-card:hover .court-served-stamp {
-  transform: rotate(20deg) scale(1.08);
-}
-
-.stamp-inner-ring {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  border: 1.5px solid #dc2626;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  line-height: 0.9;
-}
-
-.stamp-top-arc {
-  font-family: var(--font-mono);
-  font-size: 0.44rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: #dc2626;
-  text-transform: uppercase;
-}
-
-.stamp-center-text {
-  font-family: var(--font-display);
-  font-size: 0.72rem;
-  font-weight: 900;
-  letter-spacing: -0.01em;
-  color: #b91c1c;
-  text-transform: uppercase;
-  margin: 1px 0;
-}
-
-.stamp-bottom-arc {
-  font-family: var(--font-mono);
-  font-size: 0.42rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  color: #dc2626;
-}
-
-.case-card-header-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding-right: 42px; /* Avoid overlapping the round stamp */
-}
-
-.case-company-header {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-/* Four Triangular Doodle Photo Mount Corners */
+/* Three Triangular Doodle Photo Mount Corners */
 .doodle-corner {
   position: absolute;
   width: 18px;
@@ -356,12 +276,6 @@ body {
   left: -6px;
   clip-path: polygon(0 0, 100% 0, 0 100%);
   transform: rotate(0deg);
-}
-
-.corner-top-right {
-  top: -6px;
-  right: -6px;
-  clip-path: polygon(0 0, 100% 0, 100% 100%);
 }
 
 .corner-bottom-left {
@@ -412,18 +326,17 @@ body {
   line-height: 1.1;
 }
 
-/* HIGH-IMPACT RED BADGE */
+/* HIGH-IMPACT RED BADGE WITH QUIRKY FONT */
 .case-fine-badge {
   align-self: flex-start;
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
+  font-family: var(--font-display);
+  font-size: 0.88rem;
   font-weight: 800;
   padding: 4px 10px;
   border-radius: 6px;
   background: #dc2626; /* Vibrant warning red */
   color: #ffffff; /* White high-contrast text */
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
   box-shadow: 0 2px 5px rgba(220, 38, 38, 0.35);
   border: 1px solid #b91c1c;
   display: inline-block;
@@ -436,6 +349,25 @@ body {
   font-weight: 500;
   color: #4b5563;
   line-height: 1.35;
+}
+
+/* Hand-drawn red squiggle underline under key words */
+.doodle-squiggle-under {
+  position: relative;
+  display: inline-block;
+  font-weight: 700;
+  color: #111827;
+  padding-bottom: 2px;
+}
+
+.squiggle-svg-under {
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 8px;
+  pointer-events: none;
+  overflow: visible;
 }
 
 /* ==========================================================================
@@ -556,7 +488,7 @@ body {
   justify-content: space-between;
   width: 100%;
   height: 100%;
-  padding: 24px clamp(20px, 4vw, 56px) 16px;
+  padding: clamp(14px, 2.5vh, 28px) clamp(20px, 3.5vw, 48px) clamp(8px, 1.5vh, 18px);
   position: relative;
   z-index: 10;
   overflow: hidden;
@@ -573,8 +505,8 @@ body {
 
 .paper-landing-grid {
   display: grid;
-  grid-template-columns: 1fr 1.08fr;
-  gap: clamp(24px, 4vw, 64px);
+  grid-template-columns: 1fr 1.05fr;
+  gap: clamp(24px, 4vw, 56px);
   align-items: center;
   width: 100%;
 }
@@ -583,7 +515,7 @@ body {
 .paper-hero-left {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: clamp(14px, 2vh, 22px);
 }
 
 .clean-hero-intro {
@@ -594,19 +526,19 @@ body {
 
 .clean-hero-title {
   font-family: var(--font-display);
-  font-size: clamp(2rem, 3.4vw, 3rem);
+  font-size: clamp(2.1rem, 3.4vw, 3rem);
   font-weight: 800;
-  line-height: 1.06;
-  letter-spacing: -0.03em;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
   color: var(--text-primary);
 }
 
 .clean-hero-subtitle {
   font-family: var(--font-body);
-  font-size: clamp(0.92rem, 1vw, 1rem);
-  line-height: 1.5;
+  font-size: clamp(0.9rem, 1vw, 1.02rem);
+  line-height: 1.45;
   color: var(--text-secondary);
-  max-width: 50ch;
+  max-width: 48ch;
 }
 
 /* ==========================================================================
@@ -627,8 +559,8 @@ body {
 .clean-dropzone-canvas {
   position: relative;
   width: 100%;
-  min-height: 180px;
-  padding: 28px 24px;
+  min-height: 155px;
+  padding: 20px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -667,7 +599,7 @@ body {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 12px;
+  gap: 10px;
   max-width: 380px;
   margin: 0 auto;
 }
@@ -676,9 +608,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
   background-color: var(--bg-inset);
   color: var(--text-primary);
   transition: all 0.2s ease;
@@ -800,7 +732,7 @@ body {
 .phone-3d-stage-container {
   position: relative;
   width: 100%;
-  height: clamp(480px, 58vh, 600px);
+  height: clamp(480px, 62vh, 600px);
   min-height: 480px;
   display: flex;
   flex-direction: column;
@@ -809,10 +741,97 @@ body {
   overflow: visible;
 }
 
+/* Detective Doodle & Comic Speech Bubble */
+.detective-doodle-wrapper {
+  position: fixed;
+  right: clamp(16px, 2.5vw, 36px);
+  bottom: -15px;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  animation: doodleBob 4s ease-in-out infinite;
+  transform: rotate(0deg);
+}
+
+@keyframes doodleBob {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.detective-speech-bubble {
+  position: relative;
+  background: #ffffff;
+  border: 2px solid #111827;
+  border-radius: 16px;
+  padding: 8px 14px;
+  box-shadow: 2px 3px 0px rgba(0, 0, 0, 0.9);
+  margin-bottom: 8px;
+  max-width: 220px;
+  text-align: center;
+  pointer-events: auto;
+  transform: translate(-10px, 0px) scale(1) rotate(-3deg);
+  transition: transform 0.2s ease;
+}
+
+.detective-speech-bubble:hover {
+  transform: translate(-10px, 0px) scale(1.05) rotate(0deg);
+}
+
+.speech-quote {
+  font-family: var(--font-hand), cursive, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: #111827;
+  display: block;
+}
+
+/* Comic Speech Bubble Tail pointing towards character's head */
+.speech-bubble-tail {
+  position: absolute;
+  bottom: -9px;
+  left: 36px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 9px solid #111827;
+}
+
+.speech-bubble-tail::after {
+  content: '';
+  position: absolute;
+  top: -11px;
+  left: -6px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid #ffffff;
+}
+
+.detective-doodle-img {
+  width: clamp(190px, 16vw, 240px);
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.12));
+  transform-origin: bottom center;
+}
+
+.phone-3d-stage-wrapper-interactive {
+  transform: translate(0px, 0px) scale(1);
+}
+
 .phone-3d-wrapper {
   position: relative;
   width: 100%;
-  height: clamp(480px, 58vh, 600px);
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
