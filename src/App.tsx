@@ -244,6 +244,19 @@ export default function App() {
                     isCustomUpload={isCustomUpload}
                     onResetToDemo={resetToDemo}
                   />
+
+                  {/* Detective Doodle inspecting for evidence at the bottom */}
+                  <div className="detective-doodle-wrapper" aria-hidden="true">
+                    <div className="detective-speech-bubble">
+                      <span className="speech-quote">"Aha! Look at this sneakiness right here..."</span>
+                      <div className="speech-bubble-tail" />
+                    </div>
+                    <img
+                      src="/detective-doodle.png"
+                      alt="Detective cartoon looking for dark pattern evidence with magnifying glass"
+                      className="detective-doodle-img"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
