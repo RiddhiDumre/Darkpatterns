@@ -31,12 +31,22 @@
   --ink-audit-bg: rgba(211, 47, 47, 0.08);
 
   /* Fonts */
-  --font-display: 'Archivo', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Quirky', 'Grandstander', 'DynaPuff', 'Archivo', cursive, sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
   --font-hand: 'Caveat', cursive, sans-serif;
 
   --container-max: 1320px;
+}
+
+@font-face {
+  font-family: 'Quirky';
+  src: url('/fonts/quirky.woff2') format('woff2'),
+       url('/fonts/quirky.otf') format('opentype'),
+       url('/fonts/grandstander-black.woff2') format('woff2');
+  font-weight: 700 900;
+  font-style: normal;
+  font-display: swap;
 }
 
 /* ==========================================================================
@@ -1299,16 +1309,7 @@ body {
   }
 }
 
-@media (max-width: 640px) {
-  .paper-header {
-    padding: 14px 18px;
-  }
-
-  .paper-main-content {
-    padding: 24px 18px 48px;
-  }
-
-  @media (max-width: 900px) {
+@media (max-width: 900px) {
   .clean-hero-title {
     font-size: 2.2rem;
   }
@@ -1321,6 +1322,16 @@ body {
 
   .scribble-note-item {
     max-width: 170px;
+  }
+}
+
+@media (max-width: 640px) {
+  .paper-header {
+    padding: 14px 18px;
+  }
+
+  .paper-main-content {
+    padding: 24px 18px 48px;
   }
 }
 
