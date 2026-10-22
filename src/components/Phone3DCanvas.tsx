@@ -291,21 +291,15 @@ export function Phone3DCanvas({
 
     // 4. Animation & Projection Loop
     let animId: number
-    const clock = new THREE.Clock()
     const tempVec = new THREE.Vector3()
 
     const animate = () => {
       animId = requestAnimationFrame(animate)
-      const elapsedTime = clock.getElapsedTime()
 
-      // Serene, continuous ambient floating motion (no drag/touch interaction)
-      const floatY = Math.sin(elapsedTime * 1.5) * 0.07
-      const floatTiltX = Math.sin(elapsedTime * 1.1) * 0.025
-      const floatTiltY = Math.cos(elapsedTime * 1.3) * 0.035
-
-      phoneGroup.position.y = floatY
-      phoneGroup.rotation.x = baseRotX + floatTiltX
-      phoneGroup.rotation.y = baseRotY + floatTiltY
+      // Grounded resting posture (no floating/bobbing or oscillating tilt)
+      phoneGroup.position.y = 0
+      phoneGroup.rotation.x = baseRotX
+      phoneGroup.rotation.y = baseRotY
 
       // Project 3D Screen Coordinates of Dark Pattern Findings to 2D Viewport Space
       if (showOverlay && findings.length > 0 && containerRef.current) {

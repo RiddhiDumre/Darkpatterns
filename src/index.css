@@ -142,17 +142,83 @@ body {
 }
 
 /* ==========================================================================
-   HALL OF SHAME CASE STUDY MARQUEE TICKER
+   HALL OF SHAME CASE STUDY MARQUEE TICKER & CREATOR DOCK
    ========================================================================== */
+.bottom-dock-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.2vh, 14px);
+  margin-top: auto;
+  z-index: 10;
+}
+
 .case-marquee-container {
   width: 100%;
   max-width: var(--container-max);
-  margin: clamp(12px, 2vh, 24px) auto 0;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   position: relative;
   z-index: 10;
+}
+
+.riddhi-creator-footer {
+  width: 100%;
+  max-width: var(--container-max);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 4px 12px;
+  font-size: 0.76rem;
+  color: var(--text-tertiary);
+  font-family: var(--font-body);
+}
+
+.footer-tagline {
+  color: var(--text-secondary);
+}
+
+.footer-name {
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.footer-divider {
+  color: var(--border-medium);
+}
+
+.footer-email-link {
+  color: var(--text-primary);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s ease;
+}
+
+.footer-email-link:hover {
+  color: var(--ink-audit);
+}
+
+.footer-quirk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: rgba(254, 240, 138, 0.45);
+  border: 1px dashed rgba(202, 138, 4, 0.4);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #854d0e;
+  font-family: var(--font-mono);
 }
 
 .case-marquee-heading-wrap {
