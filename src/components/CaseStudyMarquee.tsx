@@ -21,7 +21,7 @@ const SHAME_CASES: CaseStudyItem[] = [
     pattern: 'Sneak into Basket & Tricky Button Config',
     fine: '$520M FTC Penalty',
     year: '2022',
-    iconBg: '#313131',
+    iconBg: '#232323',
     iconChar: 'E',
   },
   {
@@ -66,21 +66,30 @@ export function CaseStudyMarquee() {
     <div className="case-marquee-container" aria-label="Hall of Deceptive Patterns Hall of Fame">
       <div className="case-marquee-label">
         <span className="case-marquee-dot" />
-        <span>Known Hall of Shame</span>
+        <span>Forensic Evidence Dossier · Hall of Shame</span>
       </div>
       <div className="case-marquee-track-wrapper">
         <div className="case-marquee-track">
           {items.map((item, index) => (
-            <div key={`${item.company}-${index}`} className="case-marquee-card">
-              <span className="case-icon-badge" style={{ backgroundColor: item.iconBg }}>
-                {item.iconChar}
-              </span>
-              <div className="case-text-group">
-                <div className="case-title-row">
-                  <span className="case-company-name">{item.company}</span>
-                  <span className="case-fine-badge">{item.fine}</span>
+            <div key={`${item.company}-${index}`} className="case-doodle-frame-card">
+              {/* Four Hand-Drawn Triangular Photo Corner Tabs */}
+              <div className="doodle-corner corner-top-left" aria-hidden="true" />
+              <div className="doodle-corner corner-top-right" aria-hidden="true" />
+              <div className="doodle-corner corner-bottom-left" aria-hidden="true" />
+              <div className="doodle-corner corner-bottom-right" aria-hidden="true" />
+
+              {/* Inner Hand-Drawn Card Frame */}
+              <div className="case-frame-inner-mat">
+                <span className="case-icon-badge" style={{ backgroundColor: item.iconBg }}>
+                  {item.iconChar}
+                </span>
+                <div className="case-text-group">
+                  <div className="case-title-row">
+                    <span className="case-company-name">{item.company}</span>
+                    <span className="case-fine-badge">{item.fine}</span>
+                  </div>
+                  <span className="case-pattern-desc">{item.pattern}</span>
                 </div>
-                <span className="case-pattern-desc">{item.pattern}</span>
               </div>
             </div>
           ))}
