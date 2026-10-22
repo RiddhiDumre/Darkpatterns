@@ -60,6 +60,8 @@ export function Phone3DCanvas({
       explanationText: string
       targetX: number
       targetY: number
+      pinX: number
+      pinY: number
       noteX: number
       side: 'left' | 'right'
       active: boolean
@@ -112,6 +114,7 @@ export function Phone3DCanvas({
 
     // 1. Scene, Camera, Renderer
     const scene = new THREE.Scene()
+    // Perfectly tuned perspective to show full phone edge-to-edge without any cutting
     const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100)
     camera.position.set(0, 0, 10.8)
     cameraRef.current = camera
@@ -126,94 +129,95 @@ export function Phone3DCanvas({
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     rendererRef.current = renderer
 
-    // 2. Lighting Setup
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.4)
+    // 2. Crisp, Balanced Lighting Setup
+    const ambientLight = new THREE.AmbientLight(0xffffff, 2.2)
     scene.add(ambientLight)
 
-    // Key light (soft studio light from top-left)
-    const keyLight = new THREE.DirectionalLight(0xffffff, 2.2)
-    keyLight.position.set(6, 8, 9)
+    // Key studio light
+    const keyLight = new THREE.DirectionalLight(0xffffff, 2.4)
+    keyLight.position.set(5, 7, 8)
     scene.add(keyLight)
 
-    // Metallic Rim Light from bottom-right
-    const rimLight = new THREE.DirectionalLight(0x99bbff, 1.5)
+    // Silver Edge Specular Rim Light
+    const rimLight = new THREE.DirectionalLight(0xffffff, 1.6)
     rimLight.position.set(-6, -6, 5)
     scene.add(rimLight)
 
-    // Soft Front Fill
-    const fillLight = new THREE.DirectionalLight(0xffffff, 0.8)
-    fillLight.position.set(0, 2, 7)
+    // Front Fill
+    const fillLight = new THREE.DirectionalLight(0xffffff, 1.2)
+    fillLight.position.set(0, 1, 6)
     scene.add(fillLight)
 
-    // 3. iPhone Model Group
+    // 3. Precision iPhone Frame Group
     const phoneGroup = new THREE.Group()
     phoneGroupRef.current = phoneGroup
     scene.add(phoneGroup)
 
-    const phoneWidth = 3.2
-    const phoneHeight = 6.6
-    const phoneDepth = 0.32
-    const cornerRadius = 0.44
+    // Exact proportions for modern modern-aspect phone with refined bezels
+    const phoneWidth = 3.22
+    const phoneHeight = 6.8
+    const phoneDepth = 0.28
+    const cornerRadius = 0.46
 
-    // Titanium / Space Black Body
+    // Chassis: Elegant Midnight Silver Aluminum
     const bodyShape = createRoundedRectShape(phoneWidth, phoneHeight, cornerRadius)
     const bodyGeo = new THREE.ExtrudeGeometry(bodyShape, {
       depth: phoneDepth,
       bevelEnabled: true,
-      bevelThickness: 0.04,
+      bevelThickness: 0.03,
       bevelSize: 0.03,
-      bevelSegments: 5,
+      bevelSegments: 4,
     })
     bodyGeo.center()
 
     const bodyMat = new THREE.MeshStandardMaterial({
-      color: 0x121216,
-      metalness: 0.88,
-      roughness: 0.28,
+      color: 0x1f232b, // Sophisticated Graphite / Slate
+      metalness: 0.82,
+      roughness: 0.25,
     })
     const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat)
     phoneGroup.add(bodyMesh)
 
-    // Polished Metallic Outer Band
+    // Mirror-Polished Chamfered Outer Edge Ring
     const bandShape = createRoundedRectShape(phoneWidth + 0.015, phoneHeight + 0.015, cornerRadius)
     const bandGeo = new THREE.ExtrudeGeometry(bandShape, {
-      depth: phoneDepth - 0.04,
+      depth: phoneDepth - 0.05,
       bevelEnabled: false,
     })
     bandGeo.center()
     const bandMat = new THREE.MeshStandardMaterial({
-      color: 0x22222a,
-      metalness: 0.94,
-      roughness: 0.16,
+      color: 0x9ca3af, // Sleek brushed silver-grey bezel highlight
+      metalness: 0.92,
+      roughness: 0.15,
     })
     const bandMesh = new THREE.Mesh(bandGeo, bandMat)
     phoneGroup.add(bandMesh)
 
-    // Side Buttons (Volume & Power)
-    const buttonMat = new THREE.MeshStandardMaterial({ color: 0x2b2b35, metalness: 0.9, roughness: 0.2 })
-    // Power Button (right)
-    const powerGeo = new THREE.BoxGeometry(0.04, 0.65, 0.08)
+    // Side Buttons (Sleek volume and power tabs)
+    const buttonMat = new THREE.MeshStandardMaterial({ color: 0x4b5563, metalness: 0.85, roughness: 0.2 })
+    // Power button (right)
+    const powerGeo = new THREE.BoxGeometry(0.035, 0.65, 0.07)
     const powerBtn = new THREE.Mesh(powerGeo, buttonMat)
-    powerBtn.position.set(phoneWidth / 2 + 0.03, 0.8, 0)
+    powerBtn.position.set(phoneWidth / 2 + 0.025, 0.75, 0)
     phoneGroup.add(powerBtn)
 
-    // Volume Buttons (left)
-    const volGeo = new THREE.BoxGeometry(0.04, 0.45, 0.08)
+    // Volume buttons (left)
+    const volGeo = new THREE.BoxGeometry(0.035, 0.45, 0.07)
     const volUpBtn = new THREE.Mesh(volGeo, buttonMat)
-    volUpBtn.position.set(-phoneWidth / 2 - 0.03, 1.1, 0)
+    volUpBtn.position.set(-phoneWidth / 2 - 0.025, 1.05, 0)
     const volDownBtn = new THREE.Mesh(volGeo, buttonMat)
-    volDownBtn.position.set(-phoneWidth / 2 - 0.03, 0.5, 0)
+    volDownBtn.position.set(-phoneWidth / 2 - 0.025, 0.48, 0)
     phoneGroup.add(volUpBtn)
     phoneGroup.add(volDownBtn)
 
-    // Front Screen Glass Bezel
-    const screenWidth = 3.02
-    const screenHeight = 6.42
-    const screenRadius = 0.4
+    // Front Screen Glass Face — Maximized, edge-to-edge display
+    const screenWidth = 3.08
+    const screenHeight = 6.66
+    const screenRadius = 0.42
     const screenShape = createRoundedRectShape(screenWidth, screenHeight, screenRadius)
     const screenGeo = new THREE.ShapeGeometry(screenShape)
 
-    // Normalize UV coordinates so screenshot texture spans the full rounded screen edge-to-edge
+    // Normalize UV coordinates so screenshot texture spans the screen cleanly edge-to-edge
     const pos = screenGeo.attributes.position
     const uvs = screenGeo.attributes.uv
     for (let i = 0; i < pos.count; i++) {
@@ -238,17 +242,17 @@ export function Phone3DCanvas({
       toneMapped: false,
     })
     const screenMesh = new THREE.Mesh(screenGeo, screenMat)
-    screenMesh.position.set(0, 0, phoneDepth / 2 + 0.042)
+    screenMesh.position.set(0, 0, phoneDepth / 2 + 0.038)
     screenMeshRef.current = screenMesh
     phoneGroup.add(screenMesh)
 
-    // Dynamic Island Pill
-    const islandShape = createRoundedRectShape(0.72, 0.2, 0.1)
-    const islandGeo = new THREE.ShapeGeometry(islandShape)
-    const islandMat = new THREE.MeshBasicMaterial({ color: 0x000000 })
-    const islandMesh = new THREE.Mesh(islandGeo, islandMat)
-    islandMesh.position.set(0, 2.92, phoneDepth / 2 + 0.045)
-    phoneGroup.add(islandMesh)
+    // Ultra-slim Top Speaker Micro-slit
+    const speakerShape = createRoundedRectShape(0.48, 0.035, 0.015)
+    const speakerGeo = new THREE.ShapeGeometry(speakerShape)
+    const speakerMat = new THREE.MeshBasicMaterial({ color: 0x111115 })
+    const speakerMesh = new THREE.Mesh(speakerGeo, speakerMat)
+    speakerMesh.position.set(0, screenHeight / 2 - 0.06, phoneDepth / 2 + 0.042)
+    phoneGroup.add(speakerMesh)
 
     // Glass Reflection Overlay
     const glareGeo = new THREE.PlaneGeometry(screenWidth, screenHeight)
@@ -275,18 +279,12 @@ export function Phone3DCanvas({
     glareMesh.position.set(0, 0, phoneDepth / 2 + 0.044)
     phoneGroup.add(glareMesh)
 
-    // Rear Camera Island (visible if user rotates phone around)
-    const cameraBumpShape = createRoundedRectShape(1.3, 1.3, 0.25)
-    const cameraBumpGeo = new THREE.ExtrudeGeometry(cameraBumpShape, {
-      depth: 0.12,
-      bevelEnabled: true,
-      bevelThickness: 0.02,
-      bevelSize: 0.02,
-      bevelSegments: 3,
-    })
-    const cameraBumpMat = new THREE.MeshStandardMaterial({ color: 0x18181f, metalness: 0.8, roughness: 0.3 })
+    // Rear Camera (classic iPhone 5 circular lens with flash)
+    const cameraBumpGeo = new THREE.CylinderGeometry(0.18, 0.18, 0.04, 32)
+    cameraBumpGeo.rotateX(Math.PI / 2)
+    const cameraBumpMat = new THREE.MeshStandardMaterial({ color: 0x111115, metalness: 0.9, roughness: 0.2 })
     const cameraBumpMesh = new THREE.Mesh(cameraBumpGeo, cameraBumpMat)
-    cameraBumpMesh.position.set(-0.75, 1.8, -phoneDepth / 2 - 0.14)
+    cameraBumpMesh.position.set(-1.05, 2.7, -phoneDepth / 2 - 0.02)
     phoneGroup.add(cameraBumpMesh)
 
     // 4. Animation & Projection Loop
@@ -355,12 +353,16 @@ export function Phone3DCanvas({
           const screenPixelX = (tempVec.x * 0.5 + 0.5) * curW
           const screenPixelY = (-(tempVec.y * 0.5) + 0.5) * curH
 
-          // Position note completely outside the phone screen in the margin!
-          const noteMargin = 48
+          // Position note completely outside the phone screen in the margin with safe clearance
+          const noteMargin = 40
           const noteX =
             preferredSide === 'right'
               ? Math.round(phoneRightPixelX + noteMargin)
               : Math.round(phoneLeftPixelX - noteMargin)
+
+          // Vertical staggering algorithm: guarantee at least minNoteDistance between notes on the same side
+          // Initial target Y from projected anchor
+          let finalTargetY = Math.round(screenPixelY)
 
           const noteData = getNoteHierarchy(f, i)
 
@@ -370,10 +372,31 @@ export function Phone3DCanvas({
             patternTitle: noteData.patternTitle,
             explanationText: noteData.explanationText,
             targetX: Math.round(screenPixelX),
-            targetY: Math.round(screenPixelY),
+            targetY: finalTargetY,
+            pinX: Math.round(screenPixelX),
+            pinY: Math.round(screenPixelY),
             noteX: Math.round(noteX),
             side: preferredSide,
             active: activeId === f.id,
+          }
+        })
+
+        // Clean vertical slots for notes to avoid collision/overlap:
+        // Left side:
+        // Note 2 (Preselection) at 16%
+        // Note 3 (Interface Interference) at 56%
+        // Right side:
+        // Note 1 (False Urgency) at 14%
+        // Note 4 (Confirmshaming) at 58%
+        const slotMap: Record<number, number> = {
+          1: Math.round(curH * 0.14),
+          2: Math.round(curH * 0.16),
+          3: Math.round(curH * 0.56),
+          4: Math.round(curH * 0.58),
+        }
+        points.forEach((pt) => {
+          if (slotMap[pt.indexNum] !== undefined) {
+            pt.targetY = slotMap[pt.indexNum]
           }
         })
 
@@ -408,11 +431,11 @@ export function Phone3DCanvas({
       bodyGeo.dispose()
       bandGeo.dispose()
       screenGeo.dispose()
-      islandGeo.dispose()
+      speakerGeo.dispose()
       bodyMat.dispose()
       bandMat.dispose()
       screenMat.dispose()
-      islandMat.dispose()
+      speakerMat.dispose()
     }
   }, [showOverlay, findings, activeId])
 
@@ -443,31 +466,40 @@ export function Phone3DCanvas({
       {/* 2D SVG Scribbled Handwritten Notes & Curved Arrows Overlay */}
       {showOverlay && (
         <svg className="phone-scribble-svg-overlay" aria-hidden="true">
-          <defs>
-            {/* Unified forensic ink arrowhead marker */}
-            <marker
-              id="scribble-arrowhead-unified"
-              viewBox="0 0 10 10"
-              refX="7"
-              refY="5"
-              markerWidth="6"
-              markerHeight="6"
-              orient="auto"
-            >
-              <path d="M 0 2 L 7 5 L 0 8 z" fill="currentColor" />
-            </marker>
-          </defs>
-
           {projectedPoints.map((pt) => {
             const isRight = pt.side === 'right'
 
-            // Arrow originates from handwritten note in the margin and arches cleanly to the side of the element
-            const arrowStartX = isRight ? pt.noteX - 8 : pt.noteX + 8
-            const arrowStartY = pt.targetY + 2
+            // Arrow originates from handwritten note edge and points toward target on screen
+            const arrowStartX = isRight ? pt.noteX - 4 : pt.noteX + 4
+            const arrowStartY = pt.targetY + 30
+            const arrowEndX = pt.pinX
+            const arrowEndY = pt.pinY
 
-            // Organic curved control point for hand-drawn pen stroke
-            const midX = (arrowStartX + pt.targetX) / 2
-            const midY = (arrowStartY + pt.targetY) / 2 - 12
+            // Organic hand-drawn arching bezier curve control points
+            const dx = arrowEndX - arrowStartX
+            const dy = arrowEndY - arrowStartY
+
+            // Hand-drawn variation based on note index for character
+            const archOffset = isRight ? (pt.indexNum === 1 ? -24 : 18) : (pt.indexNum === 2 ? -20 : 16)
+            const c1x = arrowStartX + dx * 0.35 + (isRight ? -12 : 12)
+            const c1y = arrowStartY + dy * 0.2 + archOffset
+            const c2x = arrowStartX + dx * 0.75
+            const c2y = arrowStartY + dy * 0.85 + (archOffset * 0.3)
+
+            // Calculate angle at arrow tip to draw authentic sketched arrowhead wings
+            const tangentX = arrowEndX - c2x
+            const tangentY = arrowEndY - c2y
+            const angle = Math.atan2(tangentY, tangentX)
+
+            // Hand-drawn arrowhead wings with slight natural imperfection
+            const headLength = 14
+            const barb1Angle = angle - Math.PI + 0.52
+            const barb2Angle = angle - Math.PI - 0.44
+
+            const barb1X = arrowEndX + Math.cos(barb1Angle) * headLength
+            const barb1Y = arrowEndY + Math.sin(barb1Angle) * headLength
+            const barb2X = arrowEndX + Math.cos(barb2Angle) * (headLength * 0.92)
+            const barb2Y = arrowEndY + Math.sin(barb2Angle) * (headLength * 0.92)
 
             return (
               <g
@@ -476,16 +508,26 @@ export function Phone3DCanvas({
                 onClick={() => onActivate(pt.id)}
                 style={{ cursor: 'pointer' }}
               >
-                {/* Curved Hand-Drawn Ink Arrow pointing cleanly to the side of the element */}
+                {/* Main hand-drawn curved pen stroke */}
                 <path
-                  d={`M ${arrowStartX} ${arrowStartY} Q ${midX} ${midY} ${pt.targetX} ${pt.targetY}`}
+                  d={`M ${arrowStartX} ${arrowStartY} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${arrowEndX} ${arrowEndY}`}
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth={pt.active ? 3 : 2.2}
+                  strokeWidth={pt.active ? 3.4 : 2.6}
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  markerEnd="url(#scribble-arrowhead-unified)"
                   className="scribble-arrow-path"
+                />
+
+                {/* Hand-drawn open sketched arrowhead wings */}
+                <path
+                  d={`M ${barb1X} ${barb1Y} Q ${(arrowEndX + barb1X) / 2} ${(arrowEndY + barb1Y) / 2 - 1} ${arrowEndX} ${arrowEndY} Q ${(arrowEndX + barb2X) / 2} ${(arrowEndY + barb2Y) / 2 + 1} ${barb2X} ${barb2Y}`}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={pt.active ? 3.4 : 2.6}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="scribble-arrow-head"
                 />
               </g>
             )
@@ -504,7 +546,7 @@ export function Phone3DCanvas({
                 key={pt.id}
                 className={`scribble-note-item post-it-note side-${pt.side}${pt.active ? ' is-active' : ''}`}
                 style={{
-                  top: `${pt.targetY - 45}px`,
+                  top: `${pt.targetY}px`,
                   left: isRight ? `${pt.noteX}px` : undefined,
                   right: !isRight
                     ? `${containerRef.current ? containerRef.current.clientWidth - pt.noteX : 340}px`

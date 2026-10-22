@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dark Pattern Detector · Launch Video V4</title>
+  <link rel="stylesheet" href="/src/index.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body, html {
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      background-color: #fafaf9;
+      font-family: var(--font-body, system-ui, sans-serif);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .viewport {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      background-color: #fafaf9;
+      overflow: hidden;
+    }
+
+    /* Ambient Dot Grid for Scene 1 & Scene 5 */
+    .dot-grid-bg {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(#d1d5db 1.5px, transparent 1.5px);
+      background-size: 32px 32px;
+      z-index: 1;
+    }
+
+    /* Top Brand Bar for Scene 1 */
+    .top-bar {
+      position: absolute;
+      top: 36px;
+      left: 100px;
+      right: 100px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+    }
+    .brand-logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .brand-logo-wrap img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+    }
+    .brand-logo-title {
+      font-family: var(--font-display, 'Quirky', sans-serif);
+      font-size: 26px;
+      font-weight: 800;
+      color: #111827;
+      letter-spacing: -0.02em;
+    }
+    .brand-tag {
+      background: #ffffff;
+      border: 2px solid #111827;
+      border-radius: 999px;
+      padding: 6px 18px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #111827;
+      box-shadow: 2px 2px 0px #111827;
+    }
+
+    /* Flash Overlay */
+    .flash-overlay {
+      position: absolute;
+      inset: 0;
+      background: #ffffff;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 200;
+    }
+
+    /* =======================================================
+       ACT 1: THE HOOK / FLOATING iPHONE
+       ======================================================= */
+    #act1 {
+      position: absolute;
+      inset: 0;
+      display: none;
+      background-color: #fef2f2;
+      z-index: 20;
+    }
+    .act1-text {
+      position: absolute;
+      top: 340px;
+      left: 120px;
+      width: 680px;
+      z-index: 25;
+    }
+    .hook-pill {
+      display: inline-block;
+      background: #fee2e2;
+      color: #b91c1c;
+      font-size: 13px;
+      font-weight: 800;
+      padding: 6px 16px;
+      border-radius: 999px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(185, 28, 28, 0.2);
+    }
+    .hook-headline {
+      font-family: var(--font-display, 'Quirky', sans-serif);
+      font-size: 54px;
+      font-weight: 900;
+      line-height: 1.1;
+      color: #111827;
+      letter-spacing: -0.03em;
+      margin-bottom: 18px;
+    }
+    .hook-sub {
+      font-size: 22px;
+      line-height: 1.5;
+      color: #4b5563;
+    }
+
+    .act1-phone-wrap {
+      position: absolute;
+      top: 130px;
+      left: 980px;
+      perspective: 1200px;
+      z-index: 25;
+    }
+    .iphone-body {
+      position: relative;
+      width: 420px;
+      height: 840px;
+      background: #18181b;
+      border-radius: 54px;
+      border: 3.5px solid #3f3f46;
+      box-shadow: 0 35px 70px -15px rgba(0, 0, 0, 0.35);
+      transform: rotateY(-8deg) rotateX(4deg);
+      transition: transform 0.2s ease-out;
+    }
+    .iphone-screen {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      width: 386px;
+      height: 806px;
+      border-radius: 42px;
+      overflow: hidden;
+      background: #ffffff;
+    }
+    .iphone-screen img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .dynamic-island {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 110px;
+      height: 28px;
+      background: #000000;
+      border-radius: 999px;
+      z-index: 30;
+    }
+
+    /* EXACT Ground-Truth Bounding Box on Countdown Timer */
+    .highlight-urgency {
+      position: absolute;
+      top: 25.4%;
+      left: 6.0%;
+      width: 87.8%;
+      height: 8.4%;
+      border: 3.5px solid #e11d48;
+      border-radius: 8px;
+      background: rgba(225, 29, 72, 0.12);
+      box-shadow: 0 0 16px rgba(225, 29, 72, 0.4);
+      opacity: 0;
+      transform: scale(0.96);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 35;
+      pointer-events: none;
+    }
+    .highlight-urgency.active {
+      opacity: 1;
+      transform: scale(1.0);
+    }
+    .highlight-badge {
+      position: absolute;
+      top: -16px;
+      left: 8px;
+      background: #e11d48;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.04em;
+    }
+
+    /* =======================================================
+       ACT 2: REAL HOMEPAGE SCREENSHOT + DRAG & DROP
+       ======================================================= */
+    #act2 {
+      position: absolute;
+      inset: 0;
+      display: none;
+      z-index: 20;
+    }
+    #act2Bg {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      object-fit: cover;
+      display: block;
+    }
+    /* Dropzone Glow Ring Overlay */
+    .dropzone-glow {
+      position: absolute;
+      top: 429px;
+      left: 300px;
+      width: 484px;
+      height: 220px;
+      border-radius: 16px;
+      border: 3.5px solid #e11d48;
+      box-shadow: 0 0 24px rgba(225, 29, 72, 0.5), inset 0 0 16px rgba(225, 29, 72, 0.15);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      pointer-events: none;
+      z-index: 45;
+    }
+    .dropzone-glow.active {
+      opacity: 1;
+    }
+
+    /* Detached Flying Screenshot Thumbnail */
+    #flyingThumb {
+      position: absolute;
+      width: 240px;
+      height: 520px;
+      border-radius: 18px;
+      background: #ffffff;
+      border: 2.5px solid #111827;
+      box-shadow: 10px 10px 0px #111827;
+      overflow: hidden;
+      z-index: 80;
+      display: none;
+      transform-origin: center center;
+    }
+    #flyingThumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* =======================================================
+       ACT 3: REAL ANALYZING OVERLAY SCREENSHOT + LASER SCAN
+       ======================================================= */
+    #act3 {
+      position: absolute;
+      inset: 0;
+      display: none;
+      z-index: 20;
+    }
+    #act3Bg {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      object-fit: cover;
+      display: block;
+    }
+    .laser-scan-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: #e11d48;
+      box-shadow: 0 0 20px 6px rgba(225, 29, 72, 0.8);
+      top: 0;
+      z-index: 50;
+      pointer-events: none;
+    }
+
+    /* =======================================================
+       ACT 4: REAL AUDIT DOSSIER SCREENSHOT + HIGHLIGHTS
+       ======================================================= */
+    #act4 {
+      position: absolute;
+      inset: 0;
+      display: none;
+      z-index: 20;
+    }
+    #act4Bg {
+      position: absolute;
+      inset: 0;
+      width: 1920px;
+      height: 1080px;
+      object-fit: cover;
+      display: block;
+    }
+    /* Highlight over Card 1 (False Urgency) on real_site_audit.png */
+    .audit-card1-glow {
+      position: absolute;
+      top: 260px;
+      left: 1045px;
+      width: 610px;
+      height: 140px;
+      border-radius: 16px;
+      border: 3.5px solid #e11d48;
+      box-shadow: 0 0 20px rgba(225, 29, 72, 0.5);
+      opacity: 0;
+      transform: scale(0.98);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 50;
+      pointer-events: none;
+    }
+    .audit-card1-glow.active {
+      opacity: 1;
+      transform: scale(1.0);
+    }
+    /* Highlight over Card 2 (Preselection) on real_site_audit.png */
+    .audit-card2-glow {
+      position: absolute;
+      top: 415px;
+      left: 1045px;
+      width: 610px;
+      height: 140px;
+      border-radius: 16px;
+      border: 3.5px solid #f59e0b;
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+      opacity: 0;
+      transform: scale(0.98);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 50;
+      pointer-events: none;
+    }
+    .audit-card2-glow.active {
+      opacity: 1;
+      transform: scale(1.0);
+    }
+
+    /* =======================================================
+       ACT 5: BRAND HERO CTA
+       ======================================================= */
+    #act5 {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: #fffbeb;
+      z-index: 20;
+    }
+    .cta-card {
+      width: 1040px;
+      background: #ffffff;
+      border: 3.5px solid #111827;
+      border-radius: 28px;
+      box-shadow: 12px 12px 0px #111827;
+      padding: 50px 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transform-origin: center center;
+      z-index: 25;
+    }
+    .cta-card img {
+      width: 160px;
+      height: 160px;
+      object-fit: contain;
+      margin-bottom: 20px;
+    }
+    .cta-title {
+      font-family: var(--font-display, 'Quirky', sans-serif);
+      font-size: 56px;
+      font-weight: 900;
+      color: #111827;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+    }
+    .cta-sub {
+      font-size: 24px;
+      color: #e11d48;
+      font-weight: 800;
+      margin-bottom: 32px;
+    }
+    .cta-btn {
+      background: #111827;
+      color: #ffffff;
+      border: none;
+      border-radius: 16px;
+      padding: 18px 42px;
+      font-size: 20px;
+      font-weight: 800;
+      box-shadow: 4px 4px 0px #e11d48;
+      margin-bottom: 24px;
+      transition: transform 0.2s ease;
+    }
+    .cta-credit {
+      font-size: 14px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="viewport" id="viewport">
+    <!-- Flash Overlay -->
+    <div class="flash-overlay" id="flash"></div>
+
+    <!-- Flying Thumbnail -->
+    <div id="flyingThumb">
+      <img src="/mobile-checkout-specimen.png" alt="Screenshot">
+    </div>
+
+    <!-- ================= ACT 1 ================= -->
+    <div id="act1">
+      <div class="dot-grid-bg"></div>
+      <div class="top-bar">
+        <div class="brand-logo-wrap">
+          <img src="/detective-doodle.png" alt="Detective">
+          <span class="brand-logo-title">DARK PATTERN DETECTOR</span>
+        </div>
+        <div class="brand-tag">v2.0 LIVE</div>
+      </div>
+
+      <div class="act1-text">
+        <span class="hook-pill">SUSPECT SPECIMEN #01</span>
+        <h1 class="hook-headline">Notice anything suspicious in this checkout?</h1>
+        <p class="hook-sub">A ticking countdown timer and pre-checked monthly warranty designed to rush your decision.</p>
+      </div>
+
+      <div class="act1-phone-wrap">
+        <div class="iphone-body" id="iphoneBody">
+          <div class="dynamic-island"></div>
+          <div class="iphone-screen">
+            <img src="/mobile-checkout-specimen.png" alt="Specimen">
+            <div class="highlight-urgency" id="urgencyBox">
+              <span class="highlight-badge">1  FALSE URGENCY</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= ACT 2: REAL LIVE HOMEPAGE ================= -->
+    <div id="act2">
+      <img id="act2Bg" src="/real_site_home.png" alt="Live Homepage">
+      <div class="dropzone-glow" id="dzGlow"></div>
+    </div>
+
+    <!-- ================= ACT 3: REAL LIVE ANALYZING OVERLAY ================= -->
+    <div id="act3">
+      <img id="act3Bg" src="/real_site_analyzing.png" alt="Live Analyzing State">
+      <div class="laser-scan-line" id="laserLine"></div>
+    </div>
+
+    <!-- ================= ACT 4: REAL LIVE AUDIT REPORT ================= -->
+    <div id="act4">
+      <img id="act4Bg" src="/real_site_audit.png" alt="Live Audit Report">
+      <div class="audit-card1-glow" id="card1Glow"></div>
+      <div class="audit-card2-glow" id="card2Glow"></div>
+    </div>
+
+    <!-- ================= ACT 5: BRAND HERO CTA ================= -->
+    <div id="act5">
+      <div class="dot-grid-bg"></div>
+      <div class="top-bar">
+        <div class="brand-logo-wrap">
+          <img src="/detective-doodle.png" alt="Detective">
+          <span class="brand-logo-title">DARK PATTERN DETECTOR</span>
+        </div>
+        <div class="brand-tag">v2.0 LIVE</div>
+      </div>
+
+      <div class="cta-card" id="ctaCard">
+        <img src="/detective-doodle.png" alt="Detective">
+        <h1 class="cta-title">DARK PATTERN DETECTOR</h1>
+        <p class="cta-sub">Scan before you pay. Expose the traps.</p>
+        <div class="cta-btn" id="ctaBtn">Drop a screenshot at darkpatterns.dev →</div>
+        <p class="cta-credit">Created by Riddhi Dumre · riddhidumre@gmail.com</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const flash = document.getElementById('flash');
+    const flyingThumb = document.getElementById('flyingThumb');
+    const act1 = document.getElementById('act1');
+    const act2 = document.getElementById('act2');
+    const act3 = document.getElementById('act3');
+    const act4 = document.getElementById('act4');
+    const act5 = document.getElementById('act5');
+
+    const iphoneBody = document.getElementById('iphoneBody');
+    const urgencyBox = document.getElementById('urgencyBox');
+    const dzGlow = document.getElementById('dzGlow');
+    const laserLine = document.getElementById('laserLine');
+    const card1Glow = document.getElementById('card1Glow');
+    const card2Glow = document.getElementById('card2Glow');
+    const ctaCard = document.getElementById('ctaCard');
+    const ctaBtn = document.getElementById('ctaBtn');
+
+    function easeInOutCubic(t) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    function easeOutBack(t, s = 1.70158) {
+      t = Math.max(0, Math.min(1, t)) - 1;
+      return t * t * ((s + 1) * t + s) + 1;
+    }
+
+    window.seek = function(t) {
+      // ====================================================
+      // ACT 1: 0.0s – 3.2s (The Urgency Trap)
+      // ====================================================
+      if (t < 3.2) {
+        act1.style.display = 'block';
+        act2.style.display = 'none';
+        act3.style.display = 'none';
+        act4.style.display = 'none';
+        act5.style.display = 'none';
+
+        // Floating physics
+        const bob = Math.sin(t * 3.0) * 12;
+        iphoneBody.style.transform = `rotateY(-8deg) rotateX(4deg) translateY(${bob}px)`;
+
+        // Highlight countdown at 1.8s (Exact Ground-Truth 25.4%)
+        if (t >= 1.8) {
+          urgencyBox.classList.add('active');
+        } else {
+          urgencyBox.classList.remove('active');
+        }
+
+        // Camera Flash at 2.8s
+        if (t >= 2.8 && t <= 3.05) {
+          const fAlpha = 1.0 - (t - 2.8) / 0.25;
+          flash.style.opacity = Math.max(0, fAlpha);
+        } else {
+          flash.style.opacity = '0';
+        }
+
+        // Thumbnail pops out at 2.95s
+        if (t >= 2.95) {
+          const popT = Math.min(1, (t - 2.95) / 0.25);
+          const pScale = easeOutBack(popT) * 0.75;
+          flyingThumb.style.display = 'block';
+          flyingThumb.style.left = '1050px';
+          flyingThumb.style.top = '270px';
+          flyingThumb.style.transform = `scale(${pScale})`;
+        } else {
+          flyingThumb.style.display = 'none';
+        }
+      }
+      // ====================================================
+      // ACT 2: 3.2s – 6.5s (Drop into Live Website Dropzone)
+      // ====================================================
+      else if (t < 6.5) {
+        act1.style.display = 'none';
+        act2.style.display = 'block';
+        act3.style.display = 'none';
+        act4.style.display = 'none';
+        act5.style.display = 'none';
+        flash.style.opacity = '0';
+
+        // Fly thumbnail into real dropzone center on real_site_home.png (x: 542px, y: 539px)
+        const flyProg = easeInOutCubic(Math.min(1, (t - 3.2) / 2.2));
+        const startX = 1050, startY = 270;
+        const endX = 422, endY = 279; // thumb center lands at (542, 539)
+        const curX = (1 - flyProg) * startX + flyProg * endX;
+        const curY = (1 - flyProg) * startY + flyProg * endY - Math.sin(flyProg * Math.PI) * 160;
+        const curScale = 0.75 - flyProg * 0.35; // scales down to 0.40
+
+        flyingThumb.style.display = 'block';
+        flyingThumb.style.left = `${curX}px`;
+        flyingThumb.style.top = `${curY}px`;
+        flyingThumb.style.transform = `scale(${curScale})`;
+
+        // Drop event at 5.4s
+        if (t >= 5.4) {
+          dzGlow.classList.add('active');
+          const bounceT = Math.min(1, (t - 5.4) / 0.6);
+          const bounceScale = 0.40 + Math.sin(bounceT * Math.PI * 3) * 0.04 * (1 - bounceT);
+          flyingThumb.style.transform = `scale(${bounceScale})`;
+        } else {
+          dzGlow.classList.remove('active');
+        }
+      }
+      // ====================================================
+      // ACT 3: 6.5s – 9.5s (Real Live Analyzing Overlay + Scan)
+      // ====================================================
+      else if (t < 9.5) {
+        act1.style.display = 'none';
+        act2.style.display = 'none';
+        act3.style.display = 'block';
+        act4.style.display = 'none';
+        act5.style.display = 'none';
+        flyingThumb.style.display = 'none';
+
+        // Laser scan line sweeps vertically
+        const scanT = (t - 6.5) / 3.0;
+        const laserY = Math.sin(scanT * Math.PI * 2) * 220 + 440;
+        laserLine.style.top = `${laserY}px`;
+      }
+      // ====================================================
+      // ACT 4: 9.5s – 12.5s (Real Live Audit Dossier)
+      // ====================================================
+      else if (t < 12.5) {
+        act1.style.display = 'none';
+        act2.style.display = 'none';
+        act3.style.display = 'none';
+        act4.style.display = 'block';
+        act5.style.display = 'none';
+        flyingThumb.style.display = 'none';
+
+        // Card 1 highlights at 9.8s
+        if (t >= 9.8) {
+          card1Glow.classList.add('active');
+        } else {
+          card1Glow.classList.remove('active');
+        }
+
+        // Card 2 highlights at 10.6s
+        if (t >= 10.6) {
+          card2Glow.classList.add('active');
+        } else {
+          card2Glow.classList.remove('active');
+        }
+      }
+      // ====================================================
+      // ACT 5: 12.5s – 15.0s (Brand Hero CTA)
+      // ====================================================
+      else {
+        act1.style.display = 'none';
+        act2.style.display = 'none';
+        act3.style.display = 'none';
+        act4.style.display = 'none';
+        act5.style.display = 'flex';
+        flyingThumb.style.display = 'none';
+
+        const ctaT = easeOutBack(Math.min(1, (t - 12.5) / 0.8));
+        ctaCard.style.transform = `scale(${ctaT})`;
+
+        // Button glint pulse at 13.0s
+        if (t >= 13.0) {
+          const chimeT = Math.min(1, (t - 13.0) / 0.5);
+          const pulse = Math.sin(chimeT * Math.PI) * 4;
+          ctaBtn.style.transform = `scale(${1 + pulse * 0.02})`;
+        } else {
+          ctaBtn.style.transform = 'scale(1)';
+        }
+      }
+    };
+
+    seek(0);
+  </script>
+</body>
+</html>

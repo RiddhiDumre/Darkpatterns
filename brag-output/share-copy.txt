@@ -1,0 +1,6 @@
+Ever get the feeling a checkout button is rushing you on purpose?
+
+We built Dark Pattern Detector to catch fake countdowns, prechecked warranties, and hidden surge fees before you tap pay.
+
+Drop any screenshot → Get an instant forensic autopsy.
+darkpatterns.dev

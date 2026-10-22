@@ -4,6 +4,7 @@ import { Dropzone } from './components/Dropzone'
 import { Phone3DCanvas } from './components/Phone3DCanvas'
 import { CaseStudyMarquee } from './components/CaseStudyMarquee'
 import { AnalysisLoadingOverlay } from './components/AnalysisLoadingOverlay'
+import { AuditReportView } from './components/AuditReportView'
 import { FEATURED_HERO_ANALYSIS } from './data/featuredFindings'
 
 type AppStatus = 'idle' | 'analyzing' | 'error'
@@ -89,10 +90,6 @@ export default function App() {
   // Handle sample preset selection
   const handleSelectSample = async (samplePath: string) => {
     try {
-      if (samplePath === DEFAULT_SPECIMEN_SRC) {
-        resetToDemo()
-        return
-      }
       const res = await fetch(samplePath)
       const blob = await res.blob()
       const reader = new FileReader()
@@ -146,7 +143,20 @@ export default function App() {
       )}
 
       {/* Main Content Area */}
-      <main className="paper-main-content">
+      <main className={`paper-main-content${isCustomUpload ? ' is-audit-mode' : ''}`}>
+        {/* Top Header Row with Creator Credit pinned to the top right as subtle small text */}
+        <header className="paper-top-bar">
+          <div className="paper-top-bar-inner">
+            <div className="creator-subtle-text">
+              <span className="creator-author">By Riddhi Dumre</span>
+              <span className="creator-dot">·</span>
+              <a href="mailto:riddhidumre@gmail.com" className="creator-link">
+                riddhidumre@gmail.com
+              </a>
+            </div>
+          </div>
+        </header>
+
         {/* ERROR STATE */}
         {status === 'error' && (
           <section className="paper-error-viewport" role="alert">
@@ -177,34 +187,15 @@ export default function App() {
         )}
 
         {/* ACTIVE EDITORIAL INVESTIGATION VIEW */}
-        {status === 'idle' && (
+        {status === 'idle' && !isCustomUpload && (
           <section className="paper-landing-viewport">
             <div className="paper-landing-grid">
               {/* Left Column: Big Prominent Input Area & Hero Introduction */}
               <div className="paper-hero-left">
-                {/* Creator Credit Top-Badge */}
-                <div className="creator-top-pill">
-                  <span className="creator-by">By Riddhi Dumre</span>
-                  <span className="creator-sep">/</span>
-                  <a href="mailto:riddhidumre@gmail.com" className="creator-mail">
-                    riddhidumre@gmail.com
-                  </a>
-                  <span className="creator-tag">Don't click weird buttons</span>
-                </div>
-
-                {isCustomUpload && (
-                  <button
-                    type="button"
-                    className="clean-reset-btn"
-                    onClick={resetToDemo}
-                    style={{ alignSelf: 'flex-start', marginBottom: '-8px' }}
-                  >
-                    &larr; Reset to demo specimen
-                  </button>
-                )}
                 <div className="clean-hero-intro">
                   <h1 className="clean-hero-title">
-                    Deceptive design, unmasked.
+                    Deceptive design,<br/>
+                    <span className="hero-title-line2">unmasked.</span>
                   </h1>
                   <p className="clean-hero-subtitle">
                     Drop any checkout, subscription, or booking screenshot to detect manipulative patterns before you pay.
@@ -227,16 +218,12 @@ export default function App() {
                   <div className="phone-3d-stage-wrapper-interactive">
                     <Phone3DCanvas
                       src={currentImage}
-                      alt={
-                        isCustomUpload
-                          ? `Uploaded screenshot: ${uploadFileName || 'Custom screenshot'}`
-                          : 'Mobile checkout specimen inside 3D iPhone'
-                      }
+                      alt="Mobile checkout specimen inside 3D iPhone"
                       findings={currentAnalysis.findings}
                       showOverlay={true}
                       activeId={activeId}
                       onActivate={setActiveId}
-                      isCustomUpload={isCustomUpload}
+                      isCustomUpload={false}
                       onResetToDemo={resetToDemo}
                     />
                   </div>
@@ -246,21 +233,58 @@ export default function App() {
           </section>
         )}
 
-        {/* Detective Doodle inspecting for evidence fixed at the bottom right corner */}
-        <div className="detective-doodle-wrapper" aria-hidden="true">
-          <div className="detective-speech-bubble">
-            <span className="speech-quote">"Aha! Look at this sneakiness right here..."</span>
-            <div className="speech-bubble-tail" />
-          </div>
-          <img
-            src="/detective-doodle.png"
-            alt="Detective cartoon looking for dark pattern evidence with magnifying glass"
-            className="detective-doodle-img"
+        {/* CUSTOM UPLOADED SCREENSHOT AUDIT VIEW (DEDICATED FULL FORENSIC REPORT) */}
+        {status === 'idle' && isCustomUpload && (
+          <AuditReportView
+            imageSrc={currentImage}
+            fileName={uploadFileName}
+            analysis={currentAnalysis}
+            activeId={activeId}
+            onActivate={setActiveId}
+            onReset={resetToDemo}
+            onNewUpload={() => {
+              const fileInput = document.createElement('input')
+              fileInput.type = 'file'
+              fileInput.accept = 'image/png,image/jpeg,image/webp'
+              fileInput.onchange = (e) => {
+                const file = (e.target as HTMLInputElement).files?.[0]
+                if (file) {
+                  const reader = new FileReader()
+                  reader.onload = () => {
+                    onImage(String(reader.result), file)
+                  }
+                  reader.readAsDataURL(file)
+                }
+              }
+              fileInput.click()
+            }}
           />
-        </div>
+        )}
 
-        {/* Real Dark-Pattern Hall of Shame Marquee Ticker */}
+        {/* Detective Doodle inspecting for evidence:
+            - On Home View: bottom-right peeking over the marquee looking at 3D phone
+            - On After-Upload View: bottom-left and flipped looking right at the screenshot */}
         {status === 'idle' && (
+          <div
+            className={`detective-doodle-wrapper${isCustomUpload ? ' audit-mode' : ''}`}
+            aria-hidden="true"
+          >
+            <div className="detective-speech-bubble">
+              <span className="speech-quote">
+                "Aha! Look at this sneakiness right here..."
+              </span>
+              <div className="speech-bubble-tail" />
+            </div>
+            <img
+              src="/detective-doodle.png"
+              alt="Detective cartoon looking for dark pattern evidence with magnifying glass"
+              className="detective-doodle-img"
+            />
+          </div>
+        )}
+
+        {/* Real Dark-Pattern Hall of Shame Marquee Ticker - ONLY on Home View, hidden in Custom Upload */}
+        {status === 'idle' && !isCustomUpload && (
           <div className="bottom-dock-wrapper">
             <CaseStudyMarquee />
           </div>

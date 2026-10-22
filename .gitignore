@@ -21,3 +21,11 @@ debug.log
 
 test-landing*.png
 grapghic.png
+
+# Video render work directories and temp frames
+brag-output/work/
+launch-prod/draft_frames/
+launch-prod/full_render_work/
+launch-prod/snaps/
+launch-prod/*.wav
+

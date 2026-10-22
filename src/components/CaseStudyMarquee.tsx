@@ -82,6 +82,12 @@ export function CaseStudyMarquee() {
         <h3 className="case-marquee-title">
           <span className="case-title-highlight">DECEPTIVE PATTERN HALL OF SHAME</span>
         </h3>
+        <span className="marquee-title-accent-marks" aria-hidden="true">
+          <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+            <path d="M 4 12 L 2 2" stroke="#dc2626" strokeWidth="2.2" strokeLinecap="round" />
+            <path d="M 12 13 L 15 3" stroke="#dc2626" strokeWidth="2.2" strokeLinecap="round" />
+          </svg>
+        </span>
       </div>
       <div className="case-marquee-track-wrapper">
         <div className="case-marquee-track">
@@ -104,15 +110,11 @@ export function CaseStudyMarquee() {
                   </div>
                   <span className="case-pattern-desc">
                     {item.patternBefore}
-                    <span className="doodle-squiggle-under">
-                      {item.patternSquiggle}
-                      <svg className="squiggle-svg-under" viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true">
-                        <path d="M 0 5 Q 12 1 25 5 Q 38 9 50 5 Q 62 1 75 5 Q 88 9 100 5" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-                      </svg>
-                    </span>
+                    {item.patternSquiggle}
                     {item.patternAfter}
                   </span>
                 </div>
+                <span className="case-arrow-link" aria-hidden="true">&rarr;</span>
               </div>
             </div>
           ))}

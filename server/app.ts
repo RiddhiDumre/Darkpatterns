@@ -3,7 +3,14 @@ import type { Analysis, BBox, Finding, Severity } from '../shared/types'
 
 const ALLOWED_MIME = new Set(['image/png', 'image/jpeg', 'image/webp', 'image/gif'])
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024
-const DEFAULT_MODEL = 'gemini-3.8-flash'
+// Active models verified available and responsive for your key (including flash-lite high-throughput tier)
+const FALLBACK_MODELS = [
+  'gemini-3.5-flash-lite',
+  'gemini-3.5-flash',
+  'gemini-3.6-flash',
+  'gemini-3.8-flash',
+]
+const DEFAULT_MODEL = 'gemini-3.5-flash-lite'
 
 const PROMPT = `You are a razor-sharp UX forensic auditor with dry humor, deadpan sarcasm, and zero patience for manipulative interface design (dark patterns). You audit screens referencing standards like the Central Consumer Protection Authority (CCPA) Guidelines for Prevention and Regulation of Dark Patterns (2023) and OECD taxonomies, but you deliver your findings like a witty, cynical senior designer calling out corporate absurdity.
 
@@ -25,19 +32,16 @@ Taxonomy (reference CCPA 2023 & global benchmarks):
 - Disguised Advertisements: Ads styled to masquerade as native buttons or OS notifications.
 
 Rules:
-- Report up to 6 findings, sorted by severity (high, medium, low).
-- "evidence": Exact text or visual description of the offending element.
-- "explanation": 1-2 punchy sentences with dry, sarcastic wit exposing what the design is trying to pull off. Use **double asterisks** around the 1-2 most critical words or phrases exposing the deceptive trick (e.g., "The opt-out is framed as an **embarrassing personal flaw**, while the accept button gets the **red-carpet treatment**.").
-- "translation": A brutally honest, funny, sarcastic 1-sentence reality check translating what the company is *really* saying (e.g. "Translation: Agree to this right now or confess to being an irresponsible shopper.").
-- "recommendation": A crisp, sensible redesign recommendation with a subtle witty remark (e.g. "Use neutral text like 'Continue without discount' and let people leave with their dignity intact.").
-- "guideline": The specific CCPA 2023 / FTC guideline category (e.g., "CCPA 2023 Guideline 5(c): Confirmshaming", "CCPA 2023 Guideline 5(f): Interface Interference").
-- "bbox": Precise coordinates of the offending element as percentages (0-100): {"x": number, "y": number, "w": number, "h": number}. Locate the exact offending button, link, or label.
-- "score": 0-100 indicating overall deception severity (higher = more shamelessly deceptive).
-- "verdict": A snappy, sarcastic forensic verdict headline (e.g. "2 manipulative tricks spotted — this popup is actively guilt-tripping you into coughing up cash").
-- "summary": A witty, deadpan 1-2 sentence overview roasting the psychological warfare taking place on screen.
+- Report up to 5 findings, sorted by severity (high, medium, low).
+- "evidence": Short exact text or UI label of the offending element (e.g. "high demand surge charges ₹30", "No thanks, I hate discounts").
+- "explanation": Exactly 1 concise, punchy sentence with dry, sarcastic wit exposing what the design is doing (keep under 20 words).
+- "box_2d": MANDATORY [ymin, xmin, ymax, xmax] integers (0 to 1000 scale). Pinpoint the EXACT location of the specific button, row, checkbox, or text on the image. Do NOT outline the entire screen.
+- "score": 0-100 indicating overall deception severity (higher = more deceptive).
+- "verdict": A snappy forensic verdict headline (e.g. "3 deceptive traps detected on this checkout").
+- "summary": Exactly 1-2 witty, deadpan sentences summarizing the tricks.
 
 Return ONLY raw JSON (no markdown):
-{"score": 75, "verdict": "...", "summary": "...", "findings": [{"pattern": "Confirmshaming", "severity": "high", "evidence": "No thanks, I prefer paying full price", "explanation": "The opt-out is framed as an **embarrassing personal flaw**, while the accept button gets the **red-carpet treatment**.", "translation": "Agree to this now or admit you hate saving money.", "recommendation": "Use neutral text like 'Continue without discount' and skip the psychological guilt trip.", "guideline": "CCPA 2023 Guideline 5(c): Confirmshaming", "bbox": {"x": 20, "y": 65, "w": 60, "h": 8}}]}`
+{"score": 75, "verdict": "...", "summary": "...", "findings": [{"pattern": "Hidden Costs", "severity": "high", "evidence": "high demand surge charges ₹30", "explanation": "Sneaks an extra fee into the bill summary at the last second after you are already committed.", "box_2d": [665, 145, 715, 870]}]}`
 
 function getModel(): string {
   return process.env.GEMINI_MODEL?.trim() || DEFAULT_MODEL
@@ -54,8 +58,7 @@ type GeminiResult =
   | { ok: true; text: string }
   | { ok: false; status: number; message: string }
 
-async function callGemini(apiKey: string, mimeType: string, data: string): Promise<GeminiResult> {
-  const model = getModel()
+async function callGeminiSingle(model: string, apiKey: string, mimeType: string, data: string): Promise<GeminiResult> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`
   const body = {
     contents: [
@@ -98,10 +101,10 @@ async function callGemini(apiKey: string, mimeType: string, data: string): Promi
       return { ok: false, status: 401, message: 'The configured GOOGLE_API_KEY was rejected. Check the key in your .env file.' }
     }
     if (res.status === 429) {
-      return { ok: false, status: 429, message: 'Rate limit reached at the Gemini API. Wait a minute and try again.' }
+      return { ok: false, status: 429, message: detail || 'Gemini API is currently experiencing high demand. Please try again in a few moments.' }
     }
     if (res.status === 404) {
-      return { ok: false, status: 502, message: `Model "${model}" is not available for this key. Set GEMINI_MODEL to a vision-capable Gemini model.` }
+      return { ok: false, status: 502, message: `Model "${model}" is not available for this key.` }
     }
     return { ok: false, status: 502, message: detail ? `Gemini API error: ${detail}` : `Gemini API error (HTTP ${res.status}).` }
   }
@@ -120,6 +123,29 @@ async function callGemini(apiKey: string, mimeType: string, data: string): Promi
     }
   }
   return { ok: true, text }
+}
+
+async function callGemini(apiKey: string, mimeType: string, data: string): Promise<GeminiResult> {
+  const primaryModel = getModel()
+  const candidateModels = Array.from(new Set([primaryModel, ...FALLBACK_MODELS]))
+
+  let lastError: GeminiResult = { ok: false, status: 502, message: 'Gemini request failed' }
+
+  for (const model of candidateModels) {
+    const result = await callGeminiSingle(model, apiKey, mimeType, data)
+    if (result.ok) {
+      return result
+    }
+    lastError = result
+    // If it's auth failure, don't retry with other models
+    if (result.status === 401) {
+      return result
+    }
+    // High demand (429 / 503) or not found (404) -> attempt next fallback model
+    console.warn(`[api] Model ${model} returned status ${result.status} (${result.message}), trying fallback...`)
+  }
+
+  return lastError
 }
 
 function parseModelJson(text: string): unknown {
@@ -151,18 +177,74 @@ function str(v: unknown, fallback = ''): string {
 }
 
 function sanitizeBBox(v: unknown): BBox | null {
+  if (!v) return null
+
+  // Case 1: Array format [ymin, xmin, ymax, xmax] or [x, y, w, h]
+  if (Array.isArray(v) && v.length === 4 && v.every(Number.isFinite)) {
+    const nums = v.map(Number)
+    const maxVal = Math.max(...nums)
+    const [ymin, xmin, ymax, xmax] = nums
+    let x: number, y: number, w: number, h: number
+    if (maxVal > 100) {
+      // 0..1000 scale
+      x = xmin / 10
+      y = ymin / 10
+      w = (xmax - xmin) / 10
+      h = (ymax - ymin) / 10
+    } else if (maxVal <= 1) {
+      // 0..1 scale
+      x = xmin * 100
+      y = ymin * 100
+      w = (xmax - xmin) * 100
+      h = (ymax - ymin) * 100
+    } else {
+      // 0..100 scale
+      x = xmin
+      y = ymin
+      w = xmax - xmin
+      h = ymax - ymin
+    }
+    const cx = clamp(x, 0, 95)
+    const cy = clamp(y, 0, 95)
+    const cw = clamp(Math.max(w, 5), 2, 100 - cx)
+    const ch = clamp(Math.max(h, 4), 2, 100 - cy)
+    return { x: round1(cx), y: round1(cy), w: round1(cw), h: round1(ch) }
+  }
+
   const r = asRecord(v)
   if (!r) return null
-  const x = Number(r.x)
-  const y = Number(r.y)
-  const w = Number(r.w)
-  const h = Number(r.h)
+
+  // Case 2: Nested box_2d
+  if (Array.isArray(r.box_2d) && r.box_2d.length === 4) {
+    return sanitizeBBox(r.box_2d)
+  }
+
+  // Case 3: Object with {x, y, w, h} or {left, top, width, height} or {xmin, ymin, xmax, ymax}
+  let x = Number(r.x ?? r.left ?? r.xmin)
+  let y = Number(r.y ?? r.top ?? r.ymin)
+  let w = Number(r.w ?? r.width ?? (Number(r.xmax) - Number(r.xmin)))
+  let h = Number(r.h ?? r.height ?? (Number(r.ymax) - Number(r.ymin)))
+
   if (![x, y, w, h].every(Number.isFinite)) return null
-  const cx = clamp(x, 0, 100)
-  const cy = clamp(y, 0, 100)
-  const cw = clamp(w, 0, 100 - cx)
-  const ch = clamp(h, 0, 100 - cy)
-  if (cw < 1 || ch < 1) return null
+
+  // Check scale: 0..1 normalized vs 0..1000 vs 0..100
+  if (x <= 1 && y <= 1 && w <= 1 && h <= 1 && (x > 0 || y > 0 || w > 0 || h > 0)) {
+    x *= 100
+    y *= 100
+    w *= 100
+    h *= 100
+  } else if (Math.max(x, y, w, h) > 100) {
+    x /= 10
+    y /= 10
+    w /= 10
+    h /= 10
+  }
+
+  const cx = clamp(x, 0, 95)
+  const cy = clamp(y, 0, 95)
+  const cw = clamp(Math.max(w, 5), 2, 100 - cx)
+  const ch = clamp(Math.max(h, 4), 2, 100 - cy)
+
   return { x: round1(cx), y: round1(cy), w: round1(cw), h: round1(ch) }
 }
 
@@ -173,18 +255,24 @@ function sanitizeSeverity(v: unknown): Severity {
   return s === 'high' || s === 'medium' || s === 'low' ? s : 'medium'
 }
 
-function sanitizeFinding(v: unknown, index: number): Finding {
+function sanitizeFinding(v: unknown, index: number, total = 3): Finding {
   const r = asRecord(v) ?? {}
+  const rawBbox = sanitizeBBox(r.box_2d ?? r.bbox ?? r.boundingBox)
+  // Fallback bbox if model failed to supply coordinates
+  const step = Math.min(65 / Math.max(total, 1), 18)
+  const defaultY = Math.min(22 + index * step, 82)
+  const bbox = rawBbox ?? { x: 20, y: round1(defaultY), w: 60, h: 7 }
+
   return {
     id: `f${index + 1}`,
-    pattern: str(r.pattern, 'Unnamed pattern'),
+    pattern: str(r.pattern, 'Deceptive UI'),
     severity: sanitizeSeverity(r.severity),
     evidence: str(r.evidence),
     explanation: str(r.explanation),
-    recommendation: str(r.recommendation),
+    recommendation: str(r.recommendation, 'Use clear, upfront presentation.'),
     guideline: str(r.guideline) || undefined,
     translation: str(r.translation) || undefined,
-    bbox: sanitizeBBox(r.bbox),
+    bbox,
   }
 }
 
@@ -196,7 +284,7 @@ function deriveScore(findings: Finding[]): number {
 function sanitizeAnalysis(raw: unknown): Analysis {
   const r = asRecord(raw) ?? {}
   const list = Array.isArray(r.findings) ? r.findings : []
-  const findings = list.slice(0, 8).map((f, i) => sanitizeFinding(f, i))
+  const findings = list.slice(0, 8).map((f, i) => sanitizeFinding(f, i, list.length))
   const scoreRaw = Number(r.score)
   const score = Number.isFinite(scoreRaw) ? Math.round(clamp(scoreRaw, 0, 100)) : deriveScore(findings)
   const verdict = str(r.verdict) || undefined

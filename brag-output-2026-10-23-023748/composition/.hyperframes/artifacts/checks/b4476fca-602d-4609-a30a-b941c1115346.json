@@ -1,0 +1,283 @@
+{
+  "ok": true,
+  "strict": false,
+  "browserSkipped": false,
+  "lint": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 1,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "composition_file_too_large",
+        "severity": "warning",
+        "message": "This HTML composition file has 385 lines. Smaller sub-compositions are easier to read, iterate on, and diff.",
+        "selector": "[data-composition-id]",
+        "dataAttributes": {},
+        "sourceFile": "/Users/riddhidumre/Desktop/Brain Dump/Week chalenge/dark patterns/brag-output-2026-10-23-023748/composition/index.html",
+        "bbox": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        },
+        "time": 0,
+        "fixHint": "Split coherent scenes or layers into separate .html files under compositions/, then mount them from the parent with data-composition-src so each file stays small enough to inspect, revise, and validate independently."
+      }
+    ],
+    "filesScanned": 1
+  },
+  "runtime": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": []
+  },
+  "layout": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "duration": 19.5,
+    "samples": [
+      1.083,
+      3.25,
+      5.417,
+      7.583,
+      9.75,
+      11.917,
+      14.083,
+      16.25,
+      18.417
+    ],
+    "transitionSamples": [],
+    "transitionSamplesDropped": 0,
+    "tolerance": 2,
+    "totalIssueCount": 0,
+    "truncated": false
+  },
+  "motion": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": false,
+    "samples": 0
+  },
+  "contrast": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 0,
+    "infoCount": 0,
+    "findings": [],
+    "enabled": true,
+    "samples": [
+      1.083,
+      5.417,
+      9.75,
+      14.083,
+      18.417
+    ],
+    "checked": 32,
+    "passed": 32
+  },
+  "craft": {
+    "ok": true,
+    "errorCount": 0,
+    "warningCount": 1,
+    "infoCount": 0,
+    "findings": [
+      {
+        "code": "text_below_floor",
+        "severity": "warning",
+        "message": "Type floor is 28 px (2.6% of the 1080 px short side, what a phone can read) and 19 text elements stay under it for 0.5 s or more, the smallest \"Scanning visual hierarchy\" at 18 px: set reading text to at least 28 px, or put data-layout-ignore on text that is texture rather than reading; see references/look.md.",
+        "text": "Scanning visual hierarchy",
+        "selector": "div.telemetry-card > div:nth-of-type(1) > span:nth-of-type(1)",
+        "dataAttributes": {},
+        "sourceFile": "index.html",
+        "bbox": {
+          "x": 106,
+          "y": 711.08,
+          "width": 214.63,
+          "height": 21
+        },
+        "time": 7.25,
+        "times": [
+          0,
+          1.125,
+          3.875,
+          7.25,
+          7.25,
+          7.25,
+          7.25,
+          11,
+          11,
+          11,
+          12.125,
+          12.125,
+          12.125,
+          12.875,
+          12.875,
+          12.875,
+          14.375,
+          15.75,
+          15.75
+        ],
+        "fontPx": 18,
+        "floorPx": 28,
+        "seconds": 3.25,
+        "elements": [
+          {
+            "selector": "div.telemetry-card > div:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "Scanning visual hierarchy",
+            "fontPx": 18,
+            "time": 7.25,
+            "seconds": 3.25
+          },
+          {
+            "selector": "div.telemetry-card > div:nth-of-type(2) > span:nth-of-type(1)",
+            "text": "Auditing CCPA deceptive design guidelines",
+            "fontPx": 18,
+            "time": 7.25,
+            "seconds": 3.25
+          },
+          {
+            "selector": "div.telemetry-card > div:nth-of-type(3) > span:nth-of-type(1)",
+            "text": "Deceptive UX traps identified",
+            "fontPx": 18,
+            "time": 7.25,
+            "seconds": 3.25
+          },
+          {
+            "selector": "#findingCard1 > p:nth-of-type(1)",
+            "text": "Fabricated 2-hour countdown timer resets automatically to force impulsive purchases.",
+            "fontPx": 18,
+            "time": 11,
+            "seconds": 4.5
+          },
+          {
+            "selector": "#findingCard2 > p:nth-of-type(1)",
+            "text": "Pre-checks an optional recurring $9.95/month warranty without explicit user consent.",
+            "fontPx": 18,
+            "time": 12.125,
+            "seconds": 3.375
+          },
+          {
+            "selector": "#findingCard3 > p:nth-of-type(1)",
+            "text": "Labels the decline button as reckless behavior: \"No thanks, I'll pay full repair price\".",
+            "fontPx": 18,
+            "time": 12.875,
+            "seconds": 2.625
+          },
+          {
+            "selector": "div.dropzone-sub",
+            "text": "or paste anytime with /",
+            "fontPx": 20,
+            "time": 3.875,
+            "seconds": 3.375
+          },
+          {
+            "selector": "#findingCard1 > div:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "1. False Urgency",
+            "fontPx": 22,
+            "time": 11,
+            "seconds": 4.5
+          },
+          {
+            "selector": "#findingCard2 > div:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "2. Preselection",
+            "fontPx": 22,
+            "time": 12.125,
+            "seconds": 3.375
+          },
+          {
+            "selector": "#findingCard3 > div:nth-of-type(1) > span:nth-of-type(1)",
+            "text": "3. Confirmshaming",
+            "fontPx": 22,
+            "time": 12.875,
+            "seconds": 2.625
+          },
+          {
+            "selector": "div.fix-headline",
+            "text": "Ethical Redesign Applied",
+            "fontPx": 22,
+            "time": 14.375,
+            "seconds": 1.125
+          },
+          {
+            "selector": "#s5CtaBtn > span:nth-of-type(1)",
+            "text": "Drop Any Screenshot → darkpatterns.dev",
+            "fontPx": 23.25,
+            "time": 15.75,
+            "seconds": 2
+          },
+          {
+            "selector": "p.s5-subtext",
+            "text": "Scan before you pay. Expose fake countdowns, hidden fees, and guilt traps.",
+            "fontPx": 23.32,
+            "time": 15.75,
+            "seconds": 3.75
+          },
+          {
+            "selector": "#findingCard1 > p:nth-of-type(2)",
+            "text": "Translation: \"Buy this right now before you realize you don't need it.\"",
+            "fontPx": 24,
+            "time": 11,
+            "seconds": 4.5
+          },
+          {
+            "selector": "#findingCard2 > p:nth-of-type(2)",
+            "text": "Translation: \"We added a recurring subscription to your cart for you.\"",
+            "fontPx": 24,
+            "time": 12.125,
+            "seconds": 3.375
+          },
+          {
+            "selector": "#findingCard3 > p:nth-of-type(2)",
+            "text": "Translation: \"Buy add-on or admit you are reckless.\"",
+            "fontPx": 24,
+            "time": 12.875,
+            "seconds": 2.625
+          },
+          {
+            "selector": "p.s1-subline",
+            "text": "Fabricated timers and artificial scarcity designed to trigger panic buying before you think.",
+            "fontPx": 26,
+            "time": 0,
+            "seconds": 3.875
+          },
+          {
+            "selector": "div.scribble-desc",
+            "text": "\"Resetting timer to force panic checkout.\"",
+            "fontPx": 26,
+            "time": 1.125,
+            "seconds": 2.75
+          },
+          {
+            "selector": "p.s3-subline",
+            "text": "Detects False Urgency, Preselected Add-ons, Confirmshaming, and Hidden Surges instantly.",
+            "fontPx": 26,
+            "time": 7.25,
+            "seconds": 3.25
+          }
+        ]
+      }
+    ],
+    "enabled": true,
+    "step": 0.125,
+    "samples": 156
+  },
+  "hdr": {
+    "autoPromotion": null,
+    "inspection": "available"
+  },
+  "snapshots": {
+    "enabled": false,
+    "files": [],
+    "times": [],
+    "findingFiles": []
+  }
+}
