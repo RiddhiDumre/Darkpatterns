@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import * as THREE from 'three'
 import type { Finding } from '../../shared/types'
 
@@ -21,7 +21,20 @@ interface Props {
   onResetToDemo?: () => void
 }
 
-// Helper to create a rounded rectangle shape
+interface ProjectedPoint {
+  id: string
+  indexNum: number
+  patternTitle: string
+  explanationText: string
+  targetX: number
+  targetY: number
+  pinX: number
+  pinY: number
+  noteX: number
+  side: 'left' | 'right'
+}
+
+// Helper to create a rounded rectangle shape for Three.js
 function createRoundedRectShape(width: number, height: number, radius: number): THREE.Shape {
   const shape = new THREE.Shape()
   const x = -width / 2
@@ -49,35 +62,32 @@ export function Phone3DCanvas({
   onResetToDemo,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const stageRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
-  // 2D projected anchor positions for the handwritten notes & arrows
-  const [projectedPoints, setProjectedPoints] = useState<
-    Array<{
-      id: string
-      indexNum: number
-      patternTitle: string
-      explanationText: string
-      targetX: number
-      targetY: number
-      pinX: number
-      pinY: number
-      noteX: number
-      side: 'left' | 'right'
-      active: boolean
-    }>
-  >([])
+  const [projectedPoints, setProjectedPoints] = useState<ProjectedPoint[]>([])
+  const [isMobile, setIsMobile] = useState(false)
 
-  // Base resting orientation
+  // Resting orientation (subtle natural angle, no bobbing)
   const baseRotX = 0.04
   const baseRotY = -0.14
+
   const screenMeshRef = useRef<THREE.Mesh | null>(null)
   const phoneGroupRef = useRef<THREE.Group | null>(null)
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null)
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
+  const sceneRef = useRef<THREE.Scene | null>(null)
 
-  // Extract handwritten note parts: number at top, pattern title below, then explanation
-  const getNoteHierarchy = (f: Finding, idx: number) => {
+  // Physical phone dimensions in Three.js world units
+  const phoneWidth = 3.22
+  const phoneHeight = 6.8
+  const phoneDepth = 0.28
+  const cornerRadius = 0.46
+  const screenWidth = 3.08
+  const screenHeight = 6.66
+
+  // Extract clean note parts: number, pattern title, explanation
+  const getNoteHierarchy = useCallback((f: Finding, idx: number) => {
     const scribbleF = f as ScribbleFinding
     const patternTitle = scribbleF.patternTitle || f.pattern
     let explanationText = scribbleF.explanationText || scribbleF.noteScribble
@@ -101,22 +111,150 @@ export function Phone3DCanvas({
       patternTitle,
       explanationText,
     }
-  }
+  }, [])
 
-  // Set up Three.js scene
+  // Check if viewport is mobile/tablet stacked mode or stage width is narrow
+  const isMobileLayout = useCallback((stageW: number) => {
+    if (typeof window !== 'undefined' && window.innerWidth <= 1024) return true
+    return stageW < 560
+  }, [])
+
+  // Calculate 2D screen coordinate projections of 3D phone screen findings
+  const computeProjections = useCallback(
+    (stageW: number, stageH: number, mobileMode: boolean): ProjectedPoint[] => {
+      const phoneGroup = phoneGroupRef.current
+      const camera = cameraRef.current
+      if (!phoneGroup || !camera || findings.length === 0 || stageW === 0 || stageH === 0) {
+        return []
+      }
+
+      const tempVec = new THREE.Vector3()
+
+      // Calculate 2D X pixel bounds of the physical phone body in world space
+      const leftEdgeVec = new THREE.Vector3(-phoneWidth / 2 - 0.1, 0, phoneDepth / 2)
+      leftEdgeVec.applyMatrix4(phoneGroup.matrixWorld)
+      leftEdgeVec.project(camera)
+      const phoneLeftPixelX = (leftEdgeVec.x * 0.5 + 0.5) * stageW
+
+      const rightEdgeVec = new THREE.Vector3(phoneWidth / 2 + 0.1, 0, phoneDepth / 2)
+      rightEdgeVec.applyMatrix4(phoneGroup.matrixWorld)
+      rightEdgeVec.project(camera)
+      const phoneRightPixelX = (rightEdgeVec.x * 0.5 + 0.5) * stageW
+
+      const pts: ProjectedPoint[] = findings.map((f, i) => {
+        const bbox = f.bbox || { x: 50, y: 30 + i * 15, w: 60, h: 8 }
+        const preferredSide: 'left' | 'right' = (f as ScribbleFinding).side || (i % 2 === 0 ? 'right' : 'left')
+
+        let normX: number
+        if ((f as ScribbleFinding).anchor?.x !== undefined) {
+          normX = (f as ScribbleFinding).anchor!.x / 100
+        } else if (preferredSide === 'right') {
+          normX = (bbox.x + bbox.w) / 100
+        } else {
+          normX = bbox.x / 100
+        }
+
+        const normY =
+          (f as ScribbleFinding).anchor?.y !== undefined
+            ? (f as ScribbleFinding).anchor!.y / 100
+            : (bbox.y + bbox.h * 0.5) / 100
+
+        const localX = (normX - 0.5) * screenWidth
+        const localY = (0.5 - normY) * screenHeight
+        const localZ = phoneDepth / 2 + 0.05
+
+        tempVec.set(localX, localY, localZ)
+        tempVec.applyMatrix4(phoneGroup.matrixWorld)
+        tempVec.project(camera)
+
+        const screenPixelX = Math.round((tempVec.x * 0.5 + 0.5) * stageW)
+        const screenPixelY = Math.round((-(tempVec.y * 0.5) + 0.5) * stageH)
+
+        // On desktop, clamp notes comfortably within container boundaries
+        const noteMargin = 28
+        const noteWidth = 200
+        let noteX: number
+        if (preferredSide === 'right') {
+          noteX = Math.min(stageW - noteWidth - 8, Math.max(phoneRightPixelX + 14, phoneRightPixelX + noteMargin))
+        } else {
+          noteX = Math.max(8, Math.min(phoneLeftPixelX - noteMargin - noteWidth, phoneLeftPixelX - 14 - noteWidth))
+        }
+
+        const noteData = getNoteHierarchy(f, i)
+
+        return {
+          id: f.id,
+          indexNum: noteData.indexNum,
+          patternTitle: noteData.patternTitle,
+          explanationText: noteData.explanationText,
+          targetX: screenPixelX,
+          targetY: screenPixelY,
+          pinX: screenPixelX,
+          pinY: screenPixelY,
+          noteX: Math.round(noteX),
+          side: preferredSide,
+        }
+      })
+
+      // On desktop, stagger notes vertically into distinct slots to prevent overlap
+      if (!mobileMode) {
+        const slotMap: Record<number, number> = {
+          1: Math.round(stageH * 0.12),
+          2: Math.round(stageH * 0.15),
+          3: Math.round(stageH * 0.52),
+          4: Math.round(stageH * 0.55),
+        }
+        pts.forEach((pt) => {
+          if (slotMap[pt.indexNum] !== undefined) {
+            pt.targetY = slotMap[pt.indexNum]
+          }
+        })
+      }
+
+      return pts
+    },
+    [findings, getNoteHierarchy, phoneWidth, phoneDepth, screenWidth, screenHeight],
+  )
+
+  // Update Camera aspect and frustum distance without clipping
+  const updateCameraFrustum = useCallback((stageW: number, stageH: number) => {
+    const camera = cameraRef.current
+    const renderer = rendererRef.current
+    if (!camera || !renderer || stageW === 0 || stageH === 0) return
+
+    const aspect = stageW / stageH
+    camera.aspect = aspect
+
+    const vFovRad = THREE.MathUtils.degToRad(38)
+    const halfFovTan = Math.tan(vFovRad / 2)
+
+    // Fit phone neatly inside stage
+    const mobileMode = stageW < 860
+    const margin = mobileMode ? 1.12 : 1.18
+    const distV = (6.8 * margin) / (2 * halfFovTan)
+    const distH = (3.22 * margin) / (2 * halfFovTan * Math.max(aspect, 0.45))
+
+    const targetZ = Math.max(10.8, distV, distH)
+    camera.position.set(0, 0, targetZ)
+    camera.updateProjectionMatrix()
+
+    renderer.setSize(stageW, stageH, false)
+  }, [])
+
+  // Initialize Three.js scene once on mount
   useEffect(() => {
-    const container = containerRef.current
+    const stage = stageRef.current
     const canvas = canvasRef.current
-    if (!container || !canvas) return
+    if (!stage || !canvas) return
 
-    const width = container.clientWidth || 540
-    const height = container.clientHeight || 640
+    const width = stage.clientWidth || 540
+    const height = stage.clientHeight || 580
 
     // 1. Scene, Camera, Renderer
     const scene = new THREE.Scene()
-    // Perfectly tuned perspective to show full phone edge-to-edge without any cutting
+    sceneRef.current = scene
+
     const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100)
-    camera.position.set(0, 0, 10.8)
     cameraRef.current = camera
 
     const renderer = new THREE.WebGLRenderer({
@@ -125,41 +263,35 @@ export function Phone3DCanvas({
       alpha: true,
       powerPreference: 'high-performance',
     })
-    renderer.setSize(width, height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     rendererRef.current = renderer
 
-    // 2. Crisp, Balanced Lighting Setup
+    updateCameraFrustum(width, height)
+
+    // 2. Lighting Setup
     const ambientLight = new THREE.AmbientLight(0xffffff, 2.2)
     scene.add(ambientLight)
 
-    // Key studio light
     const keyLight = new THREE.DirectionalLight(0xffffff, 2.4)
     keyLight.position.set(5, 7, 8)
     scene.add(keyLight)
 
-    // Silver Edge Specular Rim Light
     const rimLight = new THREE.DirectionalLight(0xffffff, 1.6)
     rimLight.position.set(-6, -6, 5)
     scene.add(rimLight)
 
-    // Front Fill
     const fillLight = new THREE.DirectionalLight(0xffffff, 1.2)
     fillLight.position.set(0, 1, 6)
     scene.add(fillLight)
 
-    // 3. Precision iPhone Frame Group
+    // 3. iPhone Chassis & Screen
     const phoneGroup = new THREE.Group()
     phoneGroupRef.current = phoneGroup
+    phoneGroup.position.set(0, 0, 0)
+    phoneGroup.rotation.set(baseRotX, baseRotY, 0)
     scene.add(phoneGroup)
 
-    // Exact proportions for modern modern-aspect phone with refined bezels
-    const phoneWidth = 3.22
-    const phoneHeight = 6.8
-    const phoneDepth = 0.28
-    const cornerRadius = 0.46
-
-    // Chassis: Elegant Midnight Silver Aluminum
+    // Body Mesh
     const bodyShape = createRoundedRectShape(phoneWidth, phoneHeight, cornerRadius)
     const bodyGeo = new THREE.ExtrudeGeometry(bodyShape, {
       depth: phoneDepth,
@@ -171,14 +303,14 @@ export function Phone3DCanvas({
     bodyGeo.center()
 
     const bodyMat = new THREE.MeshStandardMaterial({
-      color: 0x1f232b, // Sophisticated Graphite / Slate
+      color: 0x1f232b,
       metalness: 0.82,
       roughness: 0.25,
     })
     const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat)
     phoneGroup.add(bodyMesh)
 
-    // Mirror-Polished Chamfered Outer Edge Ring
+    // Outer Silver Chamfer Ring
     const bandShape = createRoundedRectShape(phoneWidth + 0.015, phoneHeight + 0.015, cornerRadius)
     const bandGeo = new THREE.ExtrudeGeometry(bandShape, {
       depth: phoneDepth - 0.05,
@@ -186,22 +318,20 @@ export function Phone3DCanvas({
     })
     bandGeo.center()
     const bandMat = new THREE.MeshStandardMaterial({
-      color: 0x9ca3af, // Sleek brushed silver-grey bezel highlight
+      color: 0x9ca3af,
       metalness: 0.92,
       roughness: 0.15,
     })
     const bandMesh = new THREE.Mesh(bandGeo, bandMat)
     phoneGroup.add(bandMesh)
 
-    // Side Buttons (Sleek volume and power tabs)
+    // Buttons
     const buttonMat = new THREE.MeshStandardMaterial({ color: 0x4b5563, metalness: 0.85, roughness: 0.2 })
-    // Power button (right)
     const powerGeo = new THREE.BoxGeometry(0.035, 0.65, 0.07)
     const powerBtn = new THREE.Mesh(powerGeo, buttonMat)
     powerBtn.position.set(phoneWidth / 2 + 0.025, 0.75, 0)
     phoneGroup.add(powerBtn)
 
-    // Volume buttons (left)
     const volGeo = new THREE.BoxGeometry(0.035, 0.45, 0.07)
     const volUpBtn = new THREE.Mesh(volGeo, buttonMat)
     volUpBtn.position.set(-phoneWidth / 2 - 0.025, 1.05, 0)
@@ -210,14 +340,11 @@ export function Phone3DCanvas({
     phoneGroup.add(volUpBtn)
     phoneGroup.add(volDownBtn)
 
-    // Front Screen Glass Face — Maximized, edge-to-edge display
-    const screenWidth = 3.08
-    const screenHeight = 6.66
+    // Front Screen Glass Face
     const screenRadius = 0.42
     const screenShape = createRoundedRectShape(screenWidth, screenHeight, screenRadius)
     const screenGeo = new THREE.ShapeGeometry(screenShape)
 
-    // Normalize UV coordinates so screenshot texture spans the screen cleanly edge-to-edge
     const pos = screenGeo.attributes.position
     const uvs = screenGeo.attributes.uv
     for (let i = 0; i < pos.count; i++) {
@@ -229,12 +356,12 @@ export function Phone3DCanvas({
     }
     uvs.needsUpdate = true
 
-    // Texture Loader for the Screenshot
     const textureLoader = new THREE.TextureLoader()
     const screenTexture = textureLoader.load(src, (tex) => {
       tex.colorSpace = THREE.SRGBColorSpace
       tex.generateMipmaps = true
       tex.minFilter = THREE.LinearMipmapLinearFilter
+      renderer.render(scene, camera)
     })
 
     const screenMat = new THREE.MeshBasicMaterial({
@@ -246,7 +373,7 @@ export function Phone3DCanvas({
     screenMeshRef.current = screenMesh
     phoneGroup.add(screenMesh)
 
-    // Ultra-slim Top Speaker Micro-slit
+    // Speaker Micro-slit
     const speakerShape = createRoundedRectShape(0.48, 0.035, 0.015)
     const speakerGeo = new THREE.ShapeGeometry(speakerShape)
     const speakerMat = new THREE.MeshBasicMaterial({ color: 0x111115 })
@@ -254,7 +381,7 @@ export function Phone3DCanvas({
     speakerMesh.position.set(0, screenHeight / 2 - 0.06, phoneDepth / 2 + 0.042)
     phoneGroup.add(speakerMesh)
 
-    // Glass Reflection Overlay
+    // Glass Reflection
     const glareGeo = new THREE.PlaneGeometry(screenWidth, screenHeight)
     const glareCanvas = document.createElement('canvas')
     glareCanvas.width = 256
@@ -279,169 +406,69 @@ export function Phone3DCanvas({
     glareMesh.position.set(0, 0, phoneDepth / 2 + 0.044)
     phoneGroup.add(glareMesh)
 
-    // Rear Camera (classic iPhone 5 circular lens with flash)
-    const cameraBumpGeo = new THREE.CylinderGeometry(0.18, 0.18, 0.04, 32)
-    cameraBumpGeo.rotateX(Math.PI / 2)
-    const cameraBumpMat = new THREE.MeshStandardMaterial({ color: 0x111115, metalness: 0.9, roughness: 0.2 })
-    const cameraBumpMesh = new THREE.Mesh(cameraBumpGeo, cameraBumpMat)
-    cameraBumpMesh.position.set(-1.05, 2.7, -phoneDepth / 2 - 0.02)
-    phoneGroup.add(cameraBumpMesh)
+    // Initial render and points calculation
+    phoneGroup.updateMatrixWorld(true)
+    renderer.render(scene, camera)
+    const mobile = isMobileLayout(width)
+    setIsMobile(mobile)
+    setProjectedPoints(computeProjections(width, height, mobile))
 
-    // 4. Animation & Projection Loop
+    // Animation Loop: Render only. NO setState in RAF loop.
     let animId: number
-    const tempVec = new THREE.Vector3()
-
     const animate = () => {
       animId = requestAnimationFrame(animate)
-
-      // Grounded resting posture (no floating/bobbing or oscillating tilt)
-      phoneGroup.position.y = 0
-      phoneGroup.rotation.x = baseRotX
-      phoneGroup.rotation.y = baseRotY
-
-      // Project 3D Screen Coordinates of Dark Pattern Findings to 2D Viewport Space
-      if (showOverlay && findings.length > 0 && containerRef.current) {
-        const curW = containerRef.current.clientWidth || width
-        const curH = containerRef.current.clientHeight || height
-
-        // Calculate 2D X pixel bounds of the physical phone body in world space
-        const leftEdgeVec = new THREE.Vector3(-phoneWidth / 2 - 0.1, 0, phoneDepth / 2)
-        leftEdgeVec.applyMatrix4(phoneGroup.matrixWorld)
-        leftEdgeVec.project(camera)
-        const phoneLeftPixelX = (leftEdgeVec.x * 0.5 + 0.5) * curW
-
-        const rightEdgeVec = new THREE.Vector3(phoneWidth / 2 + 0.1, 0, phoneDepth / 2)
-        rightEdgeVec.applyMatrix4(phoneGroup.matrixWorld)
-        rightEdgeVec.project(camera)
-        const phoneRightPixelX = (rightEdgeVec.x * 0.5 + 0.5) * curW
-
-        const points = findings.map((f, i) => {
-          // Bounding box percentages (0-100)
-          const bbox = f.bbox || { x: 50, y: 30 + i * 15, w: 60, h: 8 }
-
-          // Determine preferred side (alternate or use custom)
-          const preferredSide: 'left' | 'right' = (f as ScribbleFinding).side || (i % 2 === 0 ? 'right' : 'left')
-
-          // Point arrow directly to the SIDE of the element facing the incoming note (not the center)
-          let normX: number
-          if ((f as ScribbleFinding).anchor?.x !== undefined) {
-            normX = (f as ScribbleFinding).anchor!.x / 100
-          } else if (preferredSide === 'right') {
-            // Arrow comes from right note -> point to right side/edge of element
-            normX = (bbox.x + bbox.w) / 100
-          } else {
-            // Arrow comes from left note -> point to left side/edge of element
-            normX = bbox.x / 100
-          }
-
-          const normY =
-            (f as ScribbleFinding).anchor?.y !== undefined
-              ? (f as ScribbleFinding).anchor!.y / 100
-              : (bbox.y + bbox.h * 0.5) / 100
-
-          // Screen local 3D coordinates
-          const localX = (normX - 0.5) * screenWidth
-          const localY = (0.5 - normY) * screenHeight
-          const localZ = phoneDepth / 2 + 0.05
-
-          // Transform into world space and project onto camera plane
-          tempVec.set(localX, localY, localZ)
-          tempVec.applyMatrix4(phoneGroup.matrixWorld)
-          tempVec.project(camera)
-
-          // 2D Pixel Coordinates of target element on screen
-          const screenPixelX = (tempVec.x * 0.5 + 0.5) * curW
-          const screenPixelY = (-(tempVec.y * 0.5) + 0.5) * curH
-
-          // Position note completely outside the phone screen in the margin with safe clearance
-          const noteMargin = 40
-          const noteX =
-            preferredSide === 'right'
-              ? Math.round(phoneRightPixelX + noteMargin)
-              : Math.round(phoneLeftPixelX - noteMargin)
-
-          // Vertical staggering algorithm: guarantee at least minNoteDistance between notes on the same side
-          // Initial target Y from projected anchor
-          let finalTargetY = Math.round(screenPixelY)
-
-          const noteData = getNoteHierarchy(f, i)
-
-          return {
-            id: f.id,
-            indexNum: noteData.indexNum,
-            patternTitle: noteData.patternTitle,
-            explanationText: noteData.explanationText,
-            targetX: Math.round(screenPixelX),
-            targetY: finalTargetY,
-            pinX: Math.round(screenPixelX),
-            pinY: Math.round(screenPixelY),
-            noteX: Math.round(noteX),
-            side: preferredSide,
-            active: activeId === f.id,
-          }
-        })
-
-        // Clean vertical slots for notes to avoid collision/overlap:
-        // Left side:
-        // Note 2 (Preselection) at 16%
-        // Note 3 (Interface Interference) at 56%
-        // Right side:
-        // Note 1 (False Urgency) at 14%
-        // Note 4 (Confirmshaming) at 58%
-        const slotMap: Record<number, number> = {
-          1: Math.round(curH * 0.14),
-          2: Math.round(curH * 0.16),
-          3: Math.round(curH * 0.56),
-          4: Math.round(curH * 0.58),
-        }
-        points.forEach((pt) => {
-          if (slotMap[pt.indexNum] !== undefined) {
-            pt.targetY = slotMap[pt.indexNum]
-          }
-        })
-
-        setProjectedPoints(points)
-      } else {
-        setProjectedPoints([])
-      }
-
       renderer.render(scene, camera)
     }
-
     animate()
 
-    // 5. Responsive Resize Observer
-    const handleResize = () => {
-      if (!container || !renderer || !camera) return
-      const newW = container.clientWidth
-      const newH = container.clientHeight
-      camera.aspect = newW / newH
-      camera.updateProjectionMatrix()
-      renderer.setSize(newW, newH)
+    // Smooth Resize Handling via ResizeObserver
+    let resizeTimer: number | null = null
+    const handleResize = (entries: ResizeObserverEntry[]) => {
+      const entry = entries[0]
+      if (!entry) return
+
+      const newW = Math.round(entry.contentRect.width)
+      const newH = Math.round(entry.contentRect.height)
+      if (newW === 0 || newH === 0) return
+
+      if (resizeTimer) cancelAnimationFrame(resizeTimer)
+      resizeTimer = requestAnimationFrame(() => {
+        updateCameraFrustum(newW, newH)
+        const isMob = isMobileLayout(newW)
+        setIsMobile(isMob)
+        if (showOverlay) {
+          setProjectedPoints(computeProjections(newW, newH, isMob))
+        }
+        renderer.render(scene, camera)
+      })
     }
 
     const resizeObserver = new ResizeObserver(handleResize)
-    resizeObserver.observe(container)
+    resizeObserver.observe(stage)
 
-    // Cleanup on unmount
     return () => {
       cancelAnimationFrame(animId)
+      if (resizeTimer) cancelAnimationFrame(resizeTimer)
       resizeObserver.disconnect()
       renderer.dispose()
       bodyGeo.dispose()
       bandGeo.dispose()
       screenGeo.dispose()
       speakerGeo.dispose()
+      glareGeo.dispose()
       bodyMat.dispose()
       bandMat.dispose()
       screenMat.dispose()
       speakerMat.dispose()
+      glareMat.dispose()
+      screenTexture.dispose()
+      glareTex.dispose()
     }
-  }, [showOverlay, findings, activeId])
+  }, [computeProjections, updateCameraFrustum, showOverlay])
 
-  // Update screen texture when `src` prop changes (e.g. user uploads custom screenshot)
+  // Update texture when `src` prop changes
   useEffect(() => {
-    if (!screenMeshRef.current) return
+    if (!screenMeshRef.current || !rendererRef.current || !sceneRef.current || !cameraRef.current) return
     const textureLoader = new THREE.TextureLoader()
     textureLoader.load(src, (tex) => {
       tex.colorSpace = THREE.SRGBColorSpace
@@ -451,139 +478,200 @@ export function Phone3DCanvas({
         ;(screenMeshRef.current.material as THREE.MeshBasicMaterial).map = tex
         ;(screenMeshRef.current.material as THREE.MeshBasicMaterial).needsUpdate = true
       }
+      if (rendererRef.current && sceneRef.current && cameraRef.current) {
+        rendererRef.current.render(sceneRef.current, cameraRef.current)
+      }
     })
   }, [src])
 
+  // Recalculate projections when findings change
+  useEffect(() => {
+    if (!stageRef.current || !showOverlay) return
+    const w = stageRef.current.clientWidth
+    const h = stageRef.current.clientHeight
+    if (w > 0 && h > 0) {
+      setProjectedPoints(computeProjections(w, h, isMobileLayout(w)))
+    }
+  }, [findings, showOverlay, computeProjections])
+
   return (
-    <div className="phone-3d-wrapper" ref={containerRef}>
-      {/* 3D Canvas - Serene floating display */}
-      <canvas
-        ref={canvasRef}
-        className="phone-3d-canvas"
-        aria-label="3D model of iPhone displaying sample checkout screen with detected dark patterns."
-      />
+    <div className={`phone-3d-root${isMobile ? ' is-mobile-view' : ''}`} ref={containerRef}>
+      {/* 3D Phone Stage */}
+      <div className="phone-canvas-stage" ref={stageRef}>
+        <canvas
+          ref={canvasRef}
+          className="phone-3d-canvas"
+          aria-label="3D model of iPhone displaying specimen checkout screen"
+        />
 
-      {/* 2D SVG Scribbled Handwritten Notes & Curved Arrows Overlay */}
-      {showOverlay && (
-        <svg className="phone-scribble-svg-overlay" aria-hidden="true">
-          {projectedPoints.map((pt) => {
-            const isRight = pt.side === 'right'
+        {/* DESKTOP VIEW: SVG Hand-Drawn Curved Arrows */}
+        {!isMobile && showOverlay && (
+          <svg className="phone-scribble-svg-overlay" aria-hidden="true">
+            {projectedPoints.map((pt) => {
+              const isRight = pt.side === 'right'
+              const isActive = activeId === pt.id
 
-            // Arrow originates from handwritten note edge and points toward target on screen
-            const arrowStartX = isRight ? pt.noteX - 4 : pt.noteX + 4
-            const arrowStartY = pt.targetY + 30
-            const arrowEndX = pt.pinX
-            const arrowEndY = pt.pinY
+              const arrowStartX = isRight ? pt.noteX - 4 : pt.noteX + 4
+              const arrowStartY = pt.targetY + 30
+              const arrowEndX = pt.pinX
+              const arrowEndY = pt.pinY
 
-            // Organic hand-drawn arching bezier curve control points
-            const dx = arrowEndX - arrowStartX
-            const dy = arrowEndY - arrowStartY
+              const dx = arrowEndX - arrowStartX
+              const dy = arrowEndY - arrowStartY
 
-            // Hand-drawn variation based on note index for character
-            const archOffset = isRight ? (pt.indexNum === 1 ? -24 : 18) : (pt.indexNum === 2 ? -20 : 16)
-            const c1x = arrowStartX + dx * 0.35 + (isRight ? -12 : 12)
-            const c1y = arrowStartY + dy * 0.2 + archOffset
-            const c2x = arrowStartX + dx * 0.75
-            const c2y = arrowStartY + dy * 0.85 + (archOffset * 0.3)
+              const archOffset = isRight ? (pt.indexNum === 1 ? -24 : 18) : (pt.indexNum === 2 ? -20 : 16)
+              const c1x = arrowStartX + dx * 0.35 + (isRight ? -12 : 12)
+              const c1y = arrowStartY + dy * 0.2 + archOffset
+              const c2x = arrowStartX + dx * 0.75
+              const c2y = arrowStartY + dy * 0.85 + archOffset * 0.3
 
-            // Calculate angle at arrow tip to draw authentic sketched arrowhead wings
-            const tangentX = arrowEndX - c2x
-            const tangentY = arrowEndY - c2y
-            const angle = Math.atan2(tangentY, tangentX)
+              const tangentX = arrowEndX - c2x
+              const tangentY = arrowEndY - c2y
+              const angle = Math.atan2(tangentY, tangentX)
 
-            // Hand-drawn arrowhead wings with slight natural imperfection
-            const headLength = 14
-            const barb1Angle = angle - Math.PI + 0.52
-            const barb2Angle = angle - Math.PI - 0.44
+              const headLength = 14
+              const barb1Angle = angle - Math.PI + 0.52
+              const barb2Angle = angle - Math.PI - 0.44
 
-            const barb1X = arrowEndX + Math.cos(barb1Angle) * headLength
-            const barb1Y = arrowEndY + Math.sin(barb1Angle) * headLength
-            const barb2X = arrowEndX + Math.cos(barb2Angle) * (headLength * 0.92)
-            const barb2Y = arrowEndY + Math.sin(barb2Angle) * (headLength * 0.92)
+              const barb1X = arrowEndX + Math.cos(barb1Angle) * headLength
+              const barb1Y = arrowEndY + Math.sin(barb1Angle) * headLength
+              const barb2X = arrowEndX + Math.cos(barb2Angle) * (headLength * 0.92)
+              const barb2Y = arrowEndY + Math.sin(barb2Angle) * (headLength * 0.92)
 
-            return (
-              <g
-                key={pt.id}
-                className={`scribble-note-group${pt.active ? ' is-active' : ''}`}
-                onClick={() => onActivate(pt.id)}
-                style={{ cursor: 'pointer' }}
-              >
-                {/* Main hand-drawn curved pen stroke */}
-                <path
-                  d={`M ${arrowStartX} ${arrowStartY} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${arrowEndX} ${arrowEndY}`}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={pt.active ? 3.4 : 2.6}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="scribble-arrow-path"
-                />
+              return (
+                <g
+                  key={pt.id}
+                  className={`scribble-note-group${isActive ? ' is-active' : ''}`}
+                  onClick={() => onActivate(pt.id)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <path
+                    d={`M ${arrowStartX} ${arrowStartY} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${arrowEndX} ${arrowEndY}`}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={isActive ? 3.4 : 2.6}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="scribble-arrow-path"
+                  />
+                  <path
+                    d={`M ${barb1X} ${barb1Y} Q ${(arrowEndX + barb1X) / 2} ${(arrowEndY + barb1Y) / 2 - 1} ${arrowEndX} ${arrowEndY} Q ${(arrowEndX + barb2X) / 2} ${(arrowEndY + barb2Y) / 2 + 1} ${barb2X} ${barb2Y}`}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={isActive ? 3.4 : 2.6}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="scribble-arrow-head"
+                  />
+                </g>
+              )
+            })}
+          </svg>
+        )}
 
-                {/* Hand-drawn open sketched arrowhead wings */}
-                <path
-                  d={`M ${barb1X} ${barb1Y} Q ${(arrowEndX + barb1X) / 2} ${(arrowEndY + barb1Y) / 2 - 1} ${arrowEndX} ${arrowEndY} Q ${(arrowEndX + barb2X) / 2} ${(arrowEndY + barb2Y) / 2 + 1} ${barb2X} ${barb2Y}`}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={pt.active ? 3.4 : 2.6}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="scribble-arrow-head"
-                />
-              </g>
-            )
-          })}
-        </svg>
-      )}
+        {/* DESKTOP VIEW: Floating Handwritten Post-It Notes */}
+        {!isMobile && showOverlay && (
+          <div className="phone-scribble-notes-layer" aria-label="Dark pattern handwritten notes">
+            {projectedPoints.map((pt) => {
+              const isRight = pt.side === 'right'
+              const isActive = activeId === pt.id
 
-      {/* Floating Handwritten Notes Elements (HTML for natural handwriting text wrapping) */}
-      {showOverlay && (
-        <div className="phone-scribble-notes-layer" aria-label="Dark pattern handwritten notes">
-          {projectedPoints.map((pt) => {
-            const isRight = pt.side === 'right'
+              return (
+                <div
+                  key={pt.id}
+                  className={`scribble-note-item post-it-note side-${pt.side}${isActive ? ' is-active' : ''}`}
+                  style={{
+                    top: `${pt.targetY}px`,
+                    left: isRight ? `${pt.noteX}px` : undefined,
+                    right: !isRight
+                      ? `${stageRef.current ? Math.max(12, stageRef.current.clientWidth - pt.noteX) : 340}px`
+                      : undefined,
+                  }}
+                  onClick={() => onActivate(pt.id)}
+                  onMouseEnter={() => onActivate(pt.id)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      onActivate(pt.id)
+                    }
+                  }}
+                  aria-label={`Note ${pt.indexNum}: ${pt.patternTitle} — ${pt.explanationText}`}
+                >
+                  <div className="post-it-tape" aria-hidden="true" />
+                  <span className="scribble-top-number">{pt.indexNum}</span>
+                  <h4 className="scribble-pattern-title">{pt.patternTitle}</h4>
+                  <p className="scribble-explanation">{pt.explanationText}</p>
+                </div>
+              )
+            })}
+          </div>
+        )}
 
-            return (
-              <div
-                key={pt.id}
-                className={`scribble-note-item post-it-note side-${pt.side}${pt.active ? ' is-active' : ''}`}
-                style={{
-                  top: `${pt.targetY}px`,
-                  left: isRight ? `${pt.noteX}px` : undefined,
-                  right: !isRight
-                    ? `${containerRef.current ? containerRef.current.clientWidth - pt.noteX : 340}px`
-                    : undefined,
-                }}
-                onClick={() => onActivate(pt.id)}
-                onMouseEnter={() => onActivate(pt.id)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    onActivate(pt.id)
-                  }
-                }}
-                aria-label={`Note ${pt.indexNum}: ${pt.patternTitle} — ${pt.explanationText}`}
-              >
-                {/* Post-it Washi Tape accent at top */}
-                <div className="post-it-tape" aria-hidden="true" />
+        {/* MOBILE VIEW: Interactive Forensic Target Pins Directly on Phone Screen */}
+        {isMobile && showOverlay && (
+          <div className="mobile-phone-pins-layer" aria-hidden="true">
+            {projectedPoints.map((pt) => {
+              const isActive = activeId === pt.id
+              return (
+                <button
+                  key={pt.id}
+                  type="button"
+                  className={`mobile-forensic-pin${isActive ? ' is-active' : ''}`}
+                  style={{
+                    left: `${pt.pinX}px`,
+                    top: `${pt.pinY}px`,
+                  }}
+                  onClick={() => onActivate(pt.id)}
+                  aria-label={`Pin ${pt.indexNum}: ${pt.patternTitle}`}
+                >
+                  <span className="mobile-pin-ping" />
+                  <span className="mobile-pin-core">{pt.indexNum}</span>
+                </button>
+              )
+            })}
+          </div>
+        )}
+      </div>
 
-                {/* 1. TOP: Big Handwritten Number (no #) */}
-                <span className="scribble-top-number">
-                  {pt.indexNum}
-                </span>
+      {/* MOBILE VIEW: Clean Touch-Friendly Forensic Dossier Tray Below Phone */}
+      {isMobile && showOverlay && projectedPoints.length > 0 && (
+        <div className="mobile-findings-tray" aria-label="Detected deceptive patterns">
+          <div className="mobile-findings-tray-header">
+            <span className="mobile-findings-pill">
+              {projectedPoints.length} TRAPS DETECTED
+            </span>
+            <span className="mobile-findings-hint">Tap a card to pinpoint on screen</span>
+          </div>
 
-                {/* 2. BELOW NUMBER: Dark Pattern Title */}
-                <h4 className="scribble-pattern-title">
-                  {pt.patternTitle}
-                </h4>
-
-                {/* 3. BELOW TITLE: The Explanation */}
-                <p className="scribble-explanation">
-                  {pt.explanationText}
-                </p>
-              </div>
-            )
-          })}
+          <div className="mobile-findings-carousel">
+            {projectedPoints.map((pt) => {
+              const isActive = activeId === pt.id
+              return (
+                <div
+                  key={pt.id}
+                  className={`mobile-finding-card post-it-note${isActive ? ' is-active' : ''}`}
+                  onClick={() => onActivate(pt.id)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      onActivate(pt.id)
+                    }
+                  }}
+                  aria-label={`Trap ${pt.indexNum}: ${pt.patternTitle}`}
+                >
+                  <div className="mobile-card-top-row">
+                    <span className="mobile-card-badge">{pt.indexNum}</span>
+                    <h4 className="mobile-card-title">{pt.patternTitle}</h4>
+                  </div>
+                  <p className="mobile-card-desc">{pt.explanationText}</p>
+                </div>
+              )
+            })}
+          </div>
         </div>
       )}
 

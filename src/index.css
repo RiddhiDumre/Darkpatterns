@@ -65,18 +65,20 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--bg-canvas);
-  height: 100%;
-  overflow: hidden;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 body {
-  height: 100vh;
-  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
   color: var(--text-primary);
   font-family: var(--font-body);
   background-color: var(--bg-canvas);
   line-height: 1.45;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   position: relative;
 }
 
@@ -113,12 +115,12 @@ body {
 .paper-app-root {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
   width: 100%;
   position: relative;
   z-index: 2;
-  overflow: hidden;
+  overflow-x: hidden;
   justify-content: space-between;
 }
 
@@ -143,10 +145,11 @@ body {
    Solid, bright background block spanning entire width and touching bottom edge
    ========================================================================== */
 .bottom-dock-wrapper {
-  width: 100vw;
+  width: calc(100% + 2 * clamp(28px, 4.5vw, 64px));
   margin-left: calc(-1 * clamp(28px, 4.5vw, 64px));
   margin-right: calc(-1 * clamp(28px, 4.5vw, 64px));
   margin-bottom: calc(-1 * clamp(8px, 1vh, 14px));
+  box-sizing: border-box;
   background-color: #ffd43f; /* Nice bright sunbeam yellow color block */
   border-top: 3px solid #18181b;
   display: flex;
@@ -513,11 +516,13 @@ body {
   flex-direction: column;
   justify-content: space-between;
   width: 100%;
-  height: 100%;
+  min-height: 100%;
+  height: auto;
   padding: clamp(16px, 2.4vh, 28px) clamp(28px, 4.5vw, 64px) clamp(8px, 1vh, 14px);
   position: relative;
   z-index: 10;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
 }
 
 /* Consistent Top Alignment for Audit View regardless of image dimensions */
@@ -551,10 +556,12 @@ body {
 
 .paper-landing-grid {
   display: grid;
-  grid-template-columns: 38fr 62fr;
+  grid-template-columns: minmax(0, 38fr) minmax(0, 62fr);
   gap: clamp(20px, 3vw, 44px);
   align-items: center;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 /* Left Column */
@@ -562,6 +569,9 @@ body {
   display: flex;
   flex-direction: column;
   gap: clamp(14px, 2vh, 22px);
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .clean-hero-intro {
@@ -862,11 +872,15 @@ body {
    ========================================================================== */
 .paper-hero-right {
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .phone-3d-stage-container {
   position: relative;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   height: clamp(580px, 72vh, 700px);
   min-height: 580px;
   display: flex;
@@ -982,17 +996,48 @@ body {
 
 .phone-3d-stage-wrapper-interactive {
   transform: translate(0px, 0px) scale(1);
+  width: 100%;
+  height: 100%;
 }
 
+.phone-3d-root,
 .phone-3d-wrapper {
   position: relative;
   width: 100%;
   height: 100%;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   user-select: none;
   overflow: visible;
+}
+
+.phone-canvas-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 580px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.phone-3d-root.is-mobile-view {
+  height: auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.phone-3d-root.is-mobile-view .phone-canvas-stage {
+  height: clamp(340px, 46vh, 420px);
+  min-height: 0;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
 }
 
 .phone-3d-canvas {
@@ -1186,6 +1231,198 @@ body {
 .phone-demo-reset-btn:hover {
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
+}
+
+/* ==========================================================================
+   MOBILE INTERACTIVE FORENSIC PINS & FINDINGS TRAY
+   ========================================================================== */
+.mobile-phone-pins-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 25;
+}
+
+.mobile-forensic-pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-pin-core {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #e11d48;
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(225, 29, 72, 0.45);
+  position: relative;
+  z-index: 2;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.mobile-pin-ping {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: rgba(225, 29, 72, 0.35);
+  animation: pinPulse 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  z-index: 1;
+}
+
+@keyframes pinPulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.85;
+  }
+  70%, 100% {
+    transform: scale(1.65);
+    opacity: 0;
+  }
+}
+
+.mobile-forensic-pin.is-active .mobile-pin-core {
+  background: #111827;
+  transform: scale(1.2);
+  box-shadow: 0 0 0 3px #fef08a, 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.mobile-forensic-pin.is-active .mobile-pin-ping {
+  background: rgba(17, 24, 39, 0.45);
+}
+
+.mobile-findings-tray {
+  width: 100%;
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 30;
+  position: relative;
+}
+
+.mobile-findings-tray-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+}
+
+.mobile-findings-pill {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #b91c1c;
+  background: #fee2e2;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  border: 1px solid rgba(185, 28, 28, 0.2);
+}
+
+.mobile-findings-hint {
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.mobile-findings-carousel {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 4px 2px 14px 2px;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+}
+
+.mobile-finding-card {
+  flex: 0 0 min(270px, 80vw);
+  scroll-snap-align: start;
+  padding: 13px 15px;
+  border-radius: 8px;
+  background: #fef9c3;
+  border-bottom: 3px solid #fde047;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  user-select: none;
+  text-align: left;
+}
+
+.mobile-finding-card:nth-child(1) {
+  background: #fef9c3;
+  border-bottom-color: #fde047;
+}
+.mobile-finding-card:nth-child(2) {
+  background: #ffedd5;
+  border-bottom-color: #fed7aa;
+}
+.mobile-finding-card:nth-child(3) {
+  background: #fce7f3;
+  border-bottom-color: #f9a8d4;
+}
+.mobile-finding-card:nth-child(4) {
+  background: #fef9c3;
+  border-bottom-color: #fde047;
+}
+
+.mobile-finding-card.is-active {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 24px -2px rgba(0, 0, 0, 0.18), 0 0 0 2px #e11d48;
+}
+
+.mobile-card-top-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobile-card-badge {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #e11d48;
+  line-height: 1;
+}
+
+.mobile-card-title {
+  font-family: var(--font-display);
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.mobile-card-desc {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: #374151;
+  margin: 0;
 }
 
 /* ==========================================================================
@@ -1954,23 +2191,38 @@ body {
    ========================================================================== */
 @media (max-width: 1024px) {
   .paper-landing-grid {
-    grid-template-columns: 1fr;
-    gap: 40px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+    width: 100%;
   }
 
   .paper-hero-left {
-    max-width: 620px;
+    max-width: 100%;
     margin: 0 auto;
+    width: 100%;
   }
 
-  .phone-3d-stage-container,
-  .phone-3d-wrapper {
-    height: 580px;
-    min-height: 580px;
+  .paper-hero-right {
+    max-width: 100%;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .detective-doodle-img {
+    width: 125px;
+  }
+
+  .detective-speech-bubble {
+    max-width: 140px;
+    padding: 5px 10px;
+  }
+
+  .speech-quote {
+    font-size: 0.72rem;
   }
 
   .audit-main-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 32px;
   }
 
@@ -1988,33 +2240,90 @@ body {
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 860px) {
+  .paper-landing-grid {
+    gap: 24px;
+    width: 100%;
+  }
+
   .clean-hero-title {
-    font-size: 2.2rem;
+    font-size: clamp(1.9rem, 6.5vw, 2.5rem);
   }
 
-  .phone-3d-stage-container,
-  .phone-3d-wrapper {
-    height: 500px;
-    min-height: 500px;
+  .phone-3d-stage-container {
+    height: auto;
+    min-height: 0;
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
-  .scribble-note-item {
-    max-width: 170px;
+  .phone-3d-root.is-mobile-view {
+    height: auto;
+    min-height: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .phone-3d-root.is-mobile-view .phone-canvas-stage {
+    height: clamp(320px, 44vh, 380px);
+    width: 100%;
+    max-width: min(340px, 92vw);
+    margin: 0 auto;
+  }
+
+  /* Hide floating fixed cartoon doodle on mobile screens to prevent blocking dropzone and content */
+  .detective-doodle-wrapper {
+    display: none !important;
+  }
+
+  .clean-dropzone-canvas {
+    min-height: 155px;
+    padding: 18px 14px;
   }
 }
 
 @media (max-width: 640px) {
   .paper-header {
-    padding: 14px 18px;
+    padding: 12px 14px;
+  }
+
+  .paper-top-bar {
+    padding-bottom: 8px;
+  }
+
+  .creator-subtle-text {
+    font-size: 0.72rem;
   }
 
   .paper-main-content {
-    padding: 24px 18px 48px;
+    padding: 16px 14px 28px;
+  }
+
+  .bottom-dock-wrapper {
+    width: calc(100% + 28px);
+    margin-left: -14px;
+    margin-right: -14px;
+    padding: 10px 14px 14px;
+  }
+
+  .case-marquee-title {
+    font-size: 0.78rem;
+  }
+
+  .clean-sample-row {
+    gap: 6px;
+  }
+
+  .clean-sample-chip {
+    font-size: 0.76rem;
+    padding: 4px 10px;
   }
 
   .audit-report-container {
-    padding: 6px 8px 48px;
+    padding: 4px 4px 36px;
   }
 
   .audit-top-nav {
@@ -2033,7 +2342,7 @@ body {
   }
 
   .audit-screen-img {
-    max-height: 400px;
+    max-height: 380px;
   }
 }
 
