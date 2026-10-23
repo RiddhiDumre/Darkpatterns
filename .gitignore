@@ -29,3 +29,4 @@ launch-prod/full_render_work/
 launch-prod/snaps/
 launch-prod/*.wav
 
+.vercel

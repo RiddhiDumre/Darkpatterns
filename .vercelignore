@@ -1,0 +1,19 @@
+# Ignored by Vercel deployment uploads
+node_modules
+dist
+.env
+.env.local
+.git
+.github
+.agent
+.impeccable
+.shots
+scripts
+brag-output*
+launch-prod
+deliver
+*.mp4
+*.mov
+*.wav
+*.aiff
+*.log
