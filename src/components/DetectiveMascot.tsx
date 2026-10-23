@@ -12,6 +12,7 @@ const HOME_QUOTES = [
   '"Visual hierarchy engineered to pickpocket you with a smile."',
   '"Look at that neon primary button vs the invisible cancel link."',
   '"A subscription hidden inside an order? Caught red-handed."',
+  '"Feel free to drag these post-its around... redecorate my crime scene!"',
 ]
 
 const AUDIT_QUOTES = [

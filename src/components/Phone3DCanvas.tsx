@@ -67,6 +67,20 @@ export function Phone3DCanvas({
 
   const [projectedPoints, setProjectedPoints] = useState<ProjectedPoint[]>([])
   const [isMobile, setIsMobile] = useState(false)
+  const [dragPositions, setDragPositions] = useState<Record<string, { x: number; y: number }>>({})
+  const [activeDragId, setActiveDragId] = useState<string | null>(null)
+  const [stuckNoteId, setStuckNoteId] = useState<string | null>(null)
+
+  // Tracking pointer drag state for desktop & iPad
+  const dragInfoRef = useRef<{
+    id: string
+    pointerId: number
+    startX: number
+    startY: number
+    originX: number
+    originY: number
+    hasMoved: boolean
+  } | null>(null)
 
   // Resting orientation (subtle natural angle, no bobbing)
   const baseRotX = 0.04
@@ -441,6 +455,21 @@ export function Phone3DCanvas({
         setIsMobile(isMob)
         if (showOverlay) {
           setProjectedPoints(computeProjections(newW, newH, isMob))
+          setDragPositions((prev) => {
+            let changed = false
+            const updated: Record<string, { x: number; y: number }> = {}
+            for (const [id, pos] of Object.entries(prev)) {
+              const clampedX = Math.max(4, Math.min(newW - 195, pos.x))
+              const clampedY = Math.max(4, Math.min(newH - 95, pos.y))
+              if (clampedX !== pos.x || clampedY !== pos.y) {
+                changed = true
+                updated[id] = { x: clampedX, y: clampedY }
+              } else {
+                updated[id] = pos
+              }
+            }
+            return changed ? updated : prev
+          })
         }
         renderer.render(scene, camera)
       })
@@ -497,6 +526,119 @@ export function Phone3DCanvas({
     }
   }, [findings, showOverlay, computeProjections])
 
+  // Pointer Drag Handlers for Interactive Post-Its on Desktop & iPad
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>, pt: ProjectedPoint) => {
+      if (e.button !== 0) return
+
+      e.stopPropagation()
+      const target = e.currentTarget
+      try {
+        target.setPointerCapture(e.pointerId)
+      } catch {}
+
+      const currentPos = dragPositions[pt.id] || { x: pt.noteX, y: pt.targetY }
+
+      dragInfoRef.current = {
+        id: pt.id,
+        pointerId: e.pointerId,
+        startX: e.clientX,
+        startY: e.clientY,
+        originX: currentPos.x,
+        originY: currentPos.y,
+        hasMoved: false,
+      }
+    },
+    [dragPositions],
+  )
+
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>, pt: ProjectedPoint) => {
+      const drag = dragInfoRef.current
+      if (!drag || drag.id !== pt.id || drag.pointerId !== e.pointerId) return
+
+      const deltaX = e.clientX - drag.startX
+      const deltaY = e.clientY - drag.startY
+
+      if (!drag.hasMoved) {
+        if (Math.hypot(deltaX, deltaY) > 4) {
+          drag.hasMoved = true
+          setActiveDragId(pt.id)
+          onActivate(pt.id)
+        } else {
+          return
+        }
+      }
+
+      let nextX = drag.originX + deltaX
+      let nextY = drag.originY + deltaY
+
+      if (stageRef.current) {
+        const stageW = stageRef.current.clientWidth
+        const stageH = stageRef.current.clientHeight
+        const noteW = 185
+        const noteH = 95
+        nextX = Math.max(-10, Math.min(stageW - noteW + 10, nextX))
+        nextY = Math.max(-10, Math.min(stageH - noteH + 10, nextY))
+      }
+
+      setDragPositions((prev) => ({
+        ...prev,
+        [pt.id]: {
+          x: Math.round(nextX),
+          y: Math.round(nextY),
+        },
+      }))
+    },
+    [onActivate],
+  )
+
+  const handlePointerUp = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>, pt: ProjectedPoint) => {
+      const drag = dragInfoRef.current
+      if (!drag || drag.id !== pt.id) return
+
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId)
+      } catch {}
+
+      if (drag.hasMoved) {
+        setActiveDragId(null)
+        setStuckNoteId(pt.id)
+        setTimeout(() => {
+          setStuckNoteId((curr) => (curr === pt.id ? null : curr))
+        }, 550)
+      } else {
+        onActivate(pt.id)
+      }
+
+      dragInfoRef.current = null
+    },
+    [onActivate],
+  )
+
+  const handlePointerCancel = useCallback((e: React.PointerEvent<HTMLDivElement>, pt: ProjectedPoint) => {
+    if (dragInfoRef.current && dragInfoRef.current.id === pt.id) {
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId)
+      } catch {}
+      setActiveDragId(null)
+      dragInfoRef.current = null
+    }
+  }, [])
+
+  const handleDoubleClick = useCallback((id: string) => {
+    setDragPositions((prev) => {
+      const copy = { ...prev }
+      delete copy[id]
+      return copy
+    })
+    setStuckNoteId(id)
+    setTimeout(() => {
+      setStuckNoteId((curr) => (curr === id ? null : curr))
+    }, 550)
+  }, [])
+
   return (
     <div className={`phone-3d-root${isMobile ? ' is-mobile-view' : ''}`} ref={containerRef}>
       {/* 3D Phone Stage */}
@@ -507,23 +649,35 @@ export function Phone3DCanvas({
           aria-label="3D model of iPhone displaying specimen checkout screen"
         />
 
-        {/* DESKTOP VIEW: SVG Hand-Drawn Curved Arrows */}
+        {/* DESKTOP & TABLET VIEW: SVG Hand-Drawn Curved Arrows Following Notes */}
         {!isMobile && showOverlay && (
           <svg className="phone-scribble-svg-overlay" aria-hidden="true">
             {projectedPoints.map((pt) => {
-              const isRight = pt.side === 'right'
               const isActive = activeId === pt.id
+              const isDragging = activeDragId === pt.id
+
+              const pos = dragPositions[pt.id]
+              const currentX = pos ? pos.x : pt.noteX
+              const currentY = pos ? pos.y : pt.targetY
 
               const noteWidth = 185
-              const arrowStartX = isRight ? pt.noteX - 4 : pt.noteX + noteWidth + 4
-              const arrowStartY = pt.targetY + 30
+              const noteHeight = 90
+              const noteCenterX = currentX + noteWidth / 2
+              const isRight = noteCenterX >= pt.pinX
+
+              const arrowStartX = isRight ? currentX - 4 : currentX + noteWidth + 4
+              const arrowStartY = Math.max(currentY + 16, Math.min(currentY + noteHeight - 16, currentY + 30))
               const arrowEndX = pt.pinX
               const arrowEndY = pt.pinY
 
               const dx = arrowEndX - arrowStartX
               const dy = arrowEndY - arrowStartY
+              const dist = Math.hypot(dx, dy)
 
-              const archOffset = isRight ? (pt.indexNum === 1 ? -24 : 18) : (pt.indexNum === 2 ? -20 : 16)
+              const archSign = isRight ? -1 : 1
+              const archMagnitude = Math.min(36, Math.max(12, dist * 0.15))
+              const archOffset = archSign * archMagnitude
+
               const c1x = arrowStartX + dx * 0.35 + (isRight ? -12 : 12)
               const c1y = arrowStartY + dy * 0.2 + archOffset
               const c2x = arrowStartX + dx * 0.75
@@ -531,7 +685,7 @@ export function Phone3DCanvas({
 
               const tangentX = arrowEndX - c2x
               const tangentY = arrowEndY - c2y
-              const angle = Math.atan2(tangentY, tangentX)
+              const angle = dist > 15 ? Math.atan2(tangentY, tangentX) : Math.atan2(dy || 1, dx || 1)
 
               const headLength = 14
               const barb1Angle = angle - Math.PI + 0.52
@@ -545,7 +699,7 @@ export function Phone3DCanvas({
               return (
                 <g
                   key={pt.id}
-                  className={`scribble-note-group${isActive ? ' is-active' : ''}`}
+                  className={`scribble-note-group${isActive ? ' is-active' : ''}${isDragging ? ' is-dragging' : ''}`}
                   onClick={() => onActivate(pt.id)}
                   style={{ cursor: 'pointer' }}
                 >
@@ -553,7 +707,7 @@ export function Phone3DCanvas({
                     d={`M ${arrowStartX} ${arrowStartY} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${arrowEndX} ${arrowEndY}`}
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth={isActive ? 3.4 : 2.6}
+                    strokeWidth={isActive || isDragging ? 3.4 : 2.6}
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     className="scribble-arrow-path"
@@ -562,7 +716,7 @@ export function Phone3DCanvas({
                     d={`M ${barb1X} ${barb1Y} Q ${(arrowEndX + barb1X) / 2} ${(arrowEndY + barb1Y) / 2 - 1} ${arrowEndX} ${arrowEndY} Q ${(arrowEndX + barb2X) / 2} ${(arrowEndY + barb2Y) / 2 + 1} ${barb2X} ${barb2Y}`}
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth={isActive ? 3.4 : 2.6}
+                    strokeWidth={isActive || isDragging ? 3.4 : 2.6}
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     className="scribble-arrow-head"
@@ -573,31 +727,46 @@ export function Phone3DCanvas({
           </svg>
         )}
 
-        {/* DESKTOP VIEW: Floating Handwritten Post-It Notes */}
+        {/* DESKTOP & TABLET VIEW: Floating Handwritten Post-It Notes (Draggable & Sticky) */}
         {!isMobile && showOverlay && (
           <div className="phone-scribble-notes-layer" aria-label="Dark pattern handwritten notes">
             {projectedPoints.map((pt) => {
               const isActive = activeId === pt.id
+              const isDragging = activeDragId === pt.id
+              const isStuck = stuckNoteId === pt.id
+
+              const pos = dragPositions[pt.id]
+              const currentX = pos ? pos.x : pt.noteX
+              const currentY = pos ? pos.y : pt.targetY
 
               return (
                 <div
                   key={pt.id}
-                  className={`scribble-note-item post-it-note side-${pt.side}${isActive ? ' is-active' : ''}`}
+                  className={`scribble-note-item post-it-note side-${pt.side}${isActive ? ' is-active' : ''}${
+                    isDragging ? ' is-dragging' : ''
+                  }${isStuck ? ' is-stuck' : ''}`}
                   style={{
-                    top: `${pt.targetY}px`,
-                    left: `${pt.noteX}px`,
+                    top: `${currentY}px`,
+                    left: `${currentX}px`,
                   }}
-                  onClick={() => onActivate(pt.id)}
-                  onMouseEnter={() => onActivate(pt.id)}
+                  onPointerDown={(e) => handlePointerDown(e, pt)}
+                  onPointerMove={(e) => handlePointerMove(e, pt)}
+                  onPointerUp={(e) => handlePointerUp(e, pt)}
+                  onPointerCancel={(e) => handlePointerCancel(e, pt)}
+                  onDoubleClick={() => handleDoubleClick(pt.id)}
+                  onMouseEnter={() => {
+                    if (!activeDragId) onActivate(pt.id)
+                  }}
                   role="button"
                   tabIndex={0}
+                  title="Drag anywhere & stick! (Double-click to snap back)"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                       e.preventDefault()
                       onActivate(pt.id)
                     }
                   }}
-                  aria-label={`Note ${pt.indexNum}: ${pt.patternTitle} — ${pt.explanationText}`}
+                  aria-label={`Note ${pt.indexNum}: ${pt.patternTitle} — ${pt.explanationText}. Draggable post-it note.`}
                 >
                   <div className="post-it-tape" aria-hidden="true" />
                   <span className="scribble-top-number">{pt.indexNum}</span>
