@@ -577,7 +577,6 @@ export function Phone3DCanvas({
         {!isMobile && showOverlay && (
           <div className="phone-scribble-notes-layer" aria-label="Dark pattern handwritten notes">
             {projectedPoints.map((pt) => {
-              const isRight = pt.side === 'right'
               const isActive = activeId === pt.id
 
               return (
