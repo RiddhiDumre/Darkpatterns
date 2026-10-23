@@ -298,21 +298,20 @@ function sanitizeAnalysis(raw: unknown): Analysis {
 
 const app = new Hono()
 
-app.get('/api/health', (c) =>
+const healthHandler = (c: any) =>
   c.json({
     ok: true,
     configured: Boolean(process.env.GOOGLE_API_KEY?.trim()),
     model: getModel(),
-  }),
-)
+  })
 
-app.post('/api/analyze', async (c) => {
+const analyzeHandler = async (c: any) => {
   const apiKey = process.env.GOOGLE_API_KEY?.trim()
   if (!apiKey) {
     return jsonError(
       503,
       'missing_api_key',
-      'The server has no GOOGLE_API_KEY configured. Copy .env.example to .env, add a key from https://aistudio.google.com/apikey and restart the dev server.',
+      'The server has no GOOGLE_API_KEY configured. Set GOOGLE_API_KEY in your environment variables.',
     )
   }
 
@@ -353,7 +352,13 @@ app.post('/api/analyze', async (c) => {
   }
 
   return c.json(sanitizeAnalysis(raw))
-})
+}
+
+app.get('/api', (c) => c.json({ ok: true, name: 'Dark Pattern Detector API' }))
+app.get('/api/health', healthHandler)
+app.get('/health', healthHandler)
+app.post('/api/analyze', analyzeHandler)
+app.post('/analyze', analyzeHandler)
 
 app.onError((err, _c) => {
   console.error('[api] unhandled error:', err)
