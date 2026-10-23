@@ -5,6 +5,7 @@ import { Phone3DCanvas } from './components/Phone3DCanvas'
 import { CaseStudyMarquee } from './components/CaseStudyMarquee'
 import { AnalysisLoadingOverlay } from './components/AnalysisLoadingOverlay'
 import { AuditReportView } from './components/AuditReportView'
+import { DetectiveMascot } from './components/DetectiveMascot'
 import { FEATURED_HERO_ANALYSIS } from './data/featuredFindings'
 
 type AppStatus = 'idle' | 'analyzing' | 'error'
@@ -261,26 +262,12 @@ export default function App() {
           />
         )}
 
-        {/* Detective Doodle inspecting for evidence:
-            - On Home View: bottom-right peeking over the marquee looking at 3D phone
-            - On After-Upload View: bottom-left and flipped looking right at the screenshot */}
+        {/* Detective Doodle inspecting for evidence with dynamic commentary */}
         {status === 'idle' && (
-          <div
-            className={`detective-doodle-wrapper${isCustomUpload ? ' audit-mode' : ''}`}
-            aria-hidden="true"
-          >
-            <div className="detective-speech-bubble">
-              <span className="speech-quote">
-                "Aha! Look at this sneakiness right here..."
-              </span>
-              <div className="speech-bubble-tail" />
-            </div>
-            <img
-              src="/detective-doodle.png"
-              alt="Detective cartoon looking for dark pattern evidence with magnifying glass"
-              className="detective-doodle-img"
-            />
-          </div>
+          <DetectiveMascot
+            isAuditMode={isCustomUpload}
+            activePattern={activeId ? currentAnalysis.findings.find((f) => f.id === activeId)?.pattern : null}
+          />
         )}
 
         {/* Real Dark-Pattern Hall of Shame Marquee Ticker - ONLY on Home View, hidden in Custom Upload */}

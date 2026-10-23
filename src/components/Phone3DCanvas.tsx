@@ -113,9 +113,12 @@ export function Phone3DCanvas({
     }
   }, [])
 
-  // Check if viewport is mobile/tablet stacked mode or stage width is narrow
+  // Only pure mobile screens (< 640px) switch to mobile view.
+  // Tablets (e.g. 768px, 820px, 1024px) and desktops preserve the original floating post-it notes and curved arrows.
   const isMobileLayout = useCallback((stageW: number) => {
-    if (typeof window !== 'undefined' && window.innerWidth <= 1024) return true
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 640
+    }
     return stageW < 560
   }, [])
 
@@ -511,7 +514,8 @@ export function Phone3DCanvas({
               const isRight = pt.side === 'right'
               const isActive = activeId === pt.id
 
-              const arrowStartX = isRight ? pt.noteX - 4 : pt.noteX + 4
+              const noteWidth = 185
+              const arrowStartX = isRight ? pt.noteX - 4 : pt.noteX + noteWidth + 4
               const arrowStartY = pt.targetY + 30
               const arrowEndX = pt.pinX
               const arrowEndY = pt.pinY
@@ -582,10 +586,7 @@ export function Phone3DCanvas({
                   className={`scribble-note-item post-it-note side-${pt.side}${isActive ? ' is-active' : ''}`}
                   style={{
                     top: `${pt.targetY}px`,
-                    left: isRight ? `${pt.noteX}px` : undefined,
-                    right: !isRight
-                      ? `${stageRef.current ? Math.max(12, stageRef.current.clientWidth - pt.noteX) : 340}px`
-                      : undefined,
+                    left: `${pt.noteX}px`,
                   }}
                   onClick={() => onActivate(pt.id)}
                   onMouseEnter={() => onActivate(pt.id)}
