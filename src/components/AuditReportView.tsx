@@ -36,7 +36,7 @@ export function AuditReportView({
       </div>
 
       <div className="audit-main-grid">
-        {/* LEFT COLUMN: Clean, Large, Legible Uploaded Screenshot */}
+        {/* LEFT COLUMN: Clean, Large, Legible Uploaded Screenshot with Interactive Bounding Boxes */}
         <div className="audit-image-left">
           <div className="audit-image-stage">
             <div className="audit-image-frame">
@@ -45,6 +45,33 @@ export function AuditReportView({
                 alt={fileName || 'Audited screenshot'}
                 className="audit-screen-img"
               />
+
+              {/* Forensic Bounding Box Highlights */}
+              {analysis.findings?.map((finding, idx) => {
+                if (!finding.bbox) return null
+                const isActive = currentActive === finding.id
+
+                return (
+                  <button
+                    key={finding.id}
+                    type="button"
+                    className={`audit-screen-pin${isActive ? ' is-active' : ''} sev-${finding.severity}`}
+                    style={{
+                      left: `${finding.bbox.x}%`,
+                      top: `${finding.bbox.y}%`,
+                      width: `${finding.bbox.w}%`,
+                      height: `${finding.bbox.h}%`,
+                    }}
+                    onClick={() => onActivate(finding.id)}
+                    onMouseEnter={() => setHoveredId(finding.id)}
+                    onMouseLeave={() => setHoveredId(null)}
+                    aria-label={`Finding ${idx + 1}: ${finding.pattern}`}
+                  >
+                    <span className="audit-screen-pin-badge">{idx + 1}</span>
+                    <span className="audit-screen-pin-title">{finding.pattern}</span>
+                  </button>
+                )
+              })}
             </div>
           </div>
         </div>

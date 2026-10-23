@@ -2177,6 +2177,72 @@ body {
   user-select: none;
 }
 
+/* Interactive Audit Screen Pin */
+.audit-screen-pin {
+  position: absolute;
+  border-radius: 6px;
+  border: 2px dashed rgba(225, 29, 72, 0.7);
+  background: rgba(225, 29, 72, 0.08);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 0;
+  box-sizing: border-box;
+  z-index: 10;
+}
+
+.audit-screen-pin:hover,
+.audit-screen-pin.is-active {
+  border: 2.5px solid #e11d48;
+  background: rgba(225, 29, 72, 0.18);
+  box-shadow: 0 0 0 4px rgba(225, 29, 72, 0.2), 0 8px 18px rgba(0, 0, 0, 0.15);
+  z-index: 25;
+  transform: scale(1.02);
+}
+
+.audit-screen-pin-badge {
+  position: absolute;
+  top: -11px;
+  left: -9px;
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  background: #e11d48;
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.audit-screen-pin-title {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  background: #1e293b;
+  color: #f8fafc;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+.audit-screen-pin:hover .audit-screen-pin-title,
+.audit-screen-pin.is-active .audit-screen-pin-title {
+  display: block;
+}
+
 .audit-sketch-overlay {
   position: absolute;
   inset: 0;
