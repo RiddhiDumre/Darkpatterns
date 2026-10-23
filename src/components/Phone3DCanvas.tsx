@@ -635,17 +635,16 @@ export function Phone3DCanvas({
         )}
       </div>
 
-      {/* MOBILE VIEW: Clean Touch-Friendly Forensic Dossier Tray Below Phone */}
+      {/* MOBILE VIEW: Clean 2x2 Grid of Detected Traps Below Phone */}
       {isMobile && showOverlay && projectedPoints.length > 0 && (
         <div className="mobile-findings-tray" aria-label="Detected deceptive patterns">
           <div className="mobile-findings-tray-header">
             <span className="mobile-findings-pill">
               {projectedPoints.length} TRAPS DETECTED
             </span>
-            <span className="mobile-findings-hint">Tap a card to pinpoint on screen</span>
           </div>
 
-          <div className="mobile-findings-carousel">
+          <div className="mobile-findings-grid">
             {projectedPoints.map((pt) => {
               const isActive = activeId === pt.id
               return (

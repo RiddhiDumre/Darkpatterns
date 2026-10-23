@@ -1357,8 +1357,8 @@ body {
 .mobile-findings-tray-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 4px;
+  justify-content: flex-start;
+  padding: 0 2px 2px;
 }
 
 .mobile-findings-pill {
@@ -1373,36 +1373,29 @@ body {
   border: 1px solid rgba(185, 28, 28, 0.2);
 }
 
-.mobile-findings-hint {
-  font-size: 0.75rem;
-  color: #6b7280;
-  font-weight: 500;
-}
-
-.mobile-findings-carousel {
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  padding: 4px 2px 14px 2px;
-  -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x mandatory;
+.mobile-findings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
 }
 
 .mobile-finding-card {
-  flex: 0 0 min(270px, 80vw);
-  scroll-snap-align: start;
-  padding: 13px 15px;
-  border-radius: 8px;
+  width: 100%;
+  padding: 9px 10px 10px;
+  border-radius: 6px;
   background: #fef9c3;
-  border-bottom: 3px solid #fde047;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-bottom: 2.5px solid #fde047;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   cursor: pointer;
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
   user-select: none;
   text-align: left;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .mobile-finding-card:nth-child(1) {
